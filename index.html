@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Manager</title>
+<style>
+/*───────────────────────────── RESET & BASE ─────────────────────────────*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#f3f4f8;color:#333;min-height:100vh;
+  padding-bottom:72px;
+}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit;font-size:.95rem}
+::placeholder{color:#bbb;font-style:italic;font-weight:400;font-size:.85rem}
+::-webkit-input-placeholder{color:#bbb;font-style:italic;font-weight:400;font-size:.85rem}
+::-moz-placeholder{color:#bbb;font-style:italic;font-weight:400;font-size:.85rem;opacity:1}
+
+/*───────────────────────────── HEADER ─────────────────────────────*/
+.header{
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:#fff;padding:16px 16px 12px;
+  box-shadow:0 2px 12px rgba(102,126,234,.35);
+  position:sticky;top:0;z-index:100;
+}
+.header h1{font-size:1.25rem;font-weight:700;letter-spacing:.3px}
+.header .subtitle{font-size:.75rem;opacity:.8;margin-top:2px}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.lang-toggle{
+  background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);
+  border-radius:10px;padding:6px 10px;font-size:1.3rem;cursor:pointer;
+  transition:all .2s;line-height:1;
+}
+.lang-toggle:hover{background:rgba(255,255,255,.35)}
+
+/*───────────────────────────── TAB BAR ─────────────────────────────*/
+.tab-bar{
+  display:flex;background:#fff;
+  border-bottom:1px solid #e0e0e0;
+  position:sticky;top:56px;z-index:99;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.tab-btn{
+  flex:1;padding:12px 4px 10px;border:none;background:none;
+  font-size:.82rem;font-weight:600;color:#888;
+  border-bottom:3px solid transparent;
+  transition:all .2s;
+}
+.tab-btn.active{color:#667eea;border-bottom-color:#667eea}
+.tab-btn:hover{color:#764ba2}
+
+/*───────────────────────────── DATE BANNER ─────────────────────────────*/
+.date-banner{
+  position:sticky;top:97px;z-index:98;
+  background:linear-gradient(135deg,#f8f9fc 0%,#eef0f7 100%);
+  border-bottom:1px solid #ddd;
+  text-align:center;padding:6px 12px;
+  font-size:.85rem;font-weight:700;color:#4a4a6a;
+  letter-spacing:.3px;
+}
+.date-banner .day-relative{
+  display:inline-block;background:#667eea;color:#fff;
+  border-radius:6px;padding:1px 8px;font-size:.72rem;font-weight:600;
+  margin-left:6px;vertical-align:middle;
+}
+
+/*───────────────────────────── CONTAINERS ─────────────────────────────*/
+.tab-content{display:none;padding:12px;max-width:960px;margin:0 auto}
+.tab-content.active{display:block}
+
+/*───────────────────────────── DATE NAV ─────────────────────────────*/
+.date-nav{
+  display:flex;align-items:center;gap:8px;
+  background:#fff;border-radius:12px;padding:8px 10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:10px;
+  justify-content:center;
+}
+.date-nav button{
+  border:none;background:#667eea;color:#fff;
+  border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:600;
+  transition:background .2s;white-space:nowrap;
+}
+.date-nav button:hover{background:#764ba2}
+.date-nav input[type="date"]{
+  border:1px solid #ddd;border-radius:8px;padding:6px 8px;
+  font-size:.82rem;color:#444;
+}
+
+/*───────────────────────────── FILTER ROW ─────────────────────────────*/
+.filter-row{
+  display:flex;gap:6px;align-items:center;
+  margin-bottom:12px;flex-wrap:wrap;
+}
+.pill{
+  border:none;border-radius:20px;padding:6px 14px;font-size:.75rem;
+  font-weight:600;background:#e8eaf6;color:#555;
+  transition:all .2s;white-space:nowrap;
+}
+.pill.active{background:#667eea;color:#fff}
+.pill:hover{opacity:.85}
+.filter-agent{
+  margin-left:auto;border:1px solid #ddd;border-radius:8px;
+  padding:6px 10px;font-size:.8rem;background:#fff;color:#444;
+}
+
+/*───────────────────────────── STATUS BADGES ─────────────────────────────*/
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:12px;
+  font-size:.72rem;font-weight:700;white-space:nowrap;
+}
+.badge-pending{background:#fff9c4;color:#b8860b}
+.badge-ok{background:#c8e6c9;color:#2e7d32}
+.badge-retour{background:#ffe0b2;color:#e65100}
+.badge-cancelled{background:#ffcdd2;color:#c62828}
+.badge-rescheduled{background:#e1bee7;color:#6a1b9a}
+
+.badge-cash{background:#e0e0e0;color:#555}
+.badge-prepaid{background:#c8e6c9;color:#2e7d32}
+.badge-colis{background:#bbdefb;color:#1565c0}
+.badge-mobile_delivery{background:#e1bee7;color:#6a1b9a}
+.badge-exchange{background:#fff3e0;color:#e65100}
+
+/*───────────────────────────── ORDER CARDS ─────────────────────────────*/
+.order-card{
+  background:#fff;border:1px solid #e8e8e8;border-radius:14px;
+  padding:14px 16px;margin-bottom:10px;
+  box-shadow:0 1px 6px rgba(0,0,0,.05);
+  transition:box-shadow .2s;
+}
+.order-card:hover{box-shadow:0 3px 14px rgba(0,0,0,.1)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.card-title{display:flex;align-items:center;gap:8px;min-width:0}
+.card-client{font-weight:700;font-size:1.05rem;color:#333}
+.card-copy-btn{
+  border:none;background:#eef1ff;color:#667eea;border-radius:999px;
+  width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:.95rem;line-height:1;flex:0 0 auto;transition:background .2s,color .2s,transform .2s;
+}
+.card-copy-btn:hover{background:#dbe2ff;color:#4a5fd0;transform:translateY(-1px)}
+.card-copy-btn:active{transform:translateY(0)}
+.card-badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.card-body{font-size:.85rem;color:#555;line-height:1.65}
+.card-body a{color:#667eea;text-decoration:none;font-weight:600}
+.card-body a:hover{text-decoration:underline}
+.card-row{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.card-label{color:#999;font-size:.76rem;min-width:65px;font-weight:600}
+.card-value{color:#444}
+.card-price{font-weight:700;color:#667eea;font-size:1rem}
+.card-page{
+  margin-top:6px;
+}
+.card-page-text{
+  font-size:.72rem;letter-spacing:.15px;
+  color:var(--page-text,#8b90a8);
+}
+.page-font-sans .card-page-text{font-family:'Segoe UI',system-ui,sans-serif}
+.page-font-serif .card-page-text{font-family:Georgia,'Times New Roman',serif}
+.page-font-mono .card-page-text{font-family:Consolas,'Courier New',monospace}
+.card-footer{
+  display:flex;gap:6px;align-items:center;margin-top:10px;
+  padding-top:10px;border-top:1px solid #f0f0f0;flex-wrap:wrap;
+}
+.card-footer select{
+  border:1px solid #ddd;border-radius:8px;padding:5px 8px;
+  font-size:.78rem;background:#fff;color:#444;
+}
+.btn-sm{
+  border:none;border-radius:8px;padding:6px 14px;font-size:.76rem;
+  font-weight:600;transition:all .2s;
+}
+.btn-edit{background:#e8eaf6;color:#667eea}
+.btn-edit:hover{background:#c5cae9}
+.btn-delete{background:#ffebee;color:#c62828}
+.btn-delete:hover{background:#ffcdd2}
+.btn-call{background:#e8f5e9;color:#2e7d32;text-decoration:none;display:inline-block}
+.btn-sms{background:#e3f2fd;color:#1565c0;text-decoration:none;display:inline-block}
+.btn-sms:hover{background:#bbdefb}
+.btn-sm:disabled,.btn-sm.is-disabled{opacity:.55;cursor:not-allowed}
+
+/*───────────────────────────── SEARCH BAR ─────────────────────────────*/
+.search-bar{
+  display:flex;gap:6px;align-items:center;
+  margin-bottom:10px;
+}
+.search-bar input{
+  flex:1;border:1.5px solid #ddd;border-radius:10px;
+  padding:9px 12px 9px 34px;font-size:.88rem;color:#333;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat 10px center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-bar input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.15)}
+.search-clear{
+  border:none;background:#e8eaf6;color:#667eea;
+  border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:600;
+  white-space:nowrap;transition:background .2s;
+}
+.search-clear:hover{background:#c5cae9}
+
+/*───────────────────────────── UNDO/REDO BAR ─────────────────────────────*/
+.undo-redo-bar{
+  display:flex;gap:6px;align-items:center;
+  margin-bottom:10px;
+}
+.undo-redo-bar button{
+  border:1.5px solid #ddd;background:#fff;color:#555;
+  border-radius:8px;padding:7px 14px;font-size:.8rem;font-weight:600;
+  transition:all .2s;display:flex;align-items:center;gap:4px;
+}
+.undo-redo-bar button:hover:not(:disabled){border-color:#667eea;color:#667eea}
+.undo-redo-bar button:disabled{opacity:.35;cursor:not-allowed}
+.undo-redo-bar .undo-icon{font-size:1rem}
+
+/*───────────────────────────── ORDER COUNT ─────────────────────────────*/
+.order-count{
+  font-size:.82rem;color:#888;margin-bottom:10px;font-weight:600;
+}
+
+/*───────────────────────────── EMPTY STATE ─────────────────────────────*/
+.empty-state{
+  text-align:center;padding:48px 20px;color:#aaa;
+}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:1rem}
+
+/*───────────────────────────── FORM ─────────────────────────────*/
+.form-card{
+  background:#fff;border-radius:14px;padding:20px 18px;
+  box-shadow:0 1px 6px rgba(0,0,0,.06);
+}
+.form-title{font-size:1.15rem;font-weight:700;color:#444;margin-bottom:16px}
+.form-group{margin-bottom:14px}
+.form-group label{
+  display:block;font-size:.78rem;font-weight:700;color:#888;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;
+}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;border:1.5px solid #ddd;border-radius:10px;
+  padding:10px 12px;font-size:.92rem;color:#333;
+  transition:border-color .2s,box-shadow .2s;background:#fff;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:#667eea;
+  box-shadow:0 0 0 3px rgba(102,126,234,.15);
+}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group .hint{font-size:.72rem;color:#aaa;margin-top:3px}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+
+.toggle-group{display:flex;gap:6px;flex-wrap:wrap}
+.toggle-btn{
+  border:1.5px solid #ddd;border-radius:10px;padding:8px 16px;
+  font-size:.82rem;font-weight:600;background:#fff;color:#666;
+  transition:all .2s;
+}
+.toggle-btn.active{
+  background:#667eea;color:#fff;border-color:#667eea;
+}
+.toggle-btn:hover:not(.active){border-color:#667eea;color:#667eea}
+
+.btn-submit{
+  width:100%;padding:13px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:#fff;font-size:1rem;font-weight:700;
+  margin-top:6px;transition:opacity .2s;
+  letter-spacing:.3px;
+}
+.btn-submit:hover{opacity:.9}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+
+.btn-cancel-edit{
+  width:100%;padding:11px;border:1.5px solid #ddd;border-radius:12px;
+  background:#fff;color:#888;font-size:.9rem;font-weight:600;
+  margin-top:8px;transition:all .2s;
+}
+.btn-cancel-edit:hover{border-color:#c62828;color:#c62828}
+
+.date-input-wrap{display:flex;gap:6px}
+.date-input-wrap input[type="text"]{flex:1}
+.date-input-wrap input[type="date"]{width:44px;padding:8px 4px;min-width:44px}
+
+/*───────────────────────────── PRICE PREVIEW ─────────────────────────────*/
+.price-preview{margin-top:8px}
+.price-lines{background:#f8f9fc;border:1px solid #e8e8ee;border-radius:10px;padding:10px 12px;font-size:.82rem}
+.price-line{display:flex;justify-content:space-between;padding:3px 0;color:#555}
+.price-line.fee-line{border-top:1px dashed #ddd;margin-top:4px;padding-top:6px;color:#888}
+.price-total{display:flex;justify-content:space-between;padding:6px 0 2px;border-top:2px solid #667eea;margin-top:4px;font-weight:700;color:#667eea;font-size:.92rem}
+
+/*───────────────────────────── SUBTYPES ─────────────────────────────*/
+.subtype-section{margin-top:10px;background:#f5f0fa;border:1px solid #d4b8e8;border-radius:10px;padding:10px 12px}
+.subtype-header{font-size:.82rem;font-weight:700;color:#8e44ad;margin-bottom:6px}
+.subtype-product{margin-bottom:8px}
+.subtype-product-label{font-size:.78rem;font-weight:600;color:#6c3483;margin-bottom:4px}
+.subtype-input{width:100%;padding:6px 10px;border:1px solid #d4b8e8;border-radius:8px;font-size:.82rem;box-sizing:border-box}
+.subtype-input:focus{border-color:#8e44ad;outline:none;box-shadow:0 0 0 2px rgba(142,68,173,.15)}
+.subtype-hint{font-size:.72rem;color:#888;margin-top:2px}
+.subtype-preview{font-size:.75rem;margin-top:3px;font-weight:600}
+.subtype-preview.ok{color:#27ae60}
+.subtype-preview.warn{color:#e67e22}
+.subtype-preview.err{color:#e74c3c}
+.card-subtypes{font-size:.78rem;color:#8e44ad;font-weight:600;margin-top:2px;font-style:italic}
+
+/*───────────────────────────── DASHBOARD ─────────────────────────────*/
+.stats-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;
+}
+.stat-card{
+  background:#fff;border-radius:12px;padding:14px;
+  box-shadow:0 1px 5px rgba(0,0,0,.06);text-align:center;
+}
+.stat-card .stat-value{font-size:1.5rem;font-weight:800;color:#667eea}
+.stat-card .stat-label{font-size:.72rem;font-weight:600;color:#999;margin-top:2px;text-transform:uppercase}
+
+.financial-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;
+}
+.fin-card{
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  border-radius:12px;padding:14px;text-align:center;color:#fff;
+}
+.fin-card .fin-value{font-size:1.25rem;font-weight:800}
+.fin-card .fin-label{font-size:.7rem;font-weight:600;opacity:.85;margin-top:2px;text-transform:uppercase}
+
+.section-title{
+  font-size:.85rem;font-weight:700;color:#888;text-transform:uppercase;
+  letter-spacing:.5px;margin:16px 0 8px;
+}
+
+.products-table{
+  width:100%;background:#fff;border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 5px rgba(0,0,0,.06);
+  border-collapse:collapse;
+}
+.products-table th{
+  background:#f5f5f7;font-size:.72rem;font-weight:700;color:#888;
+  text-transform:uppercase;padding:10px 8px;text-align:left;
+  letter-spacing:.5px;
+}
+.products-table td{
+  padding:10px 8px;font-size:.85rem;color:#444;border-top:1px solid #f0f0f0;
+}
+.products-table tr:hover td{background:#fafbff}
+
+/*───────────────────────────── TOAST ─────────────────────────────*/
+.toast-container{
+  position:fixed;top:12px;right:12px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  background:#333;color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:.85rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);
+  pointer-events:auto;animation:toastIn .3s ease;
+  max-width:340px;
+}
+.toast.success{background:#2e7d32}
+.toast.error{background:#c62828}
+.toast.removing{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+
+/*───────────────────────────── LOADING ─────────────────────────────*/
+.spinner{
+  display:inline-block;width:18px;height:18px;
+  border:2.5px solid #ddd;border-top-color:#667eea;
+  border-radius:50%;animation:spin .6s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.loading-overlay{
+  text-align:center;padding:32px;color:#aaa;font-size:.9rem;
+}
+
+/*───────────────────────────── MODAL ─────────────────────────────*/
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;animation:fadeIn .2s;
+}
+.modal{
+  background:#fff;border-radius:16px;padding:24px 20px;
+  width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);
+}
+.modal h3{font-size:1.05rem;margin-bottom:14px;color:#444}
+.modal input,.modal select{
+  width:100%;border:1.5px solid #ddd;border-radius:10px;
+  padding:10px 12px;font-size:.92rem;margin-bottom:12px;
+}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.modal-actions button{
+  padding:8px 20px;border-radius:10px;font-size:.85rem;font-weight:600;border:none;
+}
+.modal-actions .btn-confirm{background:#667eea;color:#fff}
+.modal-actions .btn-modal-cancel{background:#eee;color:#666}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/*───────────────────────────── FAB (Floating Action Button) ─────────────────────────────*/
+.fab{
+  position:fixed;bottom:24px;right:20px;z-index:98;
+  width:58px;height:58px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:#fff;font-size:2rem;font-weight:300;line-height:1;
+  box-shadow:0 4px 16px rgba(102,126,234,.45);
+  cursor:pointer;transition:transform .2s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.fab:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(102,126,234,.55)}
+.fab:active{transform:scale(.95)}
+
+/*───────────────────────────── SCROLLBAR ─────────────────────────────*/
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
+/*───────────────────────────── SELECTION BAR ─────────────────────────────*/
+.selection-bar{
+  display:none;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:#fff;border-radius:10px;padding:8px 12px;
+  margin-bottom:10px;flex-wrap:wrap;font-size:.82rem;font-weight:600;
+}
+.selection-bar.visible{display:flex}
+.selection-bar .sel-count{margin-right:auto}
+.selection-bar button{
+  border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);
+  color:#fff;border-radius:8px;padding:5px 12px;font-size:.76rem;
+  font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.selection-bar button:hover{background:rgba(255,255,255,.3)}
+
+/*───────────────────────────── SORT ROW ─────────────────────────────*/
+.sort-row{
+  display:flex;gap:5px;align-items:center;
+  margin-bottom:10px;flex-wrap:wrap;
+}
+.sort-label{font-size:.76rem;font-weight:700;color:#888;text-transform:uppercase;margin-right:2px}
+.sort-btn{
+  border:1px solid #ddd;border-radius:8px;padding:4px 10px;
+  font-size:.74rem;font-weight:600;background:#fff;color:#666;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.sort-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+.sort-btn:hover:not(.active){border-color:#667eea;color:#667eea}
+.sort-arrow{font-size:.68rem;margin-left:2px}
+
+/*───────────────────────────── EXPORT BAR ─────────────────────────────*/
+.export-bar{
+  display:flex;gap:6px;align-items:center;
+  margin-bottom:10px;flex-wrap:wrap;
+}
+.export-label{font-size:.76rem;font-weight:700;color:#888;text-transform:uppercase;margin-right:2px}
+.export-btn{
+  border:1.5px solid #667eea;border-radius:8px;padding:5px 12px;
+  font-size:.76rem;font-weight:600;background:#fff;color:#667eea;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.export-btn:hover{background:#667eea;color:#fff}
+
+/*───────────────────────────── CHECKBOX ON CARDS ─────────────────────────────*/
+.order-card{position:relative}
+.card-checkbox{
+  position:absolute;top:14px;left:10px;
+  width:18px;height:18px;cursor:pointer;accent-color:#667eea;
+  z-index:2;
+}
+.order-card.selected{border-color:#667eea;box-shadow:0 0 0 2px rgba(102,126,234,.25)}
+.order-card.has-checkbox{padding-left:38px}
+
+/*───────────────────────────── DESKTOP ─────────────────────────────*/
+@media(min-width:768px){
+  html{font-size:15px}
+  body{padding-bottom:24px}
+  .header{padding:18px 24px 14px}
+  .header h1{font-size:1.4rem}
+  .tab-bar{max-width:960px;margin:0 auto;border-radius:0 0 12px 12px}
+  .tab-btn{padding:14px 8px 12px;font-size:.88rem}
+  .tab-content{padding:16px 20px}
+  .date-nav{padding:10px 16px}
+  .orders-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px;
+  }
+  .orders-grid .order-card{margin-bottom:0}
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
+  .financial-grid{grid-template-columns:repeat(4,1fr)}
+  .form-card{max-width:600px;margin:0 auto}
+}
+@media(min-width:1024px){
+  .stats-grid{grid-template-columns:repeat(6,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <h1>Gestionnaire de Livraison</h1>
+      <div class="subtitle">Gestion des Commandes</div>
+    </div>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">🇬🇧</button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="orders" onclick="switchTab('orders')">Commandes</button>
+  <button class="tab-btn" data-tab="form" onclick="switchTab('form')">Nouvelle</button>
+  <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')">Tableau de bord</button>
+</div>
+
+<!-- DATE BANNER (always visible, sticky) -->
+<div class="date-banner" id="dateBanner">--</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- FAB: New Order -->
+<button class="fab" id="fabNewOrder" onclick="cancelEdit();switchTab('form')" title="Nouvelle commande">+</button>
+
+<!-- MODAL CONTAINER -->
+<div id="modalContainer"></div>
+
+<!-- ═══════════════════ TAB 1: ORDERS ═══════════════════ -->
+<div class="tab-content active" id="tabOrders">
+  <!-- Date Nav -->
+  <div class="date-nav">
+    <button onclick="prevDate()" title="Previous day">&larr; Pr&eacute;c</button>
+    <input type="date" id="orderDatePicker" onchange="pickDate(this.value)">
+    <button onclick="nextDate()">Suiv &rarr;</button>
+    <button onclick="goToday()" style="background:#43a047">Aujourd'hui</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-row" id="filterRow">
+    <button class="pill active" data-status="" onclick="filterStatus(this,'')">Tous</button>
+    <button class="pill" data-status="Pending" onclick="filterStatus(this,'Pending')">En attente</button>
+    <button class="pill" data-status="Ok" onclick="filterStatus(this,'Ok')">Ok</button>
+    <button class="pill" data-status="Ok with retour" onclick="filterStatus(this,'Ok with retour')">Retour</button>
+    <button class="pill" data-status="Cancelled" onclick="filterStatus(this,'Cancelled')">Annul&eacute;</button>
+    <button class="pill" data-status="Rescheduled" onclick="filterStatus(this,'Rescheduled')">Report&eacute;</button>
+    <select class="filter-agent" id="filterAgent" onchange="filterByAgent()">
+      <option value="">Tous les agents</option>
+    </select>
+    <select class="filter-agent" id="filterPayment" onchange="filterByPayment()">
+      <option value="">Tous les paiements</option>
+      <option value="cash">Normal</option>
+      <option value="prepaid">Pay&eacute;</option>
+      <option value="colis">Colis</option>
+      <option value="mobile_delivery">Mobile Money</option>
+      <option value="exchange">&Eacute;change</option>
+    </select>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Rechercher..." oninput="doSearch()">
+    <button class="search-clear" onclick="clearSearch()">X</button>
+  </div>
+
+  <!-- Undo/Redo -->
+  <div class="undo-redo-bar">
+    <button id="btnUndo" disabled onclick="doUndo()"><span class="undo-icon">&#8630;</span> <span id="undoLabel">Annuler</span></button>
+    <button id="btnRedo" disabled onclick="doRedo()"><span class="undo-icon">&#8631;</span> <span id="redoLabel">R&eacute;tablir</span></button>
+  </div>
+
+  <!-- Selection bar (shown when checkboxes are selected) -->
+  <div class="selection-bar" id="selectionBar">
+    <span class="sel-count" id="selCount" data-t="sel_count">0 selected</span>
+    <button onclick="selectAllOrders()" id="btnSelAll" data-t="sel_all">Select All</button>
+    <button onclick="deselectAllOrders()" id="btnDeselAll" data-t="sel_none">Deselect All</button>
+    <button onclick="exportSelectedLabels()" id="btnExpSelLabels" data-t="sel_exp_labels">Labels</button>
+    <button onclick="exportSelectedBon()" id="btnExpSelBon" data-t="sel_exp_bon">Bon</button>
+  </div>
+
+  <!-- Sort row -->
+  <div class="sort-row">
+    <span class="sort-label" id="sortLabel" data-t="sort_label">Sort:</span>
+    <button class="sort-btn" data-sort="client_name" onclick="toggleSort('client_name')" data-t="sort_name">Name</button>
+    <button class="sort-btn" data-sort="status" onclick="toggleSort('status')" data-t="sort_status">Status</button>
+    <button class="sort-btn" data-sort="agent" onclick="toggleSort('agent')" data-t="sort_agent">Agent</button>
+    <button class="sort-btn" data-sort="total_price" onclick="toggleSort('total_price')" data-t="sort_price">Price</button>
+    <button class="sort-btn" data-sort="delivery_fee" onclick="toggleSort('delivery_fee')" data-t="sort_fee">Fee</button>
+  </div>
+
+  <!-- Export bar -->
+  <div class="export-bar">
+    <span class="export-label" id="exportLabel" data-t="export_label">Export:</span>
+    <button class="export-btn" onclick="exportAllLabels()" data-t="export_labels">Labels</button>
+    <button class="export-btn" onclick="exportAllBon()" data-t="export_bon">Bon d'Enl&egrave;vement</button>
+    <button class="export-btn" onclick="exportAllReport()" data-t="export_report">Report</button>
+  </div>
+
+  <!-- Order count -->
+  <div class="order-count" id="orderCount"></div>
+
+  <!-- Order list -->
+  <div id="ordersList"></div>
+</div>
+
+<!-- ═══════════════════ TAB 2: FORM ═══════════════════ -->
+<div class="tab-content" id="tabForm">
+  <div class="form-card">
+    <div class="form-title" id="formTitle">Nouvelle</div>
+
+    <form id="orderForm" onsubmit="submitOrder(event)">
+      <input type="hidden" id="editIid" value="">
+
+      <div class="form-group">
+        <label>Date de livraison</label>
+        <div class="date-input-wrap">
+          <input type="text" id="fDeliveryDate" placeholder='demain, mardi, 25/03, etc.'>
+          <input type="date" id="fDeliveryDatePicker" title="Pick a date" onchange="document.getElementById('fDeliveryDate').value=this.value">
+        </div>
+        <div class="hint">Accepte: "demain", "mardi", "25/03", ou AAAA-MM-JJ</div>
+      </div>
+
+      <div class="form-group">
+        <label>Nom du client *</label>
+        <input type="text" id="fClientName" required placeholder="Marie R" onblur="this.value=capitalizeName(this.value)">
+      </div>
+
+      <div class="form-group">
+        <label>T&eacute;l&eacute;phone *</label>
+        <input type="tel" id="fPhone" required placeholder="034 12 345 67" onblur="this.value=formatPhone(this.value)">
+      </div>
+
+      <div class="form-group">
+        <label>Adresse</label>
+        <input type="text" id="fAddress" placeholder="Lot 123 Ambohijatovo" onblur="this.value=capitalizeName(this.value)">
+      </div>
+
+      <div class="form-group">
+        <label>Produits *</label>
+        <input type="text" id="fProducts" required placeholder="CA x2, CG x1" oninput="debouncePricePreview()" onblur="this.value=this.value.toUpperCase()">
+        <div class="hint">Ex: CA x2, CG x1 ou CA CG TA</div>
+        <div id="pricePreview" class="price-preview"></div>
+        <div id="subtypeSelection"></div>
+      </div>
+
+      <div class="form-group" id="pageSelectGroup" style="display:none">
+        <label id="lPageSelect">Page</label>
+        <select id="fPage"><option value="">--</option></select>
+        <div class="hint" id="hPageSelect">Ce produit appartient &agrave; plusieurs pages, veuillez choisir</div>
+      </div>
+
+      <div class="form-group" id="exchangeProductsGroup" style="display:none">
+        <label id="lExchangeProducts">Produits &agrave; r&eacute;cup&eacute;rer</label>
+        <input type="text" id="fExchangeProducts" placeholder="Ex: CA x1, CG x2" onblur="this.value=this.value.toUpperCase()">
+        <div class="hint" id="hExchangeProducts">Produits que l'agent doit r&eacute;cup&eacute;rer du client</div>
+      </div>
+
+      <div class="form-group" id="exchangeDirectionGroup" style="display:none">
+        <label id="lExchangeDirection">Direction</label>
+        <div class="toggle-group" id="exchangeDirectionToggles">
+          <button type="button" class="toggle-btn active" data-value="client_pays" onclick="setExchangeDirection(this,'client_pays')">Client doit payer</button>
+          <button type="button" class="toggle-btn" data-value="we_pay" onclick="setExchangeDirection(this,'we_pay')">On doit au client</button>
+          <button type="button" class="toggle-btn" data-value="even" onclick="setExchangeDirection(this,'even')">&Eacute;gal (0 Ar)</button>
+        </div>
+      </div>
+
+      <div class="form-group" id="exchangeAmountGroup" style="display:none">
+        <label id="lExchangeAmount">Montant</label>
+        <input type="number" id="fExchangeAmount" placeholder="Montant en Ar" min="0" step="100" oninput="updateExchangeTotal()">
+        <div class="hint" id="hExchangeAmount">Montant que le client doit payer ou recevoir</div>
+      </div>
+
+      <div class="form-group">
+        <label>Frais de livraison</label>
+        <div class="toggle-group" id="feeToggles"></div>
+      </div>
+
+      <div class="form-group">
+        <label id="lTotalPrice">Total (modifiable)</label>
+        <input type="number" id="fTotalPrice" placeholder="Auto-calcul&eacute;" min="0" step="100" oninput="this.dataset.manual=this.value?'1':''">
+        <div class="hint" id="hTotalPrice">Laissez vide pour le calcul automatique, ou saisissez un montant n&eacute;goci&eacute;</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Agent</label>
+          <select id="fAgent"><option value="">-- Choisir --</option></select>
+        </div>
+        <div class="form-group">
+          <label>Mode de paiement</label>
+          <div class="toggle-group" id="paymentToggles"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="fNotes" placeholder="Notes optionnelles..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">Cr&eacute;er la commande</button>
+      <button type="button" class="btn-cancel-edit" id="btnCancelEdit" style="display:none" onclick="cancelEdit()">Annuler</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════ TAB 3: DASHBOARD ═══════════════════ -->
+<div class="tab-content" id="tabDashboard">
+  <div class="date-nav" style="margin-bottom:16px">
+    <button onclick="prevDateDash()">&larr; Pr&eacute;c</button>
+    <input type="date" id="dashDatePicker" onchange="pickDateDash(this.value)">
+    <button onclick="nextDateDash()">Suiv &rarr;</button>
+    <button onclick="goTodayDash()" style="background:#43a047">Aujourd'hui</button>
+  </div>
+
+  <div class="section-title">Statistiques des commandes</div>
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="section-title">R&eacute;sum&eacute; financier</div>
+  <div class="financial-grid" id="financialGrid"></div>
+
+  <div class="section-title">D&eacute;tail des produits</div>
+  <div id="productsTableWrap"></div>
+</div>
+
+<script>
+/* ═════════════════════════════════════════════════════════════════════
+   i18n – LANGUAGE SYSTEM
+   ═════════════════════════════════════════════════════════════════════ */
+const LANG = {
+  current: localStorage.getItem('delivery_lang') || 'fr',
+
+  translations: {
+    // Header
+    app_title: { fr: 'Gestionnaire de Livraison', en: 'Delivery Manager' },
+    app_subtitle: { fr: 'Gestion des Commandes', en: 'Order Management System' },
+
+    // Tabs
+    tab_orders: { fr: 'Commandes', en: 'Orders' },
+    tab_new_order: { fr: 'Nouvelle', en: 'New Order' },
+    tab_edit_order: { fr: 'Modifier', en: 'Edit Order' },
+    tab_dashboard: { fr: 'Tableau de bord', en: 'Dashboard' },
+
+    // Date nav
+    prev: { fr: 'Pr\u00e9c', en: 'Prev' },
+    next: { fr: 'Suiv', en: 'Next' },
+    today: { fr: "Aujourd'hui", en: 'Today' },
+    yesterday: { fr: 'Hier', en: 'Yesterday' },
+    tomorrow: { fr: 'Demain', en: 'Tomorrow' },
+    day_names_fr: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+    day_names_en: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    month_names_fr: ['janvier','f\u00e9vrier','mars','avril','mai','juin','juillet','ao\u00fbt','septembre','octobre','novembre','d\u00e9cembre'],
+    month_names_en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+
+    // Filters
+    all: { fr: 'Tous', en: 'All' },
+    all_agents: { fr: 'Tous les agents', en: 'All Agents' },
+
+    // Status
+    pending: { fr: 'En attente', en: 'Pending' },
+    ok: { fr: 'Ok', en: 'Ok' },
+    retour: { fr: 'Retour', en: 'Retour' },
+    cancelled: { fr: 'Annul\u00e9', en: 'Cancelled' },
+    rescheduled: { fr: 'Report\u00e9', en: 'Rescheduled' },
+    prod_new: { fr: 'Nouveau', en: 'New' },
+    prod_rescheduled: { fr: 'Report\u00e9', en: 'Rescheduled' },
+    prod_to_ship: { fr: '\u00c0 livrer (new/total)', en: 'To Ship (new/total)' },
+    prod_breakdown: { fr: 'D\u00e9tail par statut', en: 'Status Breakdown' },
+    ok_with_retour: { fr: 'Ok avec retour', en: 'Ok with retour' },
+
+    // Order card labels
+    phone: { fr: 'T\u00e9l', en: 'Phone' },
+    address: { fr: 'Adresse', en: 'Address' },
+    products: { fr: 'Produits', en: 'Products' },
+    total: { fr: 'Total', en: 'Total' },
+    delivery_fee: { fr: 'Frais livraison', en: 'Fee' },
+    agent: { fr: 'Agent', en: 'Agent' },
+    collected: { fr: 'Collect\u00e9', en: 'Collected' },
+    revenue: { fr: 'Revenu', en: 'Revenue' },
+    notes: { fr: 'Notes', en: 'Notes' },
+
+    // Card actions
+    edit: { fr: 'Modifier', en: 'Edit' },
+    call: { fr: 'Appeler', en: 'Call' },
+    sms: { fr: 'Message', en: 'Message' },
+    delete: { fr: 'Supprimer', en: 'Delete' },
+
+    // Order count
+    orders_count: { fr: 'commande(s)', en: 'order(s)' },
+
+    // Empty state
+    no_orders: { fr: 'Aucune commande pour cette date', en: 'No orders for this date' },
+
+    // Form labels
+    delivery_date: { fr: 'Date de livraison', en: 'Delivery Date' },
+    date_hint: { fr: 'Accepte: "demain", "mardi", "25/03", ou AAAA-MM-JJ', en: 'Accepts: "demain", "mardi", "25/03", or YYYY-MM-DD' },
+    client_name: { fr: 'Nom du client *', en: 'Client Name *' },
+    phone_label: { fr: 'T\u00e9l\u00e9phone *', en: 'Phone *' },
+    address_label: { fr: 'Adresse', en: 'Address' },
+    products_label: { fr: 'Produits *', en: 'Products *' },
+    products_hint: { fr: 'Ex: CA x2, CG x1 ou CA CG TA', en: 'Ex: CA x2, CG x1 or CA CG TA' },
+    delivery_fee_label: { fr: 'Frais de livraison', en: 'Delivery Fee' },
+    total_price_label: { fr: 'Total (modifiable)', en: 'Total (editable)' },
+    page_label: { fr: 'Page', en: 'Page' },
+    page_hint: { fr: 'Ce produit appartient à plusieurs pages, veuillez choisir', en: 'This product belongs to multiple pages, please choose' },
+    page_select_default: { fr: '-- Choisir la page --', en: '-- Choose page --' },
+    copied_name: { fr: 'Nom copie', en: 'Name copied' },
+    copied_order: { fr: 'Details de la commande copies', en: 'Order details copied' },
+    total_price_hint: { fr: 'Laissez vide pour le calcul automatique, ou saisissez un montant n\u00e9goci\u00e9', en: 'Leave empty for auto-calculation, or enter a negotiated amount' },
+    total_price_placeholder: { fr: 'Auto-calcul\u00e9', en: 'Auto-calculated' },
+    agent_label: { fr: 'Agent', en: 'Agent' },
+    payment_method: { fr: 'Mode de paiement', en: 'Payment Method' },
+    pm_cash: { fr: 'Normal', en: 'Cash' },
+    pm_prepaid: { fr: 'Pay\u00e9', en: 'Prepaid' },
+    pm_colis: { fr: 'Colis', en: 'Colis' },
+    pm_mobile_delivery: { fr: 'Mobile Money', en: 'Mobile' },
+    pm_exchange: { fr: '\u00c9change', en: 'Exchange' },
+    exchange_products_label: { fr: 'Produits \u00e0 r\u00e9cup\u00e9rer', en: 'Products to Collect' },
+    exchange_products_hint: { fr: 'Produits que l\'agent doit r\u00e9cup\u00e9rer du client', en: 'Products the agent must collect from the client' },
+    exchange_products_placeholder: { fr: 'Ex: CA x1, CG x2', en: 'Ex: CA x1, CG x2' },
+    exchange_deliver: { fr: 'Livrer', en: 'Deliver' },
+    exchange_collect: { fr: 'R\u00e9cup\u00e9rer', en: 'Collect' },
+    exchange_direction: { fr: 'Direction', en: 'Direction' },
+    exchange_client_pays: { fr: 'Client doit payer', en: 'Client pays' },
+    exchange_we_pay: { fr: 'On doit au client', en: 'We pay client' },
+    exchange_even: { fr: '\u00c9gal (0 Ar)', en: 'Even (0 Ar)' },
+    exchange_amount: { fr: 'Montant', en: 'Amount' },
+    exchange_amount_hint: { fr: 'Montant que le client doit payer ou recevoir', en: 'Amount the client must pay or receive' },
+    all_payments: { fr: 'Tous les paiements', en: 'All Payments' },
+    notes_label: { fr: 'Notes', en: 'Notes' },
+    notes_placeholder: { fr: 'Notes optionnelles...', en: 'Optional notes...' },
+    select_agent: { fr: '-- Choisir --', en: '-- Select --' },
+
+    // Subtypes
+    subtypes: { fr: 'Sous-types', en: 'Subtypes' },
+    subtypes_hint: { fr: 'Ex: Vanille x1, Fraise x2', en: 'Ex: Vanille x1, Fraise x2' },
+    subtypes_mismatch: { fr: 'Les quantit\u00e9s de sous-types doivent correspondre \u00e0 la quantit\u00e9 du produit', en: 'Subtype quantities must match product quantity' },
+
+    // Form buttons
+    create_order: { fr: 'Cr\u00e9er la commande', en: 'Create Order' },
+    update_order: { fr: 'Modifier la commande', en: 'Update Order' },
+    cancel_edit: { fr: 'Annuler', en: 'Cancel Edit' },
+    creating: { fr: 'Cr\u00e9ation...', en: 'Creating...' },
+    updating: { fr: 'Mise \u00e0 jour...', en: 'Updating...' },
+
+    // Dashboard
+    order_statistics: { fr: 'Statistiques des commandes', en: 'Order Statistics' },
+    financial_summary: { fr: 'R\u00e9sum\u00e9 financier', en: 'Financial Summary' },
+    products_breakdown: { fr: 'D\u00e9tail des produits', en: 'Products Breakdown' },
+    expected_revenue: { fr: 'Revenu pr\u00e9vu', en: 'Expected Revenue' },
+    agent_payments: { fr: 'Paiements agents', en: 'Agent Payments' },
+    company_revenue: { fr: 'Revenu entreprise', en: 'Company Revenue' },
+    code: { fr: 'Code', en: 'Code' },
+    delivered: { fr: 'Livr\u00e9', en: 'Delivered' },
+    no_product_data: { fr: 'Aucune donn\u00e9e produit', en: 'No product data' },
+
+    // Modals
+    amount_collected: { fr: 'Montant collect\u00e9', en: 'Amount Collected' },
+    amount_prompt: { fr: 'Entrez le montant collect\u00e9 aupr\u00e8s du client:', en: 'Enter amount collected from the client:' },
+    amount_placeholder: { fr: 'Montant en Ar', en: 'Amount in Ar' },
+    invalid_amount: { fr: 'Montant invalide', en: 'Invalid amount' },
+    reschedule_order: { fr: 'Reporter la commande', en: 'Reschedule Order' },
+    reschedule_prompt: { fr: 'S\u00e9lectionnez une nouvelle date de livraison:', en: 'Select new delivery date:' },
+    select_date: { fr: 'Veuillez s\u00e9lectionner une date', en: 'Please select a date' },
+    delete_order: { fr: 'Supprimer la commande', en: 'Delete Order' },
+    delete_confirm: { fr: '\u00cates-vous s\u00fbr de vouloir supprimer la commande de', en: 'Are you sure you want to delete the order for' },
+    cannot_undo: { fr: '? Cette action est irr\u00e9versible.', en: '? This cannot be undone.' },
+    confirm: { fr: 'Confirmer', en: 'Confirm' },
+    cancel: { fr: 'Annuler', en: 'Cancel' },
+
+    // Toasts
+    status_updated: { fr: 'Statut mis \u00e0 jour:', en: 'Status updated to' },
+    order_deleted: { fr: 'Commande supprim\u00e9e', en: 'Order deleted' },
+    order_updated: { fr: 'Commande modifi\u00e9e avec succ\u00e8s', en: 'Order updated successfully' },
+    order_created: { fr: 'Commande cr\u00e9\u00e9e avec succ\u00e8s', en: 'Order created successfully' },
+    order_not_found: { fr: 'Commande introuvable', en: 'Order not found' },
+    error_prefix: { fr: 'Erreur:', en: 'Error:' },
+
+    // Loading
+    loading_orders: { fr: 'Chargement des commandes...', en: 'Loading orders...' },
+    loading_stats: { fr: 'Chargement des statistiques...', en: 'Loading stats...' },
+    failed_stats: { fr: '\u00c9chec du chargement', en: 'Failed to load stats' },
+
+    // Price preview
+    prepaid: { fr: 'Pr\u00e9pay\u00e9', en: 'Prepaid' },
+
+    // New order FAB title
+    new_order: { fr: 'Nouvelle commande', en: 'New Order' },
+
+    // Search
+    search_placeholder: { fr: 'Rechercher...', en: 'Search...' },
+
+    // Undo/Redo
+    undo: { fr: 'Annuler', en: 'Undo' },
+    redo: { fr: 'R\u00e9tablir', en: 'Redo' },
+    nothing_to_undo: { fr: 'Rien \u00e0 annuler', en: 'Nothing to undo' },
+    nothing_to_redo: { fr: 'Rien \u00e0 r\u00e9tablir', en: 'Nothing to redo' },
+    undone: { fr: 'Annul\u00e9', en: 'Undone' },
+    redone: { fr: 'R\u00e9tabli', en: 'Redone' },
+
+    // Selection bar
+    sel_count_suffix: { fr: 's\u00e9lectionn\u00e9(s)', en: 'selected' },
+    sel_all: { fr: 'Tout s\u00e9lect.', en: 'Select All' },
+    sel_none: { fr: 'D\u00e9s\u00e9lect.', en: 'Deselect All' },
+    sel_exp_labels: { fr: '\u00c9tiquettes', en: 'Labels' },
+    sel_exp_bon: { fr: 'Bon', en: 'Bon' },
+    no_selection: { fr: 'Aucune commande s\u00e9lectionn\u00e9e', en: 'No orders selected' },
+    export_success: { fr: 'PDF export\u00e9 avec succ\u00e8s', en: 'PDF exported successfully' },
+
+    // Sort row
+    sort_label: { fr: 'Trier:', en: 'Sort:' },
+    sort_name: { fr: 'Nom', en: 'Name' },
+    sort_status: { fr: 'Statut', en: 'Status' },
+    sort_agent: { fr: 'Agent', en: 'Agent' },
+    sort_price: { fr: 'Prix', en: 'Price' },
+    sort_fee: { fr: 'Frais', en: 'Fee' },
+
+    // Export bar
+    export_label: { fr: 'Exporter:', en: 'Export:' },
+    export_labels: { fr: '\u00c9tiquettes', en: 'Labels' },
+    export_bon: { fr: "Bon d'Enl\u00e8vement", en: "Bon d'Enl\u00e8vement" },
+    export_report: { fr: 'Rapport', en: 'Report' },
+  }
+};
+
+function T(key) {
+  const entry = LANG.translations[key];
+  if (!entry) return key;
+  return entry[LANG.current] || entry['en'] || key;
+}
+
+function setLanguage(lang) {
+  LANG.current = lang;
+  localStorage.setItem('delivery_lang', lang);
+  applyLanguage();
+}
+
+function toggleLanguage() {
+  setLanguage(LANG.current === 'fr' ? 'en' : 'fr');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   STATE
+   ═════════════════════════════════════════════════════════════════════ */
+const state = {
+  currentDate: '',
+  dashDate: '',
+  orders: [],
+  agents: [],
+  products: [],
+  pages: [],
+  paymentMethods: {},
+  paymentDefault: 'cash',
+  deliveryFees: ['3000','4000','5000'],
+  activeTab: 'orders',
+  editingOrder: null,
+  filterStatus: '',
+  filterAgent: '',
+  filterPayment: '',
+  searchQuery: '',
+  refreshTimer: null,
+  ordersLoading: false,
+  statsLoading: false,
+  orderHoldTimer: null,
+  orderHoldSource: '',
+  selectedOrders: new Set(),
+  subtypeDrafts: {},
+  sortField: '',
+  sortAsc: true
+};
+
+/* ═════════════════════════════════════════════════════════════════════
+   API
+   ═════════════════════════════════════════════════════════════════════ */
+const API = {
+  base: window.location.origin,
+  firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
+  firebaseOrdersPath: '/orders',
+  staticHost: (function() {
+    const params = new URLSearchParams(window.location.search);
+    const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
+    if (forced === 'local') return false;
+    if (forced === 'firebase') return true;
+    const host = window.location.hostname.toLowerCase();
+    if (!host || window.location.origin === 'null') return true;
+    return /(^|\.)github\.io$|(^|\.)pages\.dev$|(^|\.)netlify\.app$|(^|\.)vercel\.app$|(^|\.)web\.app$|(^|\.)firebaseapp\.com$|(^|\.)surge\.sh$/.test(host);
+  })(),
+  staticProducts: [
+    {code:'CA',name:'Creme Affinante',price:25000,subtypes:[]},
+    {code:'TA',name:'Tisane Affinante',price:15000,subtypes:[]},
+    {code:'CG',name:'Creme Galbante',price:25000,subtypes:[]},
+    {code:'SG',name:'SAVON GALBANT',price:15000,subtypes:[]},
+    {code:'BASE',name:'Base de Savon',price:50,subtypes:[]},
+    {code:'G',name:'Gaine',price:10000,subtypes:[]},
+    {code:'GM',name:'Creme Miracle 40g',price:20000,subtypes:[]},
+    {code:'PM',name:'Creme Miracle 15g',price:10000,subtypes:[]},
+    {code:'SM',name:'Savon Miracle',price:15000,subtypes:[]},
+    {code:'SN',name:'Savon Noir',price:15000,subtypes:[]},
+    {code:'SS',name:'Shampooing Solide',price:10000,subtypes:[]},
+    {code:'MLQ',name:'moule 15000',price:15000,subtypes:[]},
+    {code:'MLV',name:'moule 20000',price:20000,subtypes:[]},
+    {code:'MLVC',name:'moule 25000',price:25000,subtypes:[]},
+    {code:'MLT',name:'moule 30000',price:30000,subtypes:[]},
+    {code:'CN',name:'Creme Neutre',price:130,subtypes:[]},
+    {code:'CSV',name:'Creme Special Vergetures',price:20000,subtypes:[]},
+    {code:'CBB',name:'Creme Bye Bye Vergetures',price:20000,subtypes:[]},
+    {code:'CE',name:'Creme Eclaircissante',price:25000,subtypes:[]},
+    {code:'VITE',name:'VITAMINE E',price:1500,subtypes:[]},
+    {code:'ROBE',name:'Robe',price:10000,subtypes:[]},
+    {code:'CROP',name:'Top Court',price:8000,subtypes:[]},
+    {code:'CORSET',name:'Corset',price:15000,subtypes:[]},
+    {code:'COL',name:'Colorant',price:5000,subtypes:[]},
+    {code:'PAR',name:'Parfum',price:10000,subtypes:[]},
+    {code:'GC',name:'Graine de courge',price:6000,subtypes:[]},
+    {code:'HRO',name:'Huilde de Romarin',price:80,subtypes:[]},
+    {code:'NAPPE',name:'nappe de table',price:19000,subtypes:[]},
+    {code:'HAK',name:"huile d'akpi",price:80,subtypes:[]},
+    {code:'BALANCE',name:'Balance',price:35000,subtypes:[]},
+    {code:'ENSEMBLE',name:'Ensemble',price:35000,subtypes:['gilet']},
+    {code:'HC',name:'Huile de coco',price:80,subtypes:[]},
+    {code:'COS',name:'Cosgard',price:1000,subtypes:[]},
+    {code:'SHORT',name:'Short',price:20000,subtypes:[]}
+  ],
+  staticPages: [
+    {name:'Traitement naturel',phone:'038 17 890 54',facebook:'Traitement naturel',product_codes:['CBB'],is_default:false,accent_color:'#355C7D',text_color:'#1F2A44',font_style:'sans'},
+    {name:'Louanh Cosmetics',phone:'038 81 804 09',facebook:'Louanh Cosmetics',product_codes:['CSV'],is_default:true,accent_color:'#C06C84',text_color:'#6C3144',font_style:'serif'},
+    {name:'Luna Shop',phone:'038 81 804 09',facebook:'Luna Shop',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#2A9D8F',text_color:'#1E5E55',font_style:'mono'},
+    {name:'Tout Bio MDG',phone:'032 17 890 54',facebook:'Tout Bio MDG',product_codes:['CE'],is_default:false,accent_color:'#E76F51',text_color:'#7A3626',font_style:'sans'},
+    {name:'Elegance Royale',phone:'038 81 804 09',facebook:'Elegance Royale',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#8D6E63',text_color:'#4E342E',font_style:'serif'}
+  ],
+  staticPaymentMethods: {
+    cash: {label:'Cash on Delivery', short:'COD'},
+    prepaid: {label:'Pre-paid (Mobile Money)', short:'Prepaid'},
+    colis: {label:'Colis (Miandry Paiement)', short:'Colis'},
+    mobile_delivery: {label:'Mobile at Delivery', short:'Mobile'},
+    exchange: {label:'Echange', short:'Echange'}
+  },
+
+  isStaticMode() {
+    return this.staticHost;
+  },
+
+  async request(method, path, body) {
+    if (this.isStaticMode() && path.indexOf('/api/export/') === 0) {
+      throw new Error('PDF export requires the desktop Python server.');
+    }
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(this.base + path, opts);
+    if (!r.ok) {
+      let msg = 'Request failed (' + r.status + ')';
+      try { const j = await r.json(); msg = j.error || j.message || msg; } catch(e) {}
+      throw new Error(msg);
+    }
+    return r.json();
+  },
+
+  async fb(method, path, body) {
+    const opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const r = await fetch(this.firebaseBase + path + '.json', opts);
+    if (!r.ok) throw new Error('Firebase request failed (' + r.status + ')');
+    return r.json();
+  },
+
+  productMap() {
+    const map = {};
+    this.staticProducts.forEach(function(p) { map[p.code] = p; });
+    return map;
+  },
+
+  parseProductText(text) {
+    const productMap = this.productMap();
+    const tokens = String(text || '').toUpperCase()
+      .replace(/,/g, ' ').replace(/\+/g, ' ').replace(/X/g, ' X ')
+      .replace(/  +/g, ' ').trim().split(/\s+/).filter(Boolean);
+    const items = [];
+    for (let i = 0; i < tokens.length; i++) {
+      let code = tokens[i];
+      let qty = 1;
+      const inline = code.match(/^([A-Z]+)(\d+)$/);
+      if (inline && productMap[inline[1]]) {
+        code = inline[1];
+        qty = Number(inline[2]) || 1;
+      } else if (!productMap[code]) {
+        continue;
+      } else if (tokens[i + 1] === 'X' && /^\d+$/.test(tokens[i + 2] || '')) {
+        qty = Number(tokens[i + 2]);
+        i += 2;
+      } else if (/^\d+$/.test(tokens[i + 1] || '')) {
+        qty = Number(tokens[i + 1]);
+        i += 1;
+      }
+      const p = productMap[code];
+      items.push({code: code, qty: qty, unit_price: p.price || 0, total: qty * (p.price || 0)});
+    }
+    return items;
+  },
+
+  normalizePayment(value) {
+    if (value === 'paye') return 'prepaid';
+    if (value === 'non-paye') return 'cash';
+    return value || 'cash';
+  },
+
+  today() {
+    return todayISO();
+  },
+
+  nowStamp() {
+    return new Date().toISOString();
+  },
+
+  makeOrder(data, existing) {
+    const base = existing ? Object.assign({}, existing) : {};
+    const productsText = data.products !== undefined ? data.products : (base.products || '');
+    const deliveryFee = Number(data.delivery_fee !== undefined ? data.delivery_fee : (base.delivery_fee || 3000)) || 0;
+    const payment = this.normalizePayment(data.payment_method || base.payment_method || data.payment || base.payment);
+    const lines = this.parseProductText(productsText);
+    const subtotal = lines.reduce(function(sum, item) { return sum + (Number(item.total) || 0); }, 0);
+    let totalPrice = payment === 'prepaid' ? 0 : subtotal + deliveryFee;
+    let hiddenAmount = payment === 'prepaid' ? subtotal + deliveryFee : 0;
+    if (data.total_price !== undefined && data.total_price !== '') {
+      const manual = Number(data.total_price);
+      if (!isNaN(manual)) {
+        if (payment === 'prepaid') hiddenAmount = manual;
+        else totalPrice = manual;
+      }
+    } else if (base.total_price !== undefined && data.products === undefined && data.delivery_fee === undefined && data.payment_method === undefined) {
+      totalPrice = Number(base.total_price) || totalPrice;
+      hiddenAmount = Number(base.hidden_amount) || hiddenAmount;
+    }
+
+    const status = data.status || base.status || 'Pending';
+    const order = Object.assign(base, {
+      created_at: base.created_at || data.created_at || this.nowStamp(),
+      timestamp: base.timestamp || data.timestamp || this.nowStamp(),
+      delivery_date: data.delivery_date || base.delivery_date || this.today(),
+      client_name: data.client_name !== undefined ? data.client_name : (base.client_name || base.name || ''),
+      name: data.client_name !== undefined ? data.client_name : (base.name || base.client_name || ''),
+      phone: data.phone !== undefined ? data.phone : (base.phone || ''),
+      address: data.address !== undefined ? data.address : (base.address || ''),
+      products: productsText,
+      delivery_fee: deliveryFee,
+      total_price: totalPrice,
+      hidden_amount: hiddenAmount,
+      status: status,
+      agent: data.agent !== undefined ? data.agent : (base.agent || ''),
+      notes: data.notes !== undefined ? data.notes : (base.notes || ''),
+      payment_method: payment,
+      payment: payment === 'prepaid' ? 'paye' : 'non-paye',
+      order_lines: lines,
+      page: data.page !== undefined ? data.page : (base.page || ''),
+      exchange_products: data.exchange_products !== undefined ? data.exchange_products : (base.exchange_products || '')
+    });
+
+    if (data.subtypes) {
+      order.order_lines = lines.map(function(line) {
+        const withSubtype = Object.assign({}, line);
+        if (data.subtypes[line.code]) withSubtype.subtypes = data.subtypes[line.code];
+        return withSubtype;
+      });
+    }
+
+    if (data.amount_collected !== undefined) {
+      order.amount_collected = Number(data.amount_collected) || 0;
+    } else if (order.amount_collected === undefined) {
+      order.amount_collected = status === 'Ok' ? Math.max(totalPrice, hiddenAmount) : 0;
+    }
+    order.agent_payment = Number(order.agent_payment || (status === 'Ok' ? deliveryFee : 0)) || 0;
+    order.company_revenue = Number(order.company_revenue || 0);
+    if (status === 'Ok') {
+      order.company_revenue = Math.max(totalPrice, hiddenAmount) - deliveryFee;
+    } else if (status === 'Ok with retour') {
+      order.company_revenue = Math.max(Number(order.amount_collected) || 0, 0) - deliveryFee;
+    }
+    if (data.new_delivery_date) {
+      order.reschedule_metadata = 'Rescheduled from ' + (base.delivery_date || order.delivery_date);
+      order.delivery_date = data.new_delivery_date;
+    }
+    return order;
+  },
+
+  normalizeOrder(id, raw) {
+    const order = this.makeOrder({
+      delivery_date: raw.delivery_date || raw.date || '',
+      client_name: raw.client_name || raw.name || '',
+      phone: raw.phone || '',
+      address: raw.address || '',
+      products: raw.products || '',
+      delivery_fee: raw.delivery_fee,
+      payment_method: this.normalizePayment(raw.payment_method || raw.payment),
+      total_price: raw.total_price,
+      agent: raw.agent || '',
+      notes: raw.notes || '',
+      page: raw.page || '',
+      exchange_products: raw.exchange_products || ''
+    }, raw || {});
+    order.iid = id;
+    order.resolved_page = order.resolved_page || '';
+    order.resolved_page_style = order.resolved_page_style || {};
+    return order;
+  },
+
+  async getFirebaseOrders() {
+    const data = await this.fb('GET', this.firebaseOrdersPath) || {};
+    const orders = [];
+    Object.keys(data).forEach((id) => {
+      if (data[id]) orders.push(this.normalizeOrder(id, data[id]));
+    });
+    return orders;
+  },
+
+  getOrders(date, status, agent) {
+    if (this.isStaticMode()) {
+      return this.getFirebaseOrders().then(function(orders) {
+        let filtered = orders;
+        if (date) filtered = filtered.filter(function(o) { return o.delivery_date === date; });
+        if (status) filtered = filtered.filter(function(o) { return o.status === status; });
+        if (agent) filtered = filtered.filter(function(o) { return o.agent === agent; });
+        return {orders: filtered, count: filtered.length};
+      });
+    }
+    let q = '/api/orders?date=' + encodeURIComponent(date);
+    if (status) q += '&status=' + encodeURIComponent(status);
+    if (agent) q += '&agent=' + encodeURIComponent(agent);
+    return this.request('GET', q);
+  },
+  getOrder(iid) {
+    if (this.isStaticMode()) {
+      return this.fb('GET', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then((raw) => this.normalizeOrder(iid, raw || {}));
+    }
+    return this.request('GET', '/api/orders/' + encodeURIComponent(iid));
+  },
+  createOrder(data) {
+    if (this.isStaticMode()) {
+      const order = this.makeOrder(data);
+      return this.fb('POST', this.firebaseOrdersPath, order).then((result) => {
+        order.iid = result.name;
+        return {success: true, iid: result.name, order: order};
+      });
+    }
+    return this.request('POST', '/api/orders', data);
+  },
+  updateOrder(iid, data) {
+    if (this.isStaticMode()) {
+      return this.fb('GET', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then((raw) => {
+        const order = this.makeOrder(data, raw || {});
+        return this.fb('PATCH', this.firebaseOrdersPath + '/' + encodeURIComponent(iid), order).then(() => {
+          order.iid = iid;
+          return {success: true, order: order};
+        });
+      });
+    }
+    return this.request('PUT', '/api/orders/' + encodeURIComponent(iid), data);
+  },
+  deleteOrder(iid) {
+    if (this.isStaticMode()) {
+      return this.fb('DELETE', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then(function() {
+        return {success: true};
+      });
+    }
+    return this.request('DELETE', '/api/orders/' + encodeURIComponent(iid));
+  },
+  getAgents() {
+    if (this.isStaticMode()) return Promise.resolve({agents: ['DIARY','MAILAKA','ANTSO','BEN','I-LIVRAISON','SPEED']});
+    return this.request('GET', '/api/agents');
+  },
+  getProducts() {
+    if (this.isStaticMode()) return Promise.resolve({products: this.staticProducts});
+    return this.request('GET', '/api/products');
+  },
+  getStats(date) {
+    if (this.isStaticMode()) {
+      return this.getOrders(date, '', '').then(function(data) {
+        const stats = {total: 0, Pending: 0, Ok: 0, 'Ok with retour': 0, Cancelled: 0, Rescheduled: 0};
+        const financial = {expected: 0, collected: 0, company_revenue: 0, agent_payments: 0, agent_owes: 0};
+        const products = {};
+        data.orders.forEach(function(o) {
+          const st = o.status || 'Pending';
+          stats.total += 1;
+          if (stats[st] !== undefined) stats[st] += 1;
+          if (st !== 'Cancelled') financial.expected += Number(o.total_price || o.hidden_amount || 0);
+          if (st === 'Ok' || st === 'Ok with retour') {
+            financial.collected += Number(o.amount_collected || o.total_price || o.hidden_amount || 0);
+            financial.company_revenue += Number(o.company_revenue || 0);
+            financial.agent_payments += Number(o.agent_payment || 0);
+            financial.agent_owes += Number(o.agent_owes || 0);
+          }
+          (o.order_lines || []).forEach(function(line) {
+            const code = line.code || line.product_code;
+            if (!code) return;
+            if (!products[code]) products[code] = {subtypes: {}};
+            products[code][st] = (products[code][st] || 0) + (Number(line.qty) || 1);
+          });
+        });
+        return {stats: stats, financial: financial, products: products};
+      });
+    }
+    return this.request('GET', '/api/stats?date=' + encodeURIComponent(date));
+  },
+  getDates() {
+    if (this.isStaticMode()) {
+      return this.getFirebaseOrders().then((orders) => {
+        const dates = {};
+        dates[this.today()] = true;
+        orders.forEach(function(o) { if (o.delivery_date) dates[o.delivery_date] = true; });
+        return {dates: Object.keys(dates).sort(), today: this.today()};
+      });
+    }
+    return this.request('GET', '/api/dates');
+  },
+  getDeliveryFees() {
+    if (this.isStaticMode()) return Promise.resolve({fees: ['0','3000','4000','5000']});
+    return this.request('GET', '/api/delivery-fees');
+  },
+  getPaymentMethods() {
+    if (this.isStaticMode()) return Promise.resolve({methods: this.staticPaymentMethods, default: 'cash'});
+    return this.request('GET', '/api/payment-methods');
+  },
+  getPages() {
+    if (this.isStaticMode()) return Promise.resolve({pages: this.staticPages});
+    return this.request('GET', '/api/pages');
+  },
+  getHistory() {
+    if (this.isStaticMode()) return Promise.resolve({can_undo: false, can_redo: false, undo_label: '', redo_label: ''});
+    return this.request('GET', '/api/history');
+  },
+  undo() {
+    if (this.isStaticMode()) return Promise.resolve({success: false, error: 'Undo requires the desktop Python server.'});
+    return this.request('POST', '/api/undo');
+  },
+  redo() {
+    if (this.isStaticMode()) return Promise.resolve({success: false, error: 'Redo requires the desktop Python server.'});
+    return this.request('POST', '/api/redo');
+  }
+};
+
+/* ═════════════════════════════════════════════════════════════════════
+   UTILITIES
+   ═════════════════════════════════════════════════════════════════════ */
+function formatCurrency(val) {
+  if (val === null || val === undefined || val === '') return '0 Ar';
+  const n = Number(val);
+  if (isNaN(n)) return val;
+  const s = Math.round(n).toString();
+  const parts = [];
+  for (let i = s.length; i > 0; i -= 3) {
+    parts.unshift(s.slice(Math.max(0, i - 3), i));
+  }
+  // handle negative
+  let formatted = parts.join(' ');
+  if (n < 0 && formatted[0] !== '-') formatted = '-' + formatted;
+  return formatted + ' Ar';
+}
+
+function displayDate(isoStr) {
+  if (!isoStr) return '--/--/--';
+  const p = isoStr.split('-');
+  if (p.length !== 3) return isoStr;
+  return p[2] + '/' + p[1] + '/' + p[0].slice(2);
+}
+
+function displayDateFull(isoStr) {
+  if (!isoStr) return '--/--/----';
+  const p = isoStr.split('-');
+  if (p.length !== 3) return isoStr;
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function shiftDate(iso, days) {
+  const d = new Date(iso + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function capitalizeName(str) {
+  if (!str) return '';
+  return str.trim().split(/\s+/).map(function(w) {
+    if (w.length === 0) return '';
+    return w[0].toUpperCase() + w.slice(1).toLowerCase();
+  }).join(' ');
+}
+
+function formatPhone(str) {
+  if (!str) return '';
+  var parts = str.split('/');
+  var formatted = [];
+  parts.forEach(function(part) {
+    var clean = part.trim().replace(/[\s\-\(\)]/g, '');
+    // Handle +261 or 261 prefix
+    if (clean.indexOf('+261') === 0) clean = '0' + clean.slice(4);
+    else if (clean.indexOf('261') === 0 && clean.length === 12) clean = '0' + clean.slice(3);
+    // Format 10-digit Madagascar numbers: 034 12 345 67
+    if (clean.length === 10 && clean[0] === '0' && /^\d+$/.test(clean)) {
+      formatted.push(clean.slice(0,3) + ' ' + clean.slice(3,5) + ' ' + clean.slice(5,8) + ' ' + clean.slice(8,10));
+    } else {
+      formatted.push(part.trim());
+    }
+  });
+  return formatted.join(' / ');
+}
+
+function statusClass(s) {
+  if (!s) return '';
+  const lc = s.toLowerCase();
+  if (lc === 'pending') return 'badge-pending';
+  if (lc === 'ok' && s.length === 2) return 'badge-ok';
+  if (lc.includes('retour')) return 'badge-retour';
+  if (lc === 'cancelled') return 'badge-cancelled';
+  if (lc === 'rescheduled') return 'badge-rescheduled';
+  return 'badge-ok';
+}
+
+function paymentClass(pm) {
+  if (!pm) return 'badge-cash';
+  const lc = pm.toLowerCase().replace(/\s+/g, '_');
+  if (lc === 'cash') return 'badge-cash';
+  if (lc === 'prepaid') return 'badge-prepaid';
+  if (lc === 'colis') return 'badge-colis';
+  if (lc === 'mobile_delivery' || lc === 'mobile') return 'badge-mobile_delivery';
+  if (lc === 'exchange') return 'badge-exchange';
+  return 'badge-cash';
+}
+
+function paymentLabel(pm) {
+  if (!pm) return T('pm_cash');
+  const lc = pm.toLowerCase();
+  if (lc === 'cash') return T('pm_cash');
+  if (lc === 'prepaid') return T('pm_prepaid');
+  if (lc === 'colis') return T('pm_colis');
+  if (lc === 'mobile_delivery' || lc === 'mobile') return T('pm_mobile_delivery');
+  if (lc === 'exchange') return T('pm_exchange');
+  return pm;
+}
+
+function cleanPhone(ph) {
+  if (!ph) return '';
+  return ph.replace(/[^0-9+]/g, '');
+}
+
+function pageFontClass(page) {
+  const style = String((page && page.font_style) || '').toLowerCase();
+  if (style === 'serif') return 'page-font-serif';
+  if (style === 'mono') return 'page-font-mono';
+  return 'page-font-sans';
+}
+
+function pageStyle(page) {
+  return {
+    accent_color: (page && page.accent_color) || '#667eea',
+    text_color: (page && page.text_color) || '#4a4a6a',
+    font_style: (page && page.font_style) || 'sans'
+  };
+}
+
+function parseProductsInput(productsStr) {
+  const text = String(productsStr || '').trim().toUpperCase();
+  if (!text) return [];
+  const normalized = text.replace(/,/g,' ').replace(/\+/g,' ').replace(/X/g,' X ').replace(/  +/g,' ');
+  const tokens = normalized.trim().split(/\s+/);
+  const items = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const token = tokens[i];
+    const prod = state.products.find(function(p) { return p.code === token; });
+    if (prod) {
+      let qty = 1;
+      if (i + 1 < tokens.length && tokens[i + 1] === 'X' && i + 2 < tokens.length && /^\d+$/.test(tokens[i + 2])) {
+        qty = parseInt(tokens[i + 2], 10);
+        i += 2;
+      } else if (i + 1 < tokens.length && /^\d+$/.test(tokens[i + 1])) {
+        qty = parseInt(tokens[i + 1], 10);
+        i += 1;
+      }
+      items.push({ code: prod.code, qty: qty, unit_price: prod.price || 0 });
+    } else {
+      const m = token.match(/^([A-Z]+)(\d+)$/);
+      if (m) {
+        const prodInline = state.products.find(function(p) { return p.code === m[1]; });
+        if (prodInline) {
+          items.push({ code: prodInline.code, qty: parseInt(m[2], 10), unit_price: prodInline.price || 0 });
+        }
+      }
+    }
+    i++;
+  }
+  return items;
+}
+
+function extractOrderCodes(order) {
+  const codes = new Set();
+  if (order && Array.isArray(order.order_lines)) {
+    order.order_lines.forEach(function(line) {
+      const code = String((line && (line.code || line.product_code)) || '').trim().toUpperCase();
+      if (code) codes.add(code);
+    });
+  }
+  if (codes.size === 0) {
+    parseProductsInput(order && order.products).forEach(function(item) {
+      const code = String(item.code || '').trim().toUpperCase();
+      if (code) codes.add(code);
+    });
+  }
+  return codes;
+}
+
+function resolvePageForCodes(orderCodes, preferredName) {
+  if (!state.pages || state.pages.length === 0) return null;
+  const preferred = String(preferredName || '').trim();
+  if (preferred) {
+    const named = state.pages.find(function(page) { return String(page.name || '').trim() === preferred; });
+    if (named) return named;
+  }
+  let defaultPage = null;
+  const matches = [];
+  state.pages.forEach(function(page) {
+    if (page.is_default && !defaultPage) defaultPage = page;
+    const pageCodes = new Set((page.product_codes || []).map(function(code) { return String(code || '').trim().toUpperCase(); }).filter(Boolean));
+    if (pageCodes.size === 0) return;
+    for (const code of orderCodes) {
+      if (pageCodes.has(code)) {
+        matches.push(page);
+        return;
+      }
+    }
+  });
+  if (matches.length > 0) return matches[0];
+  return defaultPage;
+}
+
+function resolvePageForOrder(order) {
+  if (!order) return null;
+  const preferredName = order.resolved_page || order.page || '';
+  const codes = extractOrderCodes(order);
+  return resolvePageForCodes(codes, preferredName);
+}
+
+async function copyTextToClipboard(text) {
+  const value = String(text || '');
+  if (!value) return false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch(e) {}
+  const ta = document.createElement('textarea');
+  ta.value = value;
+  ta.setAttribute('readonly', 'readonly');
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch(e) {
+    ok = false;
+  }
+  ta.remove();
+  return ok;
+}
+
+function buildOrderClipboardText(order) {
+  if (!order) return '';
+  const parts = ['M'];
+  if (order.client_name) parts.push(order.client_name.trim());
+  if (order.phone) parts.push(order.phone.trim());
+  if (order.address) parts.push(order.address.trim());
+  parts.push(formatCurrency(order.total_price));
+  if (order.notes) parts.push(order.notes.trim());
+  return parts.filter(Boolean).join(' ');
+}
+
+function clearOrderHoldTimer() {
+  if (state.orderHoldTimer) {
+    clearTimeout(state.orderHoldTimer);
+    state.orderHoldTimer = null;
+  }
+  state.orderHoldSource = '';
+}
+
+function setupOrderClipboardInteractions() {
+  const list = document.getElementById('ordersList');
+  if (!list) return;
+
+  list.addEventListener('click', async function(event) {
+    const btn = event.target.closest('.card-copy-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const name = btn.getAttribute('data-client-name') || '';
+    const ok = await copyTextToClipboard(name);
+    showToast(ok ? T('copied_name') : T('error_prefix'), ok ? 'success' : 'error');
+  });
+
+  function startHold(event) {
+    const target = event.target;
+    if (!target || !target.closest) return;
+    if (target.closest('button,a,select,input,textarea,label')) {
+      return;
+    }
+    const card = target.closest('.order-card[data-iid]');
+    if (!card) return;
+    const iid = card.getAttribute('data-iid');
+    const order = state.orders.find(function(item) { return item.iid === iid; });
+    if (!order) return;
+    clearOrderHoldTimer();
+    state.orderHoldSource = iid;
+    state.orderHoldTimer = setTimeout(async function() {
+      if (state.orderHoldSource !== iid) return;
+      const ok = await copyTextToClipboard(buildOrderClipboardText(order));
+      showToast(ok ? T('copied_order') : T('error_prefix'), ok ? 'success' : 'error');
+      clearOrderHoldTimer();
+    }, 550);
+  }
+
+  function cancelHold() {
+    clearOrderHoldTimer();
+  }
+
+  list.addEventListener('mousedown', startHold);
+  list.addEventListener('touchstart', startHold, { passive: true });
+  list.addEventListener('mouseup', cancelHold);
+  list.addEventListener('mouseleave', cancelHold);
+  list.addEventListener('touchend', cancelHold);
+  list.addEventListener('touchcancel', cancelHold);
+  list.addEventListener('touchmove', cancelHold, { passive: true });
+}
+
+/** Translate a status value (English API value) to the display text */
+function translateStatus(s) {
+  if (!s) return '';
+  const lc = s.toLowerCase();
+  if (lc === 'pending') return T('pending');
+  if (lc === 'ok' && s.length === 2) return T('ok');
+  if (lc === 'ok with retour') return T('ok_with_retour');
+  if (lc === 'cancelled') return T('cancelled');
+  if (lc === 'rescheduled') return T('rescheduled');
+  return s;
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TOAST
+   ═════════════════════════════════════════════════════════════════════ */
+function showToast(msg, type) {
+  type = type || 'success';
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('removing');
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   MODAL
+   ═════════════════════════════════════════════════════════════════════ */
+function showModal(title, bodyHtml, onConfirm) {
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">' +
+    '<div class="modal"><h3>' + escHtml(title) + '</h3>' + bodyHtml +
+    '<div class="modal-actions">' +
+    '<button class="btn-modal-cancel" onclick="closeModal()">' + escHtml(T('cancel')) + '</button>' +
+    '<button class="btn-confirm" id="modalConfirmBtn">' + escHtml(T('confirm')) + '</button>' +
+    '</div></div></div>';
+  document.getElementById('modalConfirmBtn').onclick = function() {
+    onConfirm();
+    closeModal();
+  };
+}
+
+function closeModal() {
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+   ═════════════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  state.activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  // Show FAB on orders/dashboard, hide on form
+  document.getElementById('fabNewOrder').style.display = (tab === 'form') ? 'none' : 'flex';
+  if (tab === 'orders') {
+    document.getElementById('tabOrders').classList.add('active');
+    updateDateBanner(state.currentDate);
+    startAutoRefresh();
+  } else if (tab === 'form') {
+    document.getElementById('tabForm').classList.add('active');
+    stopAutoRefresh();
+    // Update tab button text
+    document.querySelector('.tab-btn[data-tab="form"]').textContent =
+      state.editingOrder ? T('tab_edit_order') : T('tab_new_order');
+  } else if (tab === 'dashboard') {
+    document.getElementById('tabDashboard').classList.add('active');
+    updateDateBanner(state.dashDate);
+    stopAutoRefresh();
+    loadStats();
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   DATE NAVIGATION (ORDERS TAB)
+   ═════════════════════════════════════════════════════════════════════ */
+function setCurrentDate(iso) {
+  state.currentDate = iso;
+  document.getElementById('orderDatePicker').value = iso;
+  updateDateBanner(iso);
+  loadOrders();
+}
+
+function prevDate() { setCurrentDate(shiftDate(state.currentDate, -1)); }
+function nextDate() { setCurrentDate(shiftDate(state.currentDate, 1)); }
+function goToday() { setCurrentDate(todayISO()); }
+function pickDate(v) { if (v) setCurrentDate(v); }
+
+function updateDateBanner(iso) {
+  const banner = document.getElementById('dateBanner');
+  if (!iso) { banner.textContent = '--'; return; }
+
+  const lang = LANG.current || 'fr';
+  const dayNames = lang === 'en' ? LANG.translations.day_names_en : LANG.translations.day_names_fr;
+  const monthNames = lang === 'en' ? LANG.translations.month_names_en : LANG.translations.month_names_fr;
+
+  // Parse the ISO date
+  const parts = iso.split('-');
+  const year = parseInt(parts[0]);
+  const month = parseInt(parts[1]) - 1;
+  const day = parseInt(parts[2]);
+  const d = new Date(year, month, day);
+  const dayName = dayNames[d.getDay()];
+
+  // Format: "Lundi 25 mars 2026" (fr) or "Monday 25 March 2026" (en)
+  const dateStr = day + ' ' + monthNames[month] + ' ' + year;
+
+  // Check relative day
+  const today = todayISO();
+  const yesterdayISO = shiftDate(today, -1);
+  const tomorrowISO = shiftDate(today, 1);
+
+  let relLabel = '';
+  if (iso === today) relLabel = T('today');
+  else if (iso === yesterdayISO) relLabel = T('yesterday');
+  else if (iso === tomorrowISO) relLabel = T('tomorrow');
+
+  banner.innerHTML = escHtml(dayName) + ' ' + escHtml(dateStr) +
+    (relLabel ? ' <span class="day-relative">' + escHtml(relLabel) + '</span>' : '');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   DATE NAVIGATION (DASHBOARD TAB)
+   ═════════════════════════════════════════════════════════════════════ */
+function setDashDate(iso) {
+  state.dashDate = iso;
+  document.getElementById('dashDatePicker').value = iso;
+  updateDateBanner(iso);
+  loadStats();
+}
+
+function prevDateDash() { setDashDate(shiftDate(state.dashDate, -1)); }
+function nextDateDash() { setDashDate(shiftDate(state.dashDate, 1)); }
+function goTodayDash() { setDashDate(todayISO()); }
+function pickDateDash(v) { if (v) setDashDate(v); }
+
+/* ═════════════════════════════════════════════════════════════════════
+   FILTER
+   ═════════════════════════════════════════════════════════════════════ */
+function filterStatus(el, status) {
+  state.filterStatus = status;
+  document.querySelectorAll('#filterRow .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderOrders();
+}
+
+function filterByAgent() {
+  state.filterAgent = document.getElementById('filterAgent').value;
+  renderOrders();
+}
+
+function filterByPayment() {
+  state.filterPayment = document.getElementById('filterPayment').value;
+  renderOrders();
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   SEARCH
+   ═════════════════════════════════════════════════════════════════════ */
+function doSearch() {
+  state.searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+  renderOrders();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  state.searchQuery = '';
+  renderOrders();
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   LOAD DATA
+   ═════════════════════════════════════════════════════════════════════ */
+let _ordersReqId = 0;
+async function loadOrders() {
+  if (state.ordersLoading) return;
+  const reqId = ++_ordersReqId;
+  state.ordersLoading = true;
+  try {
+    const data = await API.getOrders(state.currentDate, '', '');
+    if (reqId !== _ordersReqId) return; // Stale response, discard
+    state.orders = data.orders || [];
+    renderOrders();
+  } catch(e) {
+    if (reqId !== _ordersReqId) return;
+    console.error('loadOrders error:', e);
+  } finally {
+    state.ordersLoading = false;
+  }
+}
+
+async function loadAgents() {
+  try {
+    const data = await API.getAgents();
+    state.agents = data.agents || [];
+    populateAgentDropdowns();
+  } catch(e) {
+    console.error('loadAgents error:', e);
+  }
+}
+
+async function loadProducts() {
+  try {
+    const data = await API.getProducts();
+    state.products = data.products || [];
+  } catch(e) {
+    console.error('loadProducts error:', e);
+  }
+}
+
+async function loadPages() {
+  try {
+    const data = await API.getPages();
+    state.pages = data.pages || [];
+    if (state.orders && state.orders.length) {
+      renderOrders();
+    }
+  } catch(e) {
+    console.error('loadPages error:', e);
+  }
+}
+
+async function loadDeliveryFees() {
+  try {
+    const data = await API.getDeliveryFees();
+    state.deliveryFees = data.fees || ['3000','4000','5000'];
+  } catch(e) {
+    console.error('loadDeliveryFees error:', e);
+  }
+  buildFeeToggles();
+}
+
+async function loadPaymentMethods() {
+  try {
+    const data = await API.getPaymentMethods();
+    state.paymentMethods = data.methods || {};
+    state.paymentDefault = data.default || 'cash';
+  } catch(e) {
+    console.error('loadPaymentMethods error:', e);
+    state.paymentMethods = {
+      cash: { label: 'Cash', short: 'Cash' },
+      prepaid: { label: 'Prepaid', short: 'Prepaid' },
+      colis: { label: 'Colis', short: 'Colis' },
+      mobile_delivery: { label: 'Mobile Delivery', short: 'Mobile' },
+      exchange: { label: 'Exchange', short: 'Exchange' }
+    };
+    state.paymentDefault = 'cash';
+  }
+  buildPaymentToggles();
+}
+
+let _statsReqId = 0;
+async function loadStats() {
+  if (state.statsLoading) return;
+  const reqId = ++_statsReqId;
+  state.statsLoading = true;
+  const wrap = {
+    statsGrid: document.getElementById('statsGrid'),
+    financialGrid: document.getElementById('financialGrid'),
+    productsTableWrap: document.getElementById('productsTableWrap')
+  };
+  wrap.statsGrid.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> ' + escHtml(T('loading_stats')) + '</div>';
+  wrap.financialGrid.innerHTML = '';
+  wrap.productsTableWrap.innerHTML = '';
+
+  try {
+    const data = await API.getStats(state.dashDate);
+    if (reqId !== _statsReqId) return; // Stale response, discard
+    renderStats(data);
+  } catch(e) {
+    if (reqId !== _statsReqId) return;
+    wrap.statsGrid.innerHTML = '<div class="loading-overlay">' + escHtml(T('failed_stats')) + '</div>';
+    console.error('loadStats error:', e);
+  } finally {
+    state.statsLoading = false;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   POPULATE AGENT DROPDOWNS
+   ═════════════════════════════════════════════════════════════════════ */
+function populateAgentDropdowns() {
+  // Filter agent dropdown
+  const fa = document.getElementById('filterAgent');
+  const oldVal = fa.value;
+  fa.innerHTML = '<option value="">' + escHtml(T('all_agents')) + '</option>';
+  state.agents.forEach(a => {
+    fa.innerHTML += '<option value="' + escHtml(a) + '">' + escHtml(a) + '</option>';
+  });
+  fa.value = oldVal;
+
+  // Form agent dropdown
+  const fm = document.getElementById('fAgent');
+  const oldV2 = fm.value;
+  fm.innerHTML = '<option value="">' + escHtml(T('select_agent')) + '</option>';
+  state.agents.forEach(a => {
+    fm.innerHTML += '<option value="' + escHtml(a) + '">' + escHtml(a) + '</option>';
+  });
+  fm.value = oldV2;
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   BUILD TOGGLE BUTTONS
+   ═════════════════════════════════════════════════════════════════════ */
+function buildFeeToggles() {
+  const c = document.getElementById('feeToggles');
+  c.innerHTML = '';
+  state.deliveryFees.forEach((f, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toggle-btn' + (String(f) === '3000' ? ' active' : '');
+    btn.textContent = formatCurrency(f);
+    btn.dataset.value = f;
+    btn.onclick = function() {
+      c.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updatePricePreview();
+    };
+    c.appendChild(btn);
+  });
+}
+
+function buildPaymentToggles() {
+  const c = document.getElementById('paymentToggles');
+  c.innerHTML = '';
+  const keys = Object.keys(state.paymentMethods);
+  if (keys.length === 0) {
+    // fallback
+    ['cash','prepaid','colis','mobile_delivery','exchange'].forEach(k => {
+      keys.push(k);
+      state.paymentMethods[k] = { label: k.charAt(0).toUpperCase()+k.slice(1).replace('_',' '), short: k };
+    });
+  }
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toggle-btn' + (k === state.paymentDefault ? ' active' : '');
+    btn.textContent = paymentLabel(k);
+    btn.dataset.value = k;
+    btn.onclick = function() {
+      c.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updatePricePreview();
+      toggleExchangeFields();
+    };
+    c.appendChild(btn);
+  });
+}
+
+function getActiveToggle(containerId) {
+  const active = document.getElementById(containerId).querySelector('.toggle-btn.active');
+  return active ? active.dataset.value : '';
+}
+
+function toggleExchangeFields() {
+  const pm = getActiveToggle('paymentToggles');
+  const collectGroup = document.getElementById('exchangeProductsGroup');
+  const dirGroup = document.getElementById('exchangeDirectionGroup');
+  const amtGroup = document.getElementById('exchangeAmountGroup');
+  const totalGroup = document.getElementById('fTotalPrice').closest('.form-group');
+  var totalInput = document.getElementById('fTotalPrice');
+  if (pm === 'exchange') {
+    collectGroup.style.display = '';
+    dirGroup.style.display = '';
+    // Show/hide amount based on current direction
+    var dir = getActiveToggle('exchangeDirectionToggles') || 'client_pays';
+    amtGroup.style.display = (dir === 'even') ? 'none' : '';
+    totalGroup.style.display = 'none';  // Hide normal total field for exchange
+    totalInput.removeAttribute('min');   // Allow negative values for exchange
+    updateExchangeTotal();
+  } else {
+    collectGroup.style.display = 'none';
+    dirGroup.style.display = 'none';
+    amtGroup.style.display = 'none';
+    totalGroup.style.display = '';  // Show normal total field
+    totalInput.setAttribute('min', '0');
+  }
+}
+
+function setExchangeDirection(btn, dir) {
+  var c = document.getElementById('exchangeDirectionToggles');
+  c.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var amtGroup = document.getElementById('exchangeAmountGroup');
+  if (dir === 'even') {
+    amtGroup.style.display = 'none';
+    document.getElementById('fExchangeAmount').value = '';
+  } else {
+    amtGroup.style.display = '';
+  }
+  updateExchangeTotal();
+}
+
+function updateExchangeTotal() {
+  var dir = getActiveToggle('exchangeDirectionToggles') || 'client_pays';
+  var totalInput = document.getElementById('fTotalPrice');
+  if (dir === 'even') {
+    totalInput.value = 0;
+    totalInput.dataset.manual = '1';
+  } else {
+    var amt = Number(document.getElementById('fExchangeAmount').value) || 0;
+    var fee = Number(getActiveToggle('feeToggles')) || 0;
+    if (dir === 'client_pays') {
+      totalInput.value = amt + fee;
+    } else {
+      // we_pay: negative amount (client gets money back)
+      totalInput.value = -(amt) + fee;
+    }
+    totalInput.dataset.manual = '1';
+  }
+}
+
+function setActiveToggle(containerId, val) {
+  const btns = document.getElementById(containerId).querySelectorAll('.toggle-btn');
+  let found = false;
+  btns.forEach(b => {
+    const match = String(b.dataset.value) === String(val);
+    b.classList.toggle('active', match);
+    if (match) found = true;
+  });
+  // If no match, activate first
+  if (!found && btns.length) btns[0].classList.add('active');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PRICE PREVIEW
+   ═════════════════════════════════════════════════════════════════════ */
+let _pricePreviewTimer = null;
+function debouncePricePreview() {
+  clearTimeout(_pricePreviewTimer);
+  _pricePreviewTimer = setTimeout(updatePricePreview, 200);
+}
+
+function updatePricePreview() {
+  const productsStr = document.getElementById('fProducts').value.trim();
+  const container = document.getElementById('pricePreview');
+  const totalInput = document.getElementById('fTotalPrice');
+  if (!productsStr) { container.innerHTML = ''; if (!totalInput.dataset.manual) totalInput.value = ''; checkPageSelection([]); updateSubtypeSelection([]); return; }
+
+  const items = parseProductsInput(productsStr);
+
+  if (items.length === 0) { container.innerHTML = ''; if (!totalInput.dataset.manual) totalInput.value = ''; checkPageSelection([]); updateSubtypeSelection([]); return; }
+
+  const fee = Number(getActiveToggle('feeToggles')) || 3000;
+  const pm = getActiveToggle('paymentToggles') || state.paymentDefault;
+  let subtotal = 0;
+  let html = '<div class="price-lines">';
+  items.forEach(it => {
+    const lineTotal = it.unit_price * it.qty;
+    subtotal += lineTotal;
+    html += '<div class="price-line"><span>' + escHtml(it.code) + ' x' + it.qty + '</span><span>' + formatCurrency(lineTotal) + '</span></div>';
+  });
+  html += '<div class="price-line fee-line"><span>' + escHtml(T('delivery_fee')) + '</span><span>' + formatCurrency(fee) + '</span></div>';
+
+  const calcTotal = subtotal + fee;
+  html += '<div class="price-total"><span>' + escHtml(T('total')) + '</span><span>';
+  if (pm === 'prepaid') {
+    html += '0 Ar <small style="color:#888">(' + escHtml(T('prepaid')) + ': ' + formatCurrency(calcTotal) + ')</small>';
+  } else if (pm === 'exchange') {
+    var exchDir = getActiveToggle('exchangeDirectionToggles') || 'client_pays';
+    var exchAmt = Number(document.getElementById('fExchangeAmount').value) || 0;
+    var exchTotal = exchDir === 'even' ? 0 : (exchDir === 'we_pay' ? -(exchAmt) + fee : exchAmt + fee);
+    html += formatCurrency(Math.abs(exchTotal)) + ' <small style="color:#e65100">(' + escHtml(T('pm_exchange'));
+    if (exchDir === 'we_pay') html += ' - ' + escHtml(T('exchange_we_pay'));
+    else if (exchDir === 'even') html += ' - ' + escHtml(T('exchange_even'));
+    html += ')</small>';
+  } else {
+    html += formatCurrency(calcTotal);
+  }
+  html += '</span></div></div>';
+  container.innerHTML = html;
+
+  // Auto-fill total field if user hasn't manually changed it (skip for exchange - manual only)
+  if (!totalInput.dataset.manual && pm !== 'exchange') {
+    totalInput.value = calcTotal;
+    totalInput.placeholder = formatCurrency(calcTotal);
+  }
+
+  // Check if any product codes belong to multiple pages
+  checkPageSelection(items);
+
+  // Show subtype selection for products that have subtypes
+  updateSubtypeSelection(items);
+
+  // If exchange mode, recalculate total based on direction + amount + fee
+  if (pm === 'exchange') { updateExchangeTotal(); }
+}
+
+function checkPageSelection(items) {
+  const group = document.getElementById('pageSelectGroup');
+  const sel = document.getElementById('fPage');
+  if (!items || items.length === 0 || state.pages.length === 0) {
+    group.style.display = 'none';
+    return;
+  }
+
+  const orderCodes = new Set(items.map(it => it.code.toUpperCase()));
+  const defaultPage = state.pages.find(function(page) { return page.is_default; }) || null;
+  const matchingPages = state.pages.filter(function(page) {
+    const pageCodes = new Set((page.product_codes || []).map(function(code) { return String(code || '').toUpperCase(); }));
+    if (pageCodes.size === 0) return false;
+    for (const code of orderCodes) {
+      if (pageCodes.has(code)) return true;
+    }
+    return false;
+  });
+
+  // Only show selector if a product code matches more than one page
+  let needsChoice = false;
+  for (const code of orderCodes) {
+    const pagesForCode = state.pages.filter(p =>
+      (p.product_codes || []).some(c => c.toUpperCase() === code)
+    );
+    if (pagesForCode.length > 1) {
+      needsChoice = true;
+      break;
+    }
+  }
+
+  const availablePages = matchingPages.length > 0 ? matchingPages : (defaultPage ? [defaultPage] : []);
+  const prevVal = sel.value;
+  sel.innerHTML = '<option value="">' + escHtml(T('page_select_default')) + '</option>';
+  availablePages.forEach(function(page) {
+    sel.innerHTML += '<option value="' + escHtml(page.name) + '">' + escHtml(page.name) + '</option>';
+  });
+  if (prevVal && availablePages.some(function(page) { return page.name === prevVal; })) {
+    sel.value = prevVal;
+  }
+
+  if (!needsChoice) {
+    group.style.display = 'none';
+    if (availablePages.length === 1) {
+      sel.value = availablePages[0].name;
+    }
+    return;
+  }
+
+  group.style.display = '';
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   SUBTYPE SELECTION
+   ═════════════════════════════════════════════════════════════════════ */
+function parseSubtypeText(text) {
+  // Parse "Vanille x1, Fraise x2" or "Vanille 1, Fraise 2" or "Vanille, Fraise" → [{name, qty}]
+  if (!text || !text.trim()) return [];
+  const results = [];
+  text.split(',').forEach(part => {
+    part = part.trim();
+    if (!part) return;
+    const m = part.match(/^(.+?)\s*[xX×]\s*(\d+)$/);
+    if (m) {
+      results.push({name: m[1].trim(), qty: parseInt(m[2])});
+    } else {
+      const m2 = part.match(/^(.+?)\s+(\d+)$/);
+      if (m2) {
+        results.push({name: m2[1].trim(), qty: parseInt(m2[2])});
+      } else {
+        results.push({name: part.trim(), qty: 1});
+      }
+    }
+  });
+  return results;
+}
+
+function syncSubtypeDraft(code, value) {
+  const key = String(code || '').trim().toUpperCase();
+  if (!key) return;
+  const text = String(value || '').trim();
+  if (text) state.subtypeDrafts[key] = text;
+  else delete state.subtypeDrafts[key];
+}
+
+function captureSubtypeDraftsFromDom() {
+  document.querySelectorAll('.subtype-product').forEach(function(prodEl) {
+    const code = String(prodEl.dataset.code || '').trim().toUpperCase();
+    const inp = document.getElementById('stInput_' + code);
+    if (inp) syncSubtypeDraft(code, inp.value);
+  });
+}
+
+function loadSubtypeDraftsFromOrder(order) {
+  state.subtypeDrafts = {};
+  if (!order || !Array.isArray(order.order_lines)) return;
+  order.order_lines.forEach(function(ol) {
+    const code = String(ol.code || ol.product_code || '').trim().toUpperCase();
+    if (code && ol.subtypes) state.subtypeDrafts[code] = String(ol.subtypes).trim();
+  });
+}
+
+function pruneSubtypeDrafts(validCodes) {
+  const allowed = new Set((validCodes || []).map(function(code) {
+    return String(code || '').trim().toUpperCase();
+  }));
+  Object.keys(state.subtypeDrafts).forEach(function(code) {
+    if (!allowed.has(code)) delete state.subtypeDrafts[code];
+  });
+}
+
+function updateSubtypePreview(code) {
+  const inp = document.getElementById('stInput_' + code);
+  const preview = document.getElementById('stPreview_' + code);
+  const prodEl = document.querySelector('.subtype-product[data-code="' + code + '"]');
+  if (!inp || !preview || !prodEl) return;
+  syncSubtypeDraft(code, inp.value);
+  const totalQty = parseInt(prodEl.dataset.qty) || 0;
+  const text = inp.value.trim();
+  if (!text) { preview.textContent = ''; preview.className = 'subtype-preview'; return; }
+  const parsed = parseSubtypeText(text);
+  let sum = 0;
+  const parts = [];
+  parsed.forEach(p => { sum += p.qty; parts.push(p.name + ' x' + p.qty); });
+  const display = parts.join(', ') + '  (' + sum + '/' + totalQty + ')';
+  if (sum === totalQty) {
+    preview.textContent = display;
+    preview.className = 'subtype-preview ok';
+  } else if (sum > totalQty) {
+    preview.textContent = display;
+    preview.className = 'subtype-preview err';
+  } else {
+    preview.textContent = display;
+    preview.className = 'subtype-preview warn';
+  }
+}
+
+function updateSubtypeSelection(items) {
+  const container = document.getElementById('subtypeSelection');
+  captureSubtypeDraftsFromDom();
+  if (!items || items.length === 0) {
+    state.subtypeDrafts = {};
+    container.innerHTML = '';
+    return;
+  }
+
+  const productsWithSubtypes = items.filter(it => {
+    const prod = state.products.find(p => p.code === it.code);
+    return prod && prod.subtypes && prod.subtypes.length > 0;
+  });
+
+  if (productsWithSubtypes.length === 0) {
+    state.subtypeDrafts = {};
+    container.innerHTML = '';
+    return;
+  }
+
+  pruneSubtypeDrafts(productsWithSubtypes.map(function(it) { return it.code; }));
+
+  let html = '<div class="subtype-section">';
+  html += '<div class="subtype-header">' + escHtml(T('subtypes')) + '</div>';
+
+  productsWithSubtypes.forEach(it => {
+    const prod = state.products.find(p => p.code === it.code);
+    const subtypes = prod.subtypes || [];
+    const hintText = subtypes.join(', ');
+
+    const existingVal = state.subtypeDrafts[String(it.code).toUpperCase()] || '';
+
+    html += '<div class="subtype-product" data-code="' + escHtml(it.code) + '" data-qty="' + it.qty + '">';
+    html += '<div class="subtype-product-label">' + escHtml(it.code) + ' (x' + it.qty + ')</div>';
+    html += '<input type="text" class="subtype-input" id="stInput_' + escHtml(it.code) + '" ' +
+      'placeholder="' + escHtml(T('subtypes_hint')) + '" ' +
+      'value="' + escHtml(existingVal) + '" ' +
+      'oninput="updateSubtypePreview(\'' + escHtml(it.code) + '\')">';
+    html += '<div class="subtype-hint">' + escHtml(hintText) + '</div>';
+    html += '<div class="subtype-preview" id="stPreview_' + escHtml(it.code) + '"></div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  // Trigger preview for pre-filled values
+  productsWithSubtypes.forEach(it => {
+    const inp = document.getElementById('stInput_' + it.code);
+    if (inp && inp.value) updateSubtypePreview(it.code);
+  });
+}
+
+function collectSubtypes() {
+  const map = {};
+  document.querySelectorAll('.subtype-product').forEach(prodEl => {
+    const code = prodEl.dataset.code;
+    const inp = document.getElementById('stInput_' + code);
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) return;
+    // Normalize: parse and reformat
+    const parsed = parseSubtypeText(text);
+    if (parsed.length > 0) {
+      map[code] = parsed.map(p => p.name + ' x' + p.qty).join(', ');
+    }
+  });
+  return map;
+}
+
+function validateSubtypes() {
+  let valid = true;
+  document.querySelectorAll('.subtype-product').forEach(prodEl => {
+    const code = prodEl.dataset.code;
+    const totalQty = parseInt(prodEl.dataset.qty) || 0;
+    const inp = document.getElementById('stInput_' + code);
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) return;  // Empty is ok - subtypes are optional
+    const parsed = parseSubtypeText(text);
+    let sum = 0;
+    parsed.forEach(p => { sum += p.qty; });
+    if (sum > 0 && sum !== totalQty) {
+      valid = false;
+    }
+  });
+  return valid;
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   RENDER ORDERS
+   ═════════════════════════════════════════════════════════════════════ */
+function renderOrders() {
+  let filtered = state.orders;
+
+  if (state.filterStatus) {
+    filtered = filtered.filter(o => o.status === state.filterStatus);
+  }
+  if (state.filterAgent) {
+    filtered = filtered.filter(o => o.agent === state.filterAgent);
+  }
+  if (state.filterPayment) {
+    filtered = filtered.filter(o => (o.payment_method || 'cash') === state.filterPayment);
+  }
+  if (state.searchQuery) {
+    const q = state.searchQuery;
+    filtered = filtered.filter(o => {
+      return (o.client_name && o.client_name.toLowerCase().includes(q)) ||
+        (o.phone && o.phone.toLowerCase().includes(q)) ||
+        (o.address && o.address.toLowerCase().includes(q)) ||
+        (o.products && o.products.toLowerCase().includes(q)) ||
+        (o.notes && o.notes.toLowerCase().includes(q)) ||
+        (o.agent && o.agent.toLowerCase().includes(q));
+    });
+  }
+
+  // Sorting
+  if (state.sortField) {
+    const statusOrder = {'Pending':0,'Rescheduled':1,'Ok':2,'Ok with retour':3,'Cancelled':4};
+    filtered = filtered.slice().sort(function(a, b) {
+      var va, vb;
+      if (state.sortField === 'total_price' || state.sortField === 'delivery_fee') {
+        va = parseFloat(a[state.sortField]) || 0;
+        vb = parseFloat(b[state.sortField]) || 0;
+      } else if (state.sortField === 'status') {
+        va = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 99;
+        vb = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 99;
+      } else if (state.sortField === 'client_name') {
+        va = (a.client_name || '').toLowerCase();
+        vb = (b.client_name || '').toLowerCase();
+      } else if (state.sortField === 'agent') {
+        va = (a.agent || '').toLowerCase();
+        vb = (b.agent || '').toLowerCase();
+      } else {
+        va = a[state.sortField] || '';
+        vb = b[state.sortField] || '';
+      }
+      if (va < vb) return state.sortAsc ? -1 : 1;
+      if (va > vb) return state.sortAsc ? 1 : -1;
+      return 0;
+    });
+  }
+
+  const countEl = document.getElementById('orderCount');
+  countEl.textContent = filtered.length + ' ' + T('orders_count') +
+    (state.filterStatus ? ' (' + translateStatus(state.filterStatus) + ')' : '') +
+    (state.filterAgent ? ' - ' + state.filterAgent : '') +
+    (state.filterPayment ? ' - ' + paymentLabel(state.filterPayment) : '');
+
+  const container = document.getElementById('ordersList');
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state">' +
+      '<div class="icon">&#128230;</div>' +
+      '<p>' + escHtml(T('no_orders')) + '</p></div>';
+    return;
+  }
+
+  const statuses = ['Pending','Ok','Ok with retour','Cancelled','Rescheduled'];
+  let html = '<div class="orders-grid">';
+  filtered.forEach(o => {
+    const sc = statusClass(o.status);
+    const pc = paymentClass(o.payment_method);
+    const phoneClean = cleanPhone(o.phone);
+    const isSelected = state.selectedOrders.has(o.iid);
+    const pageInfo = resolvePageForOrder(o);
+    const resolvedPage = pageInfo ? pageInfo.name : (o.resolved_page || o.page || '');
+    const resolvedPageStyle = pageStyle(pageInfo || o.resolved_page_style || null);
+    const pageThemeClass = pageInfo || o.resolved_page_style ? (' page-themed ' + pageFontClass(pageInfo || o.resolved_page_style)) : '';
+    const pageThemeStyle = pageInfo || o.resolved_page_style
+      ? ' style="--page-accent:' + escHtml(resolvedPageStyle.accent_color) + ';--page-text:' + escHtml(resolvedPageStyle.text_color) + ';"'
+      : '';
+    html += '<div class="order-card has-checkbox' + pageThemeClass + (isSelected ? ' selected' : '') + '" data-iid="' + escHtml(o.iid) + '"' + pageThemeStyle + '>' +
+      '<input type="checkbox" class="card-checkbox"' + (isSelected ? ' checked' : '') +
+      ' onchange="toggleOrderSelection(\'' + escHtml(o.iid) + '\',this.checked)">' +
+      '<div class="card-header">' +
+        '<div class="card-title">' +
+          '<span class="card-client">' + escHtml(o.client_name) + '</span>' +
+          '<button type="button" class="card-copy-btn" data-client-name="' + escHtml(o.client_name) + '" title="Copy name" aria-label="Copy name">&#128203;</button>' +
+        '</div>' +
+        '<div class="card-badges">' +
+          '<span class="badge ' + sc + '">' + escHtml(translateStatus(o.status)) + '</span>' +
+          '<span class="badge ' + pc + '">' + escHtml(paymentLabel(o.payment_method)) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-body">' +
+        '<div class="card-row"><span class="card-label">' + escHtml(T('phone')) + '</span>' +
+          '<a href="tel:' + escHtml(phoneClean) + '">' + escHtml(o.phone) + '</a></div>' +
+        '<div class="card-row"><span class="card-label">' + escHtml(T('address')) + '</span>' +
+          '<span class="card-value">' + escHtml(o.address || '-') + '</span></div>' +
+        '<div class="card-row"><span class="card-label">' + escHtml(T('products')) + '</span>' +
+          '<span class="card-value">' + escHtml(o.products) + '</span></div>';
+
+    // Show subtypes from order_lines if any
+    var stParts = [];
+    if (o.order_lines && Array.isArray(o.order_lines)) {
+      o.order_lines.forEach(function(ol) {
+        var st = ol.subtypes || '';
+        if (st) {
+          stParts.push(st);
+        }
+      });
+    }
+    if (stParts.length > 0) {
+      html += '<div class="card-subtypes">' + escHtml(stParts.join(' | ')) + '</div>';
+    }
+
+    if (resolvedPage) {
+      html += '<div class="card-page"><span class="card-page-text">' +
+        escHtml(T('page_label')) + ': ' + escHtml(resolvedPage) + '</span></div>';
+    }
+
+    // Show exchange collect products
+    if (o.payment_method === 'exchange' && o.exchange_products) {
+      html += '<div class="card-row"><span class="card-label" style="color:#e65100">' +
+        escHtml(T('exchange_collect')) + '</span>' +
+        '<span class="card-value" style="color:#e65100;font-weight:600">' +
+        escHtml(o.exchange_products) + '</span></div>';
+    }
+
+    html += '<div class="card-row"><span class="card-label">' + escHtml(T('total')) + '</span>' +
+          '<span class="card-price">' + formatCurrency(o.total_price) + '</span></div>' +
+        '<div class="card-row"><span class="card-label">' + escHtml(T('delivery_fee')) + '</span>' +
+          '<span class="card-value">' + formatCurrency(o.delivery_fee) + '</span></div>' +
+        '<div class="card-row"><span class="card-label">' + escHtml(T('agent')) + '</span>' +
+          '<span class="card-value">' + escHtml(o.agent || '-') + '</span></div>';
+
+    if (o.amount_collected) {
+      html += '<div class="card-row"><span class="card-label">' + escHtml(T('collected')) + '</span>' +
+        '<span class="card-value">' + formatCurrency(o.amount_collected) + '</span></div>';
+    }
+    if (o.company_revenue) {
+      html += '<div class="card-row"><span class="card-label">' + escHtml(T('revenue')) + '</span>' +
+        '<span class="card-value">' + formatCurrency(o.company_revenue) + '</span></div>';
+    }
+    if (o.notes) {
+      html += '<div class="card-row"><span class="card-label">' + escHtml(T('notes')) + '</span>' +
+        '<span class="card-value" style="font-style:italic">' + escHtml(o.notes) + '</span></div>';
+    }
+
+    html += '</div>'; // card-body
+
+    html += '<div class="card-footer">' +
+      '<select onchange="changeStatus(\'' + escHtml(o.iid) + '\',this.value,this)" title="Change status">';
+    statuses.forEach(s => {
+      html += '<option value="' + escHtml(s) + '"' + (o.status === s ? ' selected' : '') + '>' + escHtml(translateStatus(s)) + '</option>';
+    });
+    html += '</select>' +
+      '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' +
+      '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
+      '<a class="btn-sm btn-sms" href="sms:' + escHtml(phoneClean) + '">' + escHtml(T('sms')) + '</a>' +
+      '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
+    '</div>'; // card-footer
+
+    html += '</div>'; // order-card
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  updateSelectionBar();
+  updateSortButtons();
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   SELECTION & SORT & EXPORT FUNCTIONS
+   ═════════════════════════════════════════════════════════════════════ */
+
+function toggleOrderSelection(iid, checked) {
+  if (checked) {
+    state.selectedOrders.add(iid);
+  } else {
+    state.selectedOrders.delete(iid);
+  }
+  var card = document.querySelector('.order-card[data-iid="' + iid + '"]');
+  if (card) {
+    if (checked) card.classList.add('selected');
+    else card.classList.remove('selected');
+  }
+  updateSelectionBar();
+}
+
+function selectAllOrders() {
+  document.querySelectorAll('.order-card[data-iid]').forEach(function(card) {
+    var iid = card.getAttribute('data-iid');
+    state.selectedOrders.add(iid);
+    card.classList.add('selected');
+    var cb = card.querySelector('.card-checkbox');
+    if (cb) cb.checked = true;
+  });
+  updateSelectionBar();
+}
+
+function deselectAllOrders() {
+  state.selectedOrders.clear();
+  document.querySelectorAll('.order-card.selected').forEach(function(card) {
+    card.classList.remove('selected');
+    var cb = card.querySelector('.card-checkbox');
+    if (cb) cb.checked = false;
+  });
+  updateSelectionBar();
+}
+
+function updateSelectionBar() {
+  var bar = document.getElementById('selectionBar');
+  var count = state.selectedOrders.size;
+  if (count > 0) {
+    bar.classList.add('visible');
+    document.getElementById('selCount').textContent = count + ' ' + T('sel_count_suffix');
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function toggleSort(field) {
+  if (state.sortField === field) {
+    state.sortAsc = !state.sortAsc;
+  } else {
+    state.sortField = field;
+    state.sortAsc = true;
+  }
+  renderOrders();
+}
+
+function updateSortButtons() {
+  document.querySelectorAll('.sort-btn').forEach(function(btn) {
+    var f = btn.getAttribute('data-sort');
+    if (f === state.sortField) {
+      btn.classList.add('active');
+      var arrow = btn.querySelector('.sort-arrow');
+      if (!arrow) {
+        arrow = document.createElement('span');
+        arrow.className = 'sort-arrow';
+        btn.appendChild(arrow);
+      }
+      arrow.textContent = state.sortAsc ? ' \u25B2' : ' \u25BC';
+    } else {
+      btn.classList.remove('active');
+      var arrow = btn.querySelector('.sort-arrow');
+      if (arrow) arrow.remove();
+    }
+  });
+}
+
+function downloadBlob(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
+function exportSelectedLabels() {
+  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
+  var iids = Array.from(state.selectedOrders);
+  if (iids.length === 0) { showToast(T('no_selection'), 'warning'); return; }
+  fetch(API.base + '/api/export/selected-labels', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({iids: iids})
+  }).then(function(r) {
+    if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
+    return r.blob();
+  }).then(function(blob) {
+    downloadBlob(blob, 'Etiquettes_selection_' + iids.length + '.pdf');
+    showToast(T('export_success'), 'success');
+  }).catch(function(e) {
+    showToast(e.message, 'error');
+  });
+}
+
+function exportSelectedBon() {
+  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
+  var iids = Array.from(state.selectedOrders);
+  if (iids.length === 0) { showToast(T('no_selection'), 'warning'); return; }
+  fetch(API.base + '/api/export/selected-bon', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({iids: iids})
+  }).then(function(r) {
+    if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
+    return r.blob();
+  }).then(function(blob) {
+    downloadBlob(blob, 'BON_ENLEVEMENT_selection.pdf');
+    showToast(T('export_success'), 'success');
+  }).catch(function(e) {
+    showToast(e.message, 'error');
+  });
+}
+
+function exportAllLabels() {
+  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
+  if (!state.currentDate) return;
+  fetch(API.base + '/api/export/labels?date=' + encodeURIComponent(state.currentDate))
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
+      return r.blob();
+    }).then(function(blob) {
+      downloadBlob(blob, 'Etiquettes_' + state.currentDate + '.pdf');
+      showToast(T('export_success'), 'success');
+    }).catch(function(e) {
+      showToast(e.message, 'error');
+    });
+}
+
+function exportAllBon() {
+  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
+  if (!state.currentDate) return;
+  var url = API.base + '/api/export/bon?date=' + encodeURIComponent(state.currentDate);
+  if (state.filterAgent) {
+    url += '&agent=' + encodeURIComponent(state.filterAgent);
+  }
+  fetch(url)
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
+      return r.blob();
+    }).then(function(blob) {
+      var fname = state.filterAgent
+        ? 'BON_ENLEVEMENT_' + state.filterAgent.replace(/ /g,'_') + '_' + state.currentDate + '.pdf'
+        : 'BON_ENLEVEMENT_ALL_' + state.currentDate + '.pdf';
+      downloadBlob(blob, fname);
+      showToast(T('export_success'), 'success');
+    }).catch(function(e) {
+      showToast(e.message, 'error');
+    });
+}
+
+function exportAllReport() {
+  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
+  if (!state.currentDate) return;
+  fetch(API.base + '/api/export/report?date=' + encodeURIComponent(state.currentDate))
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
+      return r.blob();
+    }).then(function(blob) {
+      downloadBlob(blob, 'Livraisons_' + state.currentDate + '.pdf');
+      showToast(T('export_success'), 'success');
+    }).catch(function(e) {
+      showToast(e.message, 'error');
+    });
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   RENDER STATS
+   ═════════════════════════════════════════════════════════════════════ */
+function renderStats(data) {
+  const stats = data.stats || {};
+  const fin = data.financial || {};
+  const prods = data.products || {};
+
+  // Stat cards
+  const statItems = [
+    { label: T('total'), value: stats.total || 0, color: '#667eea' },
+    { label: T('pending'), value: stats.Pending || 0, color: '#b8860b' },
+    { label: T('ok'), value: stats.Ok || 0, color: '#2e7d32' },
+    { label: T('retour'), value: stats['Ok with retour'] || 0, color: '#e65100' },
+    { label: T('cancelled'), value: stats.Cancelled || 0, color: '#c62828' },
+    { label: T('rescheduled'), value: stats.Rescheduled || 0, color: '#6a1b9a' }
+  ];
+
+  let html = '';
+  statItems.forEach(s => {
+    html += '<div class="stat-card"><div class="stat-value" style="color:' + s.color + '">' +
+      s.value + '</div><div class="stat-label">' + escHtml(s.label) + '</div></div>';
+  });
+  document.getElementById('statsGrid').innerHTML = html;
+
+  // Financial cards
+  const finItems = [
+    { label: T('expected_revenue'), value: fin.expected || 0 },
+    { label: T('collected'), value: fin.collected || 0 },
+    { label: T('company_revenue'), value: fin.company_revenue || 0 },
+    { label: T('agent_payments'), value: fin.agent_payments || 0 }
+  ];
+  html = '';
+  finItems.forEach(f => {
+    html += '<div class="fin-card"><div class="fin-value">' + formatCurrency(f.value) +
+      '</div><div class="fin-label">' + escHtml(f.label) + '</div></div>';
+  });
+  document.getElementById('financialGrid').innerHTML = html;
+
+  // Products table
+  const codes = Object.keys(prods);
+  if (codes.length === 0) {
+    document.getElementById('productsTableWrap').innerHTML =
+      '<div class="loading-overlay">' + escHtml(T('no_product_data')) + '</div>';
+    return;
+  }
+  var STATUS_ICONS = {Pending:'\u23f3', Rescheduled:'\ud83d\udcc5', Ok:'\u2713', 'Ok with retour':'\u21a9', Cancelled:'\u2717'};
+  var STATUS_ORDER = ['Pending','Rescheduled','Ok','Ok with retour','Cancelled'];
+  function statusBreakdown(obj) {
+    var parts = [];
+    STATUS_ORDER.forEach(function(s) {
+      var v = obj[s] || 0;
+      if (v > 0) parts.push('<span title="' + s + '">' + (STATUS_ICONS[s]||'') + v + '</span>');
+    });
+    return parts.join(' ');
+  }
+  function productTotal(obj) {
+    var t = 0;
+    STATUS_ORDER.forEach(function(s) { t += (obj[s] || 0); });
+    return t;
+  }
+  html = '<table class="products-table"><thead><tr>' +
+    '<th>' + escHtml(T('code')) + '</th><th>' + escHtml(T('total')) + '</th><th>' + escHtml(T('prod_breakdown')) + '</th>' +
+    '</tr></thead><tbody>';
+  codes.forEach(c => {
+    const p = prods[c];
+    const subs = p.subtypes || {};
+    const subKeys = Object.keys(subs);
+    const hasSubtypes = subKeys.length > 0;
+    const rowId = 'st_' + c.replace(/[^a-zA-Z0-9]/g, '_');
+    const tot = productTotal(p);
+    html += '<tr' + (hasSubtypes ? ' style="cursor:pointer" onclick="toggleSubtypes(\'' + rowId + '\')"' : '') + '>' +
+      '<td><strong>' + escHtml(c) + '</strong>' +
+      (hasSubtypes ? ' <span style="font-size:.7rem;color:#667eea;vertical-align:middle">&#9660;</span>' : '') +
+      '</td>' +
+      '<td><strong>' + tot + '</strong></td>' +
+      '<td>' + statusBreakdown(p) + '</td></tr>';
+    if (hasSubtypes) {
+      subKeys.forEach(s => {
+        const sv = subs[s];
+        const stot = productTotal(sv);
+        html += '<tr class="subtype-row ' + rowId + '" style="display:none">' +
+          '<td style="padding-left:24px;color:#666;font-size:.85rem">' + escHtml(s) + '</td>' +
+          '<td style="color:#666;font-size:.85rem">' + stot + '</td>' +
+          '<td style="color:#666;font-size:.85rem">' + statusBreakdown(sv) + '</td></tr>';
+      });
+    }
+  });
+  html += '</tbody></table>';
+  document.getElementById('productsTableWrap').innerHTML = html;
+}
+
+function toggleSubtypes(rowId) {
+  var rows = document.querySelectorAll('.' + rowId);
+  var visible = rows.length > 0 && rows[0].style.display !== 'none';
+  rows.forEach(function(r) { r.style.display = visible ? 'none' : ''; });
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   CHANGE STATUS
+   ═════════════════════════════════════════════════════════════════════ */
+function changeStatus(iid, newStatus, selectEl) {
+  const order = state.orders.find(o => o.iid === iid);
+  if (!order) return;
+  const oldStatus = order.status;
+
+  if (newStatus === oldStatus) return;
+
+  if (newStatus === 'Ok with retour') {
+    // Prompt for amount_collected
+    showModal(T('amount_collected'),
+      '<p style="font-size:.85rem;color:#666;margin-bottom:10px;">' + escHtml(T('amount_prompt')) + '</p>' +
+      '<input type="number" id="modalAmountInput" placeholder="' + escHtml(T('amount_placeholder')) + '" min="0">',
+      async function() {
+        const amt = Number(document.getElementById('modalAmountInput').value);
+        if (isNaN(amt) || amt < 0) {
+          showToast(T('invalid_amount'), 'error');
+          selectEl.value = oldStatus;
+          return;
+        }
+        await doStatusUpdate(iid, newStatus, { amount_collected: amt }, selectEl, oldStatus);
+      }
+    );
+    // Reset select visually until confirmed
+    selectEl.value = oldStatus;
+    return;
+  }
+
+  if (newStatus === 'Rescheduled') {
+    showModal(T('reschedule_order'),
+      '<p style="font-size:.85rem;color:#666;margin-bottom:10px;">' + escHtml(T('reschedule_prompt')) + '</p>' +
+      '<input type="date" id="modalRescheduleDate">',
+      async function() {
+        const nd = document.getElementById('modalRescheduleDate').value;
+        if (!nd) {
+          showToast(T('select_date'), 'error');
+          selectEl.value = oldStatus;
+          return;
+        }
+        await doStatusUpdate(iid, newStatus, { new_delivery_date: nd }, selectEl, oldStatus);
+      }
+    );
+    selectEl.value = oldStatus;
+    return;
+  }
+
+  // Simple status change
+  doStatusUpdate(iid, newStatus, {}, selectEl, oldStatus);
+}
+
+async function doStatusUpdate(iid, newStatus, extra, selectEl, oldStatus) {
+  try {
+    const body = Object.assign({ status: newStatus }, extra);
+    await API.updateOrder(iid, body);
+    showToast(T('status_updated') + ' ' + translateStatus(newStatus));
+    loadOrders();
+    refreshHistoryState();
+  } catch(e) {
+    showToast(T('error_prefix') + ' ' + e.message, 'error');
+    if (selectEl) selectEl.value = oldStatus;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   DELETE ORDER
+   ═════════════════════════════════════════════════════════════════════ */
+function deleteOrder(iid, name) {
+  showModal(T('delete_order'),
+    '<p style="font-size:.9rem;color:#666;">' + escHtml(T('delete_confirm')) + ' <strong>' +
+    escHtml(name) + '</strong>' + escHtml(T('cannot_undo')) + '</p>',
+    async function() {
+      try {
+        await API.deleteOrder(iid);
+        showToast(T('order_deleted'));
+        loadOrders();
+        refreshHistoryState();
+      } catch(e) {
+        showToast(T('error_prefix') + ' ' + e.message, 'error');
+      }
+    }
+  );
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   EDIT ORDER
+   ═════════════════════════════════════════════════════════════════════ */
+function editOrder(iid) {
+  const order = state.orders.find(o => o.iid === iid);
+  if (!order) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+
+  state.editingOrder = order;
+  loadSubtypeDraftsFromOrder(order);
+
+  document.getElementById('editIid').value = order.iid;
+  document.getElementById('formTitle').textContent = T('tab_edit_order');
+  document.getElementById('btnSubmit').textContent = T('update_order');
+  document.getElementById('btnCancelEdit').style.display = 'block';
+
+  document.getElementById('fDeliveryDate').value = order.delivery_date || '';
+  document.getElementById('fClientName').value = order.client_name || '';
+  document.getElementById('fPhone').value = order.phone || '';
+  document.getElementById('fAddress').value = order.address || '';
+  document.getElementById('fProducts').value = order.products || '';
+  document.getElementById('fNotes').value = order.notes || '';
+
+  setActiveToggle('feeToggles', order.delivery_fee);
+  document.getElementById('fAgent').value = order.agent || '';
+  setActiveToggle('paymentToggles', order.payment_method);
+
+  // Pre-fill total price from existing order
+  const tp = document.getElementById('fTotalPrice');
+  const existingTotal = order.total_price || order.hidden_amount || 0;
+  if (order.payment_method === 'exchange') {
+    // Exchange: determine direction from sign of total
+    var fee = order.delivery_fee || 0;
+    tp.value = existingTotal;
+    tp.dataset.manual = '1';
+    if (existingTotal === 0 && fee === 0) {
+      setActiveToggle('exchangeDirectionToggles', 'even');
+      document.getElementById('fExchangeAmount').value = '';
+    } else if (existingTotal - fee < 0) {
+      setActiveToggle('exchangeDirectionToggles', 'we_pay');
+      document.getElementById('fExchangeAmount').value = Math.abs(existingTotal - fee);
+    } else {
+      setActiveToggle('exchangeDirectionToggles', 'client_pays');
+      document.getElementById('fExchangeAmount').value = existingTotal - fee > 0 ? existingTotal - fee : '';
+    }
+  } else {
+    tp.value = existingTotal > 0 ? existingTotal : '';
+    tp.dataset.manual = existingTotal > 0 ? '1' : '';
+  }
+
+  // Pre-fill exchange products
+  if (order.exchange_products) {
+    document.getElementById('fExchangeProducts').value = order.exchange_products;
+  }
+  toggleExchangeFields();
+
+  switchTab('form');
+  updatePricePreview();
+
+  // Pre-fill page selection from existing order
+  if (order.page) {
+    document.getElementById('fPage').value = order.page;
+  }
+}
+
+function cancelEdit() {
+  state.editingOrder = null;
+  state.subtypeDrafts = {};
+  document.getElementById('editIid').value = '';
+  document.getElementById('formTitle').textContent = T('tab_new_order');
+  document.getElementById('btnSubmit').textContent = T('create_order');
+  document.getElementById('btnCancelEdit').style.display = 'none';
+  document.getElementById('orderForm').reset();
+  setActiveToggle('feeToggles', '3000');
+  setActiveToggle('paymentToggles', state.paymentDefault);
+  document.querySelector('.tab-btn[data-tab="form"]').textContent = T('tab_new_order');
+  document.getElementById('pricePreview').innerHTML = '';
+  const tp = document.getElementById('fTotalPrice');
+  tp.value = '';
+  tp.dataset.manual = '';
+  document.getElementById('fPage').value = '';
+  document.getElementById('pageSelectGroup').style.display = 'none';
+  document.getElementById('subtypeSelection').innerHTML = '';
+  document.getElementById('fExchangeProducts').value = '';
+  document.getElementById('exchangeProductsGroup').style.display = 'none';
+  document.getElementById('exchangeDirectionGroup').style.display = 'none';
+  document.getElementById('exchangeAmountGroup').style.display = 'none';
+  document.getElementById('fExchangeAmount').value = '';
+  setActiveToggle('exchangeDirectionToggles', 'client_pays');
+  // Restore normal total field visibility
+  document.getElementById('fTotalPrice').closest('.form-group').style.display = '';
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   SUBMIT ORDER
+   ═════════════════════════════════════════════════════════════════════ */
+async function submitOrder(e) {
+  e.preventDefault();
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = state.editingOrder ? T('updating') : T('creating');
+
+  const totalVal = document.getElementById('fTotalPrice').value.trim();
+  const body = {
+    delivery_date: document.getElementById('fDeliveryDate').value.trim(),
+    client_name: document.getElementById('fClientName').value.trim(),
+    phone: document.getElementById('fPhone').value.trim(),
+    address: document.getElementById('fAddress').value.trim(),
+    products: document.getElementById('fProducts').value.trim(),
+    delivery_fee: Number(getActiveToggle('feeToggles')) || 3000,
+    agent: document.getElementById('fAgent').value,
+    payment_method: getActiveToggle('paymentToggles') || state.paymentDefault,
+    notes: document.getElementById('fNotes').value.trim()
+  };
+  // Include total_price if user entered a value (manual override or auto-filled)
+  if (totalVal !== '') {
+    body.total_price = Number(totalVal);
+  }
+  // Include page selection
+  const pageVal = document.getElementById('fPage').value;
+  if (pageVal) {
+    body.page = pageVal;
+  }
+
+  // Include exchange products if exchange payment method
+  if (body.payment_method === 'exchange') {
+    body.exchange_products = document.getElementById('fExchangeProducts').value.trim();
+  }
+
+  // Validate and include subtypes
+  if (!validateSubtypes()) {
+    showToast(T('subtypes_mismatch'), 'error');
+    btn.disabled = false;
+    btn.textContent = state.editingOrder ? T('update_order') : T('create_order');
+    return;
+  }
+  const subtypesMap = collectSubtypes();
+  if (Object.keys(subtypesMap).length > 0) {
+    body.subtypes = subtypesMap;
+  }
+
+  try {
+    if (state.editingOrder) {
+      await API.updateOrder(state.editingOrder.iid, body);
+      showToast(T('order_updated'));
+    } else {
+      await API.createOrder(body);
+      showToast(T('order_created'));
+    }
+    cancelEdit(); // clears form
+    switchTab('orders');
+    loadOrders();
+    refreshHistoryState();
+  } catch(e) {
+    showToast(T('error_prefix') + ' ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = state.editingOrder ? T('update_order') : T('create_order');
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   AUTO-REFRESH
+   ═════════════════════════════════════════════════════════════════════ */
+function startAutoRefresh() {
+  stopAutoRefresh();
+  state.refreshTimer = setInterval(() => {
+    if (state.activeTab === 'orders') {
+      loadOrders();
+    }
+  }, 15000);
+}
+
+function stopAutoRefresh() {
+  if (state.refreshTimer) {
+    clearInterval(state.refreshTimer);
+    state.refreshTimer = null;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   UNDO / REDO
+   ═════════════════════════════════════════════════════════════════════ */
+async function refreshHistoryState() {
+  try {
+    const data = await API.getHistory();
+    document.getElementById('btnUndo').disabled = !data.can_undo;
+    document.getElementById('btnRedo').disabled = !data.can_redo;
+  } catch(e) {
+    // Silently fail - buttons stay disabled
+  }
+}
+
+async function doUndo() {
+  const btn = document.getElementById('btnUndo');
+  btn.disabled = true;
+  try {
+    const data = await API.undo();
+    if (data.success) {
+      showToast(T('undone'));
+      loadOrders();
+    } else {
+      showToast(data.error || T('nothing_to_undo'), 'error');
+    }
+  } catch(e) {
+    showToast(T('nothing_to_undo'), 'error');
+  }
+  refreshHistoryState();
+}
+
+async function doRedo() {
+  const btn = document.getElementById('btnRedo');
+  btn.disabled = true;
+  try {
+    const data = await API.redo();
+    if (data.success) {
+      showToast(T('redone'));
+      loadOrders();
+    } else {
+      showToast(data.error || T('nothing_to_redo'), 'error');
+    }
+  } catch(e) {
+    showToast(T('nothing_to_redo'), 'error');
+  }
+  refreshHistoryState();
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   APPLY LANGUAGE
+   ═════════════════════════════════════════════════════════════════════ */
+function applyLanguage() {
+  // Header
+  document.querySelector('.header h1').textContent = T('app_title');
+  document.querySelector('.header .subtitle').textContent = T('app_subtitle');
+
+  // Tab buttons
+  document.querySelector('.tab-btn[data-tab="orders"]').textContent = T('tab_orders');
+  document.querySelector('.tab-btn[data-tab="form"]').textContent = state.editingOrder ? T('tab_edit_order') : T('tab_new_order');
+  document.querySelector('.tab-btn[data-tab="dashboard"]').textContent = T('tab_dashboard');
+
+  // Date nav - Orders
+  const dateNavBtns = document.querySelectorAll('#tabOrders .date-nav button');
+  if (dateNavBtns[0]) dateNavBtns[0].innerHTML = '&larr; ' + T('prev');
+  if (dateNavBtns[1]) dateNavBtns[1].innerHTML = T('next') + ' &rarr;';
+  if (dateNavBtns[2]) dateNavBtns[2].textContent = T('today');
+
+  // Date nav - Dashboard
+  const dashNavBtns = document.querySelectorAll('#tabDashboard .date-nav button');
+  if (dashNavBtns[0]) dashNavBtns[0].innerHTML = '&larr; ' + T('prev');
+  if (dashNavBtns[1]) dashNavBtns[1].innerHTML = T('next') + ' &rarr;';
+  if (dashNavBtns[2]) dashNavBtns[2].textContent = T('today');
+
+  // Filter pills
+  const pills = document.querySelectorAll('#filterRow .pill');
+  const pillKeys = ['all','pending','ok','retour','cancelled','rescheduled'];
+  pills.forEach((p, i) => { if (pillKeys[i]) p.textContent = T(pillKeys[i]); });
+
+  // Filter agent dropdown first option
+  const fa = document.getElementById('filterAgent');
+  if (fa.options[0]) fa.options[0].textContent = T('all_agents');
+
+  // Filter payment dropdown
+  const fp = document.getElementById('filterPayment');
+  if (fp.options[0]) fp.options[0].textContent = T('all_payments');
+  if (fp.options[1]) fp.options[1].textContent = T('pm_cash');
+  if (fp.options[2]) fp.options[2].textContent = T('pm_prepaid');
+  if (fp.options[3]) fp.options[3].textContent = T('pm_colis');
+  if (fp.options[4]) fp.options[4].textContent = T('pm_mobile_delivery');
+  if (fp.options[5]) fp.options[5].textContent = T('pm_exchange');
+
+  // Form labels
+  document.getElementById('formTitle').textContent = state.editingOrder ? T('tab_edit_order') : T('tab_new_order');
+  const labels = document.querySelectorAll('#orderForm .form-group label');
+  const labelKeys = ['delivery_date','client_name','phone_label','address_label','products_label','page_label','exchange_products_label','exchange_direction','exchange_amount','delivery_fee_label','total_price_label','agent_label','payment_method','notes_label'];
+  labels.forEach((l, i) => { if (labelKeys[i]) l.textContent = T(labelKeys[i]); });
+
+  // Form hints
+  const hints = document.querySelectorAll('#orderForm .hint');
+  if (hints[0]) hints[0].textContent = T('date_hint');
+  if (hints[1]) hints[1].textContent = T('products_hint');
+  if (hints[2]) hints[2].textContent = T('page_hint');
+  if (hints[3]) hints[3].textContent = T('exchange_products_hint');
+  if (hints[4]) hints[4].textContent = T('exchange_amount_hint');
+  if (hints[5]) hints[5].textContent = T('total_price_hint');
+
+  // Form placeholders
+  document.getElementById('fNotes').placeholder = T('notes_placeholder');
+  document.getElementById('fTotalPrice').placeholder = T('total_price_placeholder');
+
+  // Page selector labels
+  document.getElementById('lPageSelect').textContent = T('page_label');
+  document.getElementById('hPageSelect').textContent = T('page_hint');
+
+  // Exchange fields
+  document.getElementById('lExchangeProducts').textContent = T('exchange_products_label');
+  document.getElementById('hExchangeProducts').textContent = T('exchange_products_hint');
+  document.getElementById('fExchangeProducts').placeholder = T('exchange_products_placeholder');
+  document.getElementById('lExchangeDirection').textContent = T('exchange_direction');
+  document.getElementById('lExchangeAmount').textContent = T('exchange_amount');
+  document.getElementById('hExchangeAmount').textContent = T('exchange_amount_hint');
+  // Translate direction toggle buttons
+  var dirBtns = document.getElementById('exchangeDirectionToggles').querySelectorAll('.toggle-btn');
+  if (dirBtns[0]) dirBtns[0].textContent = T('exchange_client_pays');
+  if (dirBtns[1]) dirBtns[1].textContent = T('exchange_we_pay');
+  if (dirBtns[2]) dirBtns[2].textContent = T('exchange_even');
+
+  // Form agent first option
+  const fAgentSelect = document.getElementById('fAgent');
+  if (fAgentSelect.options[0]) fAgentSelect.options[0].textContent = T('select_agent');
+
+  // Form buttons
+  document.getElementById('btnSubmit').textContent = state.editingOrder ? T('update_order') : T('create_order');
+  document.getElementById('btnCancelEdit').textContent = T('cancel_edit');
+
+  // Dashboard section titles
+  const secTitles = document.querySelectorAll('#tabDashboard .section-title');
+  const secKeys = ['order_statistics','financial_summary','products_breakdown'];
+  secTitles.forEach((s, i) => { if (secKeys[i]) s.textContent = T(secKeys[i]); });
+
+  // FAB title
+  document.getElementById('fabNewOrder').title = T('new_order');
+
+  // Language button text
+  document.getElementById('langToggle').textContent = LANG.current === 'fr' ? '\ud83c\uddec\ud83c\udde7' : '\ud83c\uddeb\ud83c\uddf7';
+
+  // Search placeholder
+  document.getElementById('searchInput').placeholder = T('search_placeholder');
+
+  // Undo/Redo labels
+  document.getElementById('undoLabel').textContent = T('undo');
+  document.getElementById('redoLabel').textContent = T('redo');
+
+  // Apply data-t translations to new UI elements (selection bar, sort row, export bar)
+  document.querySelectorAll('[data-t]').forEach(function(el) {
+    var key = el.getAttribute('data-t');
+    var val = T(key);
+    if (val && val !== key) {
+      if (el.tagName === 'INPUT') el.placeholder = val;
+      else el.textContent = val;
+    }
+  });
+
+  // Re-render current data to apply translations in dynamic content
+  buildPaymentToggles();
+  setActiveToggle('paymentToggles', state.editingOrder ? state.editingOrder.payment_method : state.paymentDefault);
+  renderOrders();
+  if (state.activeTab === 'dashboard') loadStats();
+  updatePricePreview();
+  // Update banner for whichever tab is active
+  updateDateBanner(state.activeTab === 'dashboard' ? state.dashDate : state.currentDate);
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   INIT
+   ═════════════════════════════════════════════════════════════════════ */
+async function init() {
+  const today = todayISO();
+  state.currentDate = today;
+  state.dashDate = today;
+  setupOrderClipboardInteractions();
+
+  document.getElementById('orderDatePicker').value = today;
+  document.getElementById('dashDatePicker').value = today;
+  updateDateBanner(today);
+
+  // Show loading state
+  document.getElementById('ordersList').innerHTML =
+    '<div class="loading-overlay"><span class="spinner"></span> ' + escHtml(T('loading_orders')) + '</div>';
+
+  // Load everything concurrently
+  await Promise.allSettled([
+    loadAgents(),
+    loadProducts(),
+    loadPages(),
+    loadDeliveryFees(),
+    loadPaymentMethods(),
+    loadOrders(),
+    refreshHistoryState()
+  ]);
+
+  // Try to get today's date from server
+  try {
+    const datesData = await API.getDates();
+    if (datesData.today && datesData.today !== today) {
+      state.currentDate = datesData.today;
+      state.dashDate = datesData.today;
+      setCurrentDate(datesData.today);
+      setDashDate(datesData.today);
+    }
+  } catch(e) { /* use local date */ }
+
+  startAutoRefresh();
+  applyLanguage();
+}
+
+// Kick it off
+init();
+</script>
+</body>
+</html>
