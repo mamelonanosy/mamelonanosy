@@ -1380,6 +1380,81 @@ function shiftDate(iso, days) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
+const FRENCH_WEEKDAYS = {
+  lundi: 0, lun: 0,
+  mardi: 1, mar: 1,
+  mercredi: 2, mer: 2,
+  jeudi: 3, jeu: 3,
+  vendredi: 4, ven: 4,
+  samedi: 5, sam: 5,
+  dimanche: 6, dim: 6
+};
+const FRENCH_WEEKDAY_PATTERN = '(mercredi|vendredi|dimanche|samedi|jeudi|lundi|mardi|mer|ven|dim|sam|jeu|lun|mar)';
+const FRENCH_WEEKDAY_KEYS = Object.keys(FRENCH_WEEKDAYS).sort(function(a, b) { return b.length - a.length; });
+
+function isoFromDateParts(year, month, day) {
+  const d = new Date(year, month - 1, day);
+  if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return '';
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function parseDeliveryDateInput(value, fallbackIso) {
+  const fallback = fallbackIso || todayISO();
+  let text = String(value || '').trim().toLowerCase();
+  if (!text) return fallback;
+  text = text.normalize ? text.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : text;
+  text = text.replace(/['\u2019]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const today = todayISO();
+  const currentYear = Number(today.slice(0, 4));
+  if (text === 'aujourd hui' || text === 'aujourdhui' || text === 'today') return today;
+  if (text === 'demain' || text === 'tomorrow') return shiftDate(today, 1);
+  if (text === 'hier' || text === 'yesterday') return shiftDate(today, -1);
+
+  let m = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return isoFromDateParts(Number(m[1]), Number(m[2]), Number(m[3])) || fallback;
+
+  m = text.match(new RegExp('^' + FRENCH_WEEKDAY_PATTERN + '\\s+(\\d{1,2})[\\/-](\\d{1,2})[\\/-](\\d{2,4})$'));
+  if (m) {
+    let year = Number(m[4]);
+    if (year < 100) year += 2000;
+    return isoFromDateParts(year, Number(m[3]), Number(m[2])) || fallback;
+  }
+
+  m = text.match(new RegExp('^' + FRENCH_WEEKDAY_PATTERN + '\\s+(\\d{1,2})[\\/-](\\d{1,2})$'));
+  if (m) {
+    let iso = isoFromDateParts(currentYear, Number(m[3]), Number(m[2]));
+    if (iso && iso < today) iso = isoFromDateParts(currentYear + 1, Number(m[3]), Number(m[2]));
+    return iso || fallback;
+  }
+
+  m = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+  if (m) {
+    let year = Number(m[3]);
+    if (year < 100) year += 2000;
+    return isoFromDateParts(year, Number(m[2]), Number(m[1])) || fallback;
+  }
+
+  m = text.match(/^(\d{1,2})[\/-](\d{1,2})$/);
+  if (m) {
+    let iso = isoFromDateParts(currentYear, Number(m[2]), Number(m[1]));
+    if (iso && iso < today) iso = isoFromDateParts(currentYear + 1, Number(m[2]), Number(m[1]));
+    return iso || fallback;
+  }
+
+  const todayDate = new Date(today + 'T00:00:00');
+  const currentWeekday = (todayDate.getDay() + 6) % 7;
+  for (let i = 0; i < FRENCH_WEEKDAY_KEYS.length; i++) {
+    const dayName = FRENCH_WEEKDAY_KEYS[i];
+    if (text === dayName || text.indexOf(dayName + ' ') === 0) {
+      const daysAhead = (FRENCH_WEEKDAYS[dayName] - currentWeekday + 7) % 7;
+      return shiftDate(today, daysAhead);
+    }
+  }
+
+  return fallback;
+}
+
 function escHtml(s) {
   if (!s) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1708,6 +1783,14 @@ function switchTab(tab) {
   } else if (tab === 'form') {
     document.getElementById('tabForm').classList.add('active');
     stopAutoRefresh();
+    if (!state.editingOrder) {
+      const dateInput = document.getElementById('fDeliveryDate');
+      const defaultDate = state.currentDate || todayISO();
+      if (!dateInput.value.trim()) {
+        dateInput.value = defaultDate;
+        document.getElementById('fDeliveryDatePicker').value = defaultDate;
+      }
+    }
     // Update tab button text
     document.querySelector('.tab-btn[data-tab="form"]').textContent =
       state.editingOrder ? T('tab_edit_order') : T('tab_new_order');
@@ -1722,11 +1805,11 @@ function switchTab(tab) {
 /* ═════════════════════════════════════════════════════════════════════
    DATE NAVIGATION (ORDERS TAB)
    ═════════════════════════════════════════════════════════════════════ */
-function setCurrentDate(iso) {
+function setCurrentDate(iso, loadOptions) {
   state.currentDate = iso;
   document.getElementById('orderDatePicker').value = iso;
   updateDateBanner(iso);
-  loadOrders();
+  return loadOrders(loadOptions);
 }
 
 function prevDate() { setCurrentDate(shiftDate(state.currentDate, -1)); }
@@ -1820,8 +1903,9 @@ function clearSearch() {
    LOAD DATA
    ═════════════════════════════════════════════════════════════════════ */
 let _ordersReqId = 0;
-async function loadOrders() {
-  if (state.ordersLoading) return;
+async function loadOrders(options) {
+  const force = options && options.force;
+  if (state.ordersLoading && !force) return;
   const reqId = ++_ordersReqId;
   state.ordersLoading = true;
   try {
@@ -1833,7 +1917,7 @@ async function loadOrders() {
     if (reqId !== _ordersReqId) return;
     console.error('loadOrders error:', e);
   } finally {
-    state.ordersLoading = false;
+    if (reqId === _ordersReqId) state.ordersLoading = false;
   }
 }
 
@@ -2916,6 +3000,7 @@ function editOrder(iid) {
   document.getElementById('btnCancelEdit').style.display = 'block';
 
   document.getElementById('fDeliveryDate').value = order.delivery_date || '';
+  document.getElementById('fDeliveryDatePicker').value = order.delivery_date || '';
   document.getElementById('fClientName').value = order.client_name || '';
   document.getElementById('fPhone').value = order.phone || '';
   document.getElementById('fAddress').value = order.address || '';
@@ -2972,6 +3057,9 @@ function cancelEdit() {
   document.getElementById('btnSubmit').textContent = T('create_order');
   document.getElementById('btnCancelEdit').style.display = 'none';
   document.getElementById('orderForm').reset();
+  const defaultDate = state.currentDate || todayISO();
+  document.getElementById('fDeliveryDate').value = defaultDate;
+  document.getElementById('fDeliveryDatePicker').value = defaultDate;
   setActiveToggle('feeToggles', '3000');
   setActiveToggle('paymentToggles', state.paymentDefault);
   document.querySelector('.tab-btn[data-tab="form"]').textContent = T('tab_new_order');
@@ -3003,8 +3091,14 @@ async function submitOrder(e) {
   btn.textContent = state.editingOrder ? T('updating') : T('creating');
 
   const totalVal = document.getElementById('fTotalPrice').value.trim();
+  const deliveryDate = parseDeliveryDateInput(
+    document.getElementById('fDeliveryDate').value,
+    state.currentDate || todayISO()
+  );
+  document.getElementById('fDeliveryDate').value = deliveryDate;
+  document.getElementById('fDeliveryDatePicker').value = deliveryDate;
   const body = {
-    delivery_date: document.getElementById('fDeliveryDate').value.trim(),
+    delivery_date: deliveryDate,
     client_name: document.getElementById('fClientName').value.trim(),
     phone: document.getElementById('fPhone').value.trim(),
     address: document.getElementById('fAddress').value.trim(),
@@ -3042,16 +3136,19 @@ async function submitOrder(e) {
   }
 
   try {
+    let result;
     if (state.editingOrder) {
-      await API.updateOrder(state.editingOrder.iid, body);
+      result = await API.updateOrder(state.editingOrder.iid, body);
       showToast(T('order_updated'));
     } else {
-      await API.createOrder(body);
+      result = await API.createOrder(body);
       showToast(T('order_created'));
     }
+    const savedDate = (result && result.order && result.order.delivery_date) || body.delivery_date || state.currentDate;
     cancelEdit(); // clears form
     switchTab('orders');
-    loadOrders();
+    if (savedDate) await setCurrentDate(savedDate, {force: true});
+    else await loadOrders({force: true});
     refreshHistoryState();
   } catch(e) {
     showToast(T('error_prefix') + ' ' + e.message, 'error');
