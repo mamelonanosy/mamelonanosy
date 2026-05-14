@@ -636,7 +636,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
       <div class="form-group">
         <label>Produits *</label>
-        <input type="text" id="fProducts" required placeholder="CA x2, CG x1" oninput="debouncePricePreview()" onblur="this.value=this.value.toUpperCase()">
+        <input type="text" id="fProducts" required placeholder="CA x2, CG x1" oninput="debouncePricePreview()" onblur="this.value=formatProductsInput(this.value);updatePricePreview()">
         <div class="hint">Ex: CA x2, CG x1 ou CA CG TA</div>
         <div id="pricePreview" class="price-preview"></div>
         <div id="subtypeSelection"></div>
@@ -974,6 +974,8 @@ const API = {
   base: window.location.origin,
   firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
   firebaseOrdersPath: '/orders',
+  staticConfigVersion: '2026-05-14-1',
+  staticConfigCache: {},
   staticHost: (function() {
     const params = new URLSearchParams(window.location.search);
     const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
@@ -1059,15 +1061,39 @@ const API = {
   async fb(method, path, body) {
     const opts = { method: method, headers: { 'Content-Type': 'application/json' } };
     if (body !== undefined) opts.body = JSON.stringify(body);
-    const r = await fetch(this.firebaseBase + path + '.json', opts);
+    const jsonPath = path.indexOf('?') >= 0 ? path.replace('?', '.json?') : path + '.json';
+    const r = await fetch(this.firebaseBase + jsonPath, opts);
     if (!r.ok) throw new Error('Firebase request failed (' + r.status + ')');
     return r.json();
   },
 
+  async staticJson(path) {
+    if (this.staticConfigCache[path]) return this.staticConfigCache[path];
+    const url = path + '?v=' + encodeURIComponent(this.staticConfigVersion);
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('Static config failed (' + r.status + ')');
+    const data = await r.json();
+    this.staticConfigCache[path] = data;
+    return data;
+  },
+
   productMap() {
     const map = {};
-    this.staticProducts.forEach(function(p) { map[p.code] = p; });
+    const products = (state.products && state.products.length) ? state.products : this.staticProducts;
+    products.forEach(function(p) { map[String(p.code || '').toUpperCase()] = p; });
     return map;
+  },
+
+  normalizeOrderLine(line, productsText) {
+    const productMap = this.productMap();
+    const copy = Object.assign({}, line || {});
+    const code = String(copy.code || copy.product_code || '').trim().toUpperCase();
+    copy.code = code;
+    copy.qty = Number(copy.qty || copy.quantity || 1) || 1;
+    copy.unit_price = Number(copy.unit_price !== undefined ? copy.unit_price : ((productMap[code] && productMap[code].price) || 0)) || 0;
+    copy.total = Number(copy.total !== undefined ? copy.total : copy.qty * copy.unit_price) || 0;
+    if (copy.subtypes !== undefined && copy.subtypes !== null) copy.subtypes = String(copy.subtypes);
+    return copy;
   },
 
   parseProductText(text) {
@@ -1117,7 +1143,11 @@ const API = {
     const productsText = data.products !== undefined ? data.products : (base.products || '');
     const deliveryFee = Number(data.delivery_fee !== undefined ? data.delivery_fee : (base.delivery_fee || 3000)) || 0;
     const payment = this.normalizePayment(data.payment_method || base.payment_method || data.payment || base.payment);
-    const lines = this.parseProductText(productsText);
+    const explicitLines = Array.isArray(data.order_lines) ? data.order_lines : null;
+    const baseLines = Array.isArray(base.order_lines) ? base.order_lines : null;
+    let lines = (explicitLines || (!data.products && baseLines))
+      ? (explicitLines || baseLines).map((line) => this.normalizeOrderLine(line, productsText))
+      : this.parseProductText(productsText);
     const subtotal = lines.reduce(function(sum, item) { return sum + (Number(item.total) || 0); }, 0);
     let totalPrice = payment === 'prepaid' ? 0 : subtotal + deliveryFee;
     let hiddenAmount = payment === 'prepaid' ? subtotal + deliveryFee : 0;
@@ -1189,6 +1219,7 @@ const API = {
       phone: raw.phone || '',
       address: raw.address || '',
       products: raw.products || '',
+      order_lines: Array.isArray(raw.order_lines) ? raw.order_lines : null,
       delivery_fee: raw.delivery_fee,
       payment_method: this.normalizePayment(raw.payment_method || raw.payment),
       total_price: raw.total_price,
@@ -1203,8 +1234,13 @@ const API = {
     return order;
   },
 
-  async getFirebaseOrders() {
-    const data = await this.fb('GET', this.firebaseOrdersPath) || {};
+  async getFirebaseOrders(date) {
+    let path = this.firebaseOrdersPath;
+    if (date) {
+      path += '?orderBy=' + encodeURIComponent(JSON.stringify('delivery_date')) +
+        '&equalTo=' + encodeURIComponent(JSON.stringify(date));
+    }
+    const data = await this.fb('GET', path) || {};
     const orders = [];
     Object.keys(data).forEach((id) => {
       if (data[id]) orders.push(this.normalizeOrder(id, data[id]));
@@ -1214,9 +1250,8 @@ const API = {
 
   getOrders(date, status, agent) {
     if (this.isStaticMode()) {
-      return this.getFirebaseOrders().then(function(orders) {
+      return this.getFirebaseOrders(date).then(function(orders) {
         let filtered = orders;
-        if (date) filtered = filtered.filter(function(o) { return o.delivery_date === date; });
         if (status) filtered = filtered.filter(function(o) { return o.status === status; });
         if (agent) filtered = filtered.filter(function(o) { return o.agent === agent; });
         return {orders: filtered, count: filtered.length};
@@ -1268,7 +1303,12 @@ const API = {
     return this.request('GET', '/api/agents');
   },
   getProducts() {
-    if (this.isStaticMode()) return Promise.resolve({products: this.staticProducts});
+    if (this.isStaticMode()) {
+      return this.staticJson('data/products.json').then((data) => {
+        const products = Array.isArray(data) ? data : (data.products || []);
+        return {products: products.length ? products : this.staticProducts};
+      }).catch(() => ({products: this.staticProducts}));
+    }
     return this.request('GET', '/api/products');
   },
   getStats(date) {
@@ -1302,12 +1342,7 @@ const API = {
   },
   getDates() {
     if (this.isStaticMode()) {
-      return this.getFirebaseOrders().then((orders) => {
-        const dates = {};
-        dates[this.today()] = true;
-        orders.forEach(function(o) { if (o.delivery_date) dates[o.delivery_date] = true; });
-        return {dates: Object.keys(dates).sort(), today: this.today()};
-      });
+      return Promise.resolve({dates: [this.today()], today: this.today()});
     }
     return this.request('GET', '/api/dates');
   },
@@ -1320,7 +1355,12 @@ const API = {
     return this.request('GET', '/api/payment-methods');
   },
   getPages() {
-    if (this.isStaticMode()) return Promise.resolve({pages: this.staticPages});
+    if (this.isStaticMode()) {
+      return this.staticJson('data/pages.json').then((data) => {
+        const pages = Array.isArray(data) ? data : (data.pages || []);
+        return {pages: pages.length ? pages : this.staticPages};
+      }).catch(() => ({pages: this.staticPages}));
+    }
     return this.request('GET', '/api/pages');
   },
   getHistory() {
@@ -1572,6 +1612,16 @@ function parseProductsInput(productsStr) {
     i++;
   }
   return items;
+}
+
+function formatProductsInput(productsStr) {
+  const original = String(productsStr || '').trim();
+  if (!original) return '';
+  const items = parseProductsInput(original);
+  if (!items.length) return original.toUpperCase();
+  return items.map(function(item) {
+    return item.code + ' x' + item.qty;
+  }).join(', ');
 }
 
 function extractOrderCodes(order) {
@@ -3097,12 +3147,20 @@ async function submitOrder(e) {
   );
   document.getElementById('fDeliveryDate').value = deliveryDate;
   document.getElementById('fDeliveryDatePicker').value = deliveryDate;
+  const clientName = capitalizeName(document.getElementById('fClientName').value);
+  const phone = formatPhone(document.getElementById('fPhone').value);
+  const address = capitalizeName(document.getElementById('fAddress').value);
+  const products = formatProductsInput(document.getElementById('fProducts').value);
+  document.getElementById('fClientName').value = clientName;
+  document.getElementById('fPhone').value = phone;
+  document.getElementById('fAddress').value = address;
+  document.getElementById('fProducts').value = products;
   const body = {
     delivery_date: deliveryDate,
-    client_name: document.getElementById('fClientName').value.trim(),
-    phone: document.getElementById('fPhone').value.trim(),
-    address: document.getElementById('fAddress').value.trim(),
-    products: document.getElementById('fProducts').value.trim(),
+    client_name: clientName.trim(),
+    phone: phone.trim(),
+    address: address.trim(),
+    products: products.trim(),
     delivery_fee: Number(getActiveToggle('feeToggles')) || 3000,
     agent: document.getElementById('fAgent').value,
     payment_method: getActiveToggle('paymentToggles') || state.paymentDefault,
@@ -3167,7 +3225,7 @@ function startAutoRefresh() {
     if (state.activeTab === 'orders') {
       loadOrders();
     }
-  }, 15000);
+  }, API.isStaticMode() ? 30000 : 15000);
 }
 
 function stopAutoRefresh() {

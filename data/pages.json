@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Traitement naturel",
+    "phone": "038 17 890 54",
+    "facebook": "Traitement naturel",
+    "product_codes": [
+      "CBB"
+    ],
+    "is_default": false,
+    "accent_color": "#355C7D",
+    "text_color": "#1F2A44",
+    "font_style": "sans"
+  },
+  {
+    "name": "Louanh Cosmetics",
+    "phone": "038 81 804 09",
+    "facebook": "Louanh Cosmetics",
+    "product_codes": [
+      "CSV"
+    ],
+    "is_default": true,
+    "accent_color": "#C06C84",
+    "text_color": "#6C3144",
+    "font_style": "serif"
+  },
+  {
+    "name": "Luna Shop",
+    "phone": "038 81 804 09",
+    "facebook": "Luna Shop",
+    "product_codes": [
+      "ENSEMBLE"
+    ],
+    "is_default": false,
+    "accent_color": "#2A9D8F",
+    "text_color": "#1E5E55",
+    "font_style": "mono"
+  },
+  {
+    "name": "Tout Bio MDG",
+    "phone": "032 17 890 54",
+    "facebook": "Tout Bio MDG",
+    "product_codes": [
+      "CE"
+    ],
+    "is_default": false,
+    "accent_color": "#E76F51",
+    "text_color": "#7A3626",
+    "font_style": "sans"
+  },
+  {
+    "name": "Elegance Royale",
+    "phone": "038 81 804 09",
+    "facebook": "Elegance Royale",
+    "product_codes": [
+      "ENSEMBLE"
+    ],
+    "is_default": false,
+    "accent_color": "#8D6E63",
+    "text_color": "#4E342E",
+    "font_style": "serif"
+  }
+]

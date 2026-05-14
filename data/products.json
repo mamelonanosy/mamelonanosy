@@ -1,0 +1,208 @@
+[
+  {
+    "code": "CA",
+    "name": "Creme Affinante",
+    "price": 25000,
+    "subtypes": []
+  },
+  {
+    "code": "TA",
+    "name": "Tisane Affinante",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "CG",
+    "name": "Creme Galbante",
+    "price": 25000,
+    "subtypes": []
+  },
+  {
+    "code": "SG",
+    "name": "SAVON GALBANT",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "BASE",
+    "name": "Base de Savon",
+    "price": 50,
+    "subtypes": []
+  },
+  {
+    "code": "G",
+    "name": "Gaine",
+    "price": 10000,
+    "subtypes": []
+  },
+  {
+    "code": "GM",
+    "name": "Creme Miracle 40g",
+    "price": 20000,
+    "subtypes": []
+  },
+  {
+    "code": "PM",
+    "name": "Creme Miracle 15g",
+    "price": 10000,
+    "subtypes": []
+  },
+  {
+    "code": "SM",
+    "name": "Savon Miracle",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "SN",
+    "name": "Savon Noir",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "SS",
+    "name": "Shampooing Solide",
+    "price": 10000,
+    "subtypes": []
+  },
+  {
+    "code": "MLQ",
+    "name": "moule 15000",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "MLV",
+    "name": "moule 20000",
+    "price": 20000,
+    "subtypes": []
+  },
+  {
+    "code": "MLVC",
+    "name": "moule 25000",
+    "price": 25000,
+    "subtypes": []
+  },
+  {
+    "code": "MLT",
+    "name": "moule 30000",
+    "price": 30000,
+    "subtypes": []
+  },
+  {
+    "code": "CN",
+    "name": "Creme Neutre",
+    "price": 130,
+    "subtypes": []
+  },
+  {
+    "code": "CSV",
+    "name": "Creme Special Vergetures",
+    "price": 20000,
+    "subtypes": []
+  },
+  {
+    "code": "CBB",
+    "name": "Creme Bye Bye Vergetures",
+    "price": 20000,
+    "subtypes": []
+  },
+  {
+    "code": "CE",
+    "name": "Creme Eclaircissante",
+    "price": 25000,
+    "subtypes": []
+  },
+  {
+    "code": "VITE",
+    "name": "VITAMINE E",
+    "price": 1500,
+    "subtypes": []
+  },
+  {
+    "code": "ROBE",
+    "name": "Robe",
+    "price": 10000,
+    "subtypes": []
+  },
+  {
+    "code": "CROP",
+    "name": "Top Court",
+    "price": 8000,
+    "subtypes": []
+  },
+  {
+    "code": "CORSET",
+    "name": "Corset",
+    "price": 15000,
+    "subtypes": []
+  },
+  {
+    "code": "COL",
+    "name": "Colorant",
+    "price": 5000,
+    "subtypes": []
+  },
+  {
+    "code": "PAR",
+    "name": "Parfum",
+    "price": 10000,
+    "subtypes": []
+  },
+  {
+    "code": "GC",
+    "name": "Graine de courge",
+    "price": 6000,
+    "subtypes": []
+  },
+  {
+    "code": "HRO",
+    "name": "Huilde de Romarin",
+    "price": 80,
+    "subtypes": []
+  },
+  {
+    "code": "NAPPE",
+    "name": "nappe de table",
+    "price": 19000,
+    "subtypes": []
+  },
+  {
+    "code": "HAK",
+    "name": "huile d'akpi",
+    "price": 80,
+    "subtypes": []
+  },
+  {
+    "code": "BALANCE",
+    "name": "Balance",
+    "price": 35000,
+    "subtypes": []
+  },
+  {
+    "code": "ENSEMBLE",
+    "name": "Ensemble",
+    "price": 35000,
+    "subtypes": [
+      "gilet"
+    ]
+  },
+  {
+    "code": "HC",
+    "name": "Huile de coco",
+    "price": 80,
+    "subtypes": []
+  },
+  {
+    "code": "COS",
+    "name": "Cosgard",
+    "price": 1000,
+    "subtypes": []
+  },
+  {
+    "code": "SHORT",
+    "name": "Short",
+    "price": 20000,
+    "subtypes": []
+  }
+]
