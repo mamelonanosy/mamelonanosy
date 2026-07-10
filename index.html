@@ -809,8 +809,8 @@ const LANG = {
     agent_label: { fr: 'Agent', en: 'Agent' },
     payment_method: { fr: 'Mode de paiement', en: 'Payment Method' },
     pm_cash: { fr: 'Normal', en: 'Cash' },
-    pm_prepaid: { fr: 'Pay\u00e9', en: 'Prepaid' },
-    pm_colis: { fr: 'Colis', en: 'Colis' },
+    pm_prepaid: { fr: 'Pay\u00e9', en: 'Paid' },
+    pm_colis: { fr: 'NON PAY\u00c9', en: 'UNPAID' },
     pm_mobile_delivery: { fr: 'Mobile Money', en: 'Mobile' },
     pm_exchange: { fr: '\u00c9change', en: 'Exchange' },
     exchange_products_label: { fr: 'Produits \u00e0 r\u00e9cup\u00e9rer', en: 'Products to Collect' },
@@ -880,7 +880,7 @@ const LANG = {
     failed_stats: { fr: '\u00c9chec du chargement', en: 'Failed to load stats' },
 
     // Price preview
-    prepaid: { fr: 'Pr\u00e9pay\u00e9', en: 'Prepaid' },
+    prepaid: { fr: 'Pay\u00e9', en: 'Paid' },
 
     // New order FAB title
     new_order: { fr: 'Nouvelle commande', en: 'New Order' },
@@ -957,6 +957,8 @@ const state = {
   filterPayment: '',
   searchQuery: '',
   refreshTimer: null,
+  referenceRefreshTimer: null,
+  referencesLoading: false,
   ordersLoading: false,
   statsLoading: false,
   orderHoldTimer: null,
@@ -974,8 +976,12 @@ const API = {
   base: window.location.origin,
   firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
   firebaseOrdersPath: '/orders',
-  staticConfigVersion: '2026-05-14-1',
+  firebaseReferencePath: '/orders/__reference_data',
+  staticConfigVersion: '2026-07-10-3',
   staticConfigCache: {},
+  referenceCache: null,
+  referenceCacheAt: 0,
+  referenceRequest: null,
   staticHost: (function() {
     const params = new URLSearchParams(window.location.search);
     const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
@@ -1026,12 +1032,14 @@ const API = {
     {name:'Louanh Cosmetics',phone:'038 81 804 09',facebook:'Louanh Cosmetics',product_codes:['CSV'],is_default:true,accent_color:'#C06C84',text_color:'#6C3144',font_style:'serif'},
     {name:'Luna Shop',phone:'038 81 804 09',facebook:'Luna Shop',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#2A9D8F',text_color:'#1E5E55',font_style:'mono'},
     {name:'Tout Bio MDG',phone:'032 17 890 54',facebook:'Tout Bio MDG',product_codes:['CE'],is_default:false,accent_color:'#E76F51',text_color:'#7A3626',font_style:'sans'},
-    {name:'Elegance Royale',phone:'038 81 804 09',facebook:'Elegance Royale',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#8D6E63',text_color:'#4E342E',font_style:'serif'}
+    {name:'Elegance Royale',phone:'038 81 804 09',facebook:'Elegance Royale',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#8D6E63',text_color:'#4E342E',font_style:'serif'},
+    {name:'Fashion`Elle MDG',phone:'0382185421',facebook:'Fashion`Elle MDG',product_codes:['ENSEMBLE'],is_default:false,accent_color:'#355C7D',text_color:'#1F2A44',font_style:'sans'}
   ],
+  staticAgents: ['DIARY','MAILAKA','ANTSO','BEN','I-LIVRAISON','SPEED','ZETRA','JASPY','ZAMA'],
   staticPaymentMethods: {
     cash: {label:'Cash on Delivery', short:'COD'},
-    prepaid: {label:'Pre-paid (Mobile Money)', short:'Prepaid'},
-    colis: {label:'Colis (Miandry Paiement)', short:'Colis'},
+    prepaid: {label:'Pay\u00e9 (Mobile Money)', short:'Pay\u00e9'},
+    colis: {label:'Colis (NON PAY\u00c9)', short:'NON PAY\u00c9'},
     mobile_delivery: {label:'Mobile at Delivery', short:'Mobile'},
     exchange: {label:'Echange', short:'Echange'}
   },
@@ -1065,6 +1073,30 @@ const API = {
     const r = await fetch(this.firebaseBase + jsonPath, opts);
     if (!r.ok) throw new Error('Firebase request failed (' + r.status + ')');
     return r.json();
+  },
+
+  invalidateReferenceCache() {
+    this.referenceCacheAt = 0;
+  },
+
+  async getFirebaseReferenceData() {
+    const now = Date.now();
+    if (this.referenceCache && now - this.referenceCacheAt < 1500) {
+      return this.referenceCache;
+    }
+    if (this.referenceRequest) return this.referenceRequest;
+
+    this.referenceRequest = this.fb('GET', this.firebaseReferencePath)
+      .then((data) => {
+        const reference = data && typeof data === 'object' ? data : {};
+        this.referenceCache = reference;
+        this.referenceCacheAt = Date.now();
+        return reference;
+      })
+      .finally(() => {
+        this.referenceRequest = null;
+      });
+    return this.referenceRequest;
   },
 
   async staticJson(path) {
@@ -1243,6 +1275,7 @@ const API = {
     const data = await this.fb('GET', path) || {};
     const orders = [];
     Object.keys(data).forEach((id) => {
+      if (String(id).startsWith('__')) return;
       if (data[id]) orders.push(this.normalizeOrder(id, data[id]));
     });
     return orders;
@@ -1299,15 +1332,25 @@ const API = {
     return this.request('DELETE', '/api/orders/' + encodeURIComponent(iid));
   },
   getAgents() {
-    if (this.isStaticMode()) return Promise.resolve({agents: ['DIARY','MAILAKA','ANTSO','BEN','I-LIVRAISON','SPEED']});
+    if (this.isStaticMode()) {
+      return this.getFirebaseReferenceData().then((reference) => {
+        const agents = Array.isArray(reference.agents) ? reference.agents.filter(Boolean) : [];
+        if (!agents.length) throw new Error('Live agents are unavailable');
+        return {agents: agents};
+      }).catch(() => ({agents: this.staticAgents}));
+    }
     return this.request('GET', '/api/agents');
   },
   getProducts() {
     if (this.isStaticMode()) {
-      return this.staticJson('data/products.json').then((data) => {
-        const products = Array.isArray(data) ? data : (data.products || []);
-        return {products: products.length ? products : this.staticProducts};
-      }).catch(() => ({products: this.staticProducts}));
+      return this.getFirebaseReferenceData().then((reference) => {
+        const products = Array.isArray(reference.products) ? reference.products : [];
+        if (!products.length) throw new Error('Live products are unavailable');
+        return {products: products};
+      }).catch(() => this.staticJson('data/products.json').then((data) => {
+          const products = Array.isArray(data) ? data : (data.products || []);
+          return {products: products.length ? products : this.staticProducts};
+        }).catch(() => ({products: this.staticProducts})));
     }
     return this.request('GET', '/api/products');
   },
@@ -1347,19 +1390,34 @@ const API = {
     return this.request('GET', '/api/dates');
   },
   getDeliveryFees() {
-    if (this.isStaticMode()) return Promise.resolve({fees: ['0','3000','4000','5000']});
+    if (this.isStaticMode()) {
+      return this.getFirebaseReferenceData().then((reference) => ({
+        fees: Array.isArray(reference.delivery_fees) && reference.delivery_fees.length
+          ? reference.delivery_fees : ['0','3000','4000','5000']
+      })).catch(() => ({fees: ['0','3000','4000','5000']}));
+    }
     return this.request('GET', '/api/delivery-fees');
   },
   getPaymentMethods() {
-    if (this.isStaticMode()) return Promise.resolve({methods: this.staticPaymentMethods, default: 'cash'});
+    if (this.isStaticMode()) {
+      return this.getFirebaseReferenceData().then((reference) => ({
+        methods: reference.payment_methods && Object.keys(reference.payment_methods).length
+          ? reference.payment_methods : this.staticPaymentMethods,
+        default: reference.payment_default || 'cash'
+      })).catch(() => ({methods: this.staticPaymentMethods, default: 'cash'}));
+    }
     return this.request('GET', '/api/payment-methods');
   },
   getPages() {
     if (this.isStaticMode()) {
-      return this.staticJson('data/pages.json').then((data) => {
-        const pages = Array.isArray(data) ? data : (data.pages || []);
-        return {pages: pages.length ? pages : this.staticPages};
-      }).catch(() => ({pages: this.staticPages}));
+      return this.getFirebaseReferenceData().then((reference) => {
+        const pages = Array.isArray(reference.pages) ? reference.pages : [];
+        if (!pages.length) throw new Error('Live pages are unavailable');
+        return {pages: pages};
+      }).catch(() => this.staticJson('data/pages.json').then((data) => {
+          const pages = Array.isArray(data) ? data : (data.pages || []);
+          return {pages: pages.length ? pages : this.staticPages};
+        }).catch(() => ({pages: this.staticPages})));
     }
     return this.request('GET', '/api/pages');
   },
@@ -1833,6 +1891,7 @@ function switchTab(tab) {
   } else if (tab === 'form') {
     document.getElementById('tabForm').classList.add('active');
     stopAutoRefresh();
+    loadReferenceData({force: true});
     if (!state.editingOrder) {
       const dateInput = document.getElementById('fDeliveryDate');
       const defaultDate = state.currentDate || todayISO();
@@ -1994,6 +2053,8 @@ async function loadPages() {
   try {
     const data = await API.getPages();
     state.pages = data.pages || [];
+    const productInput = document.getElementById('fProducts');
+    if (productInput) checkPageSelection(parseProductsInput(productInput.value || ''));
     if (state.orders && state.orders.length) {
       renderOrders();
     }
@@ -2021,14 +2082,32 @@ async function loadPaymentMethods() {
     console.error('loadPaymentMethods error:', e);
     state.paymentMethods = {
       cash: { label: 'Cash', short: 'Cash' },
-      prepaid: { label: 'Prepaid', short: 'Prepaid' },
-      colis: { label: 'Colis', short: 'Colis' },
+      prepaid: { label: 'Pay\u00e9', short: 'Pay\u00e9' },
+      colis: { label: 'NON PAY\u00c9', short: 'NON PAY\u00c9' },
       mobile_delivery: { label: 'Mobile Delivery', short: 'Mobile' },
       exchange: { label: 'Exchange', short: 'Exchange' }
     };
     state.paymentDefault = 'cash';
   }
   buildPaymentToggles();
+}
+
+async function loadReferenceData(options) {
+  const force = options && options.force;
+  if (state.referencesLoading && !force) return;
+  if (force && API.isStaticMode()) API.invalidateReferenceCache();
+  state.referencesLoading = true;
+  try {
+    await Promise.allSettled([
+      loadAgents(),
+      loadProducts(),
+      loadPages(),
+      loadDeliveryFees(),
+      loadPaymentMethods()
+    ]);
+  } finally {
+    state.referencesLoading = false;
+  }
 }
 
 let _statsReqId = 0;
@@ -3067,13 +3146,14 @@ function deleteOrder(iid, name) {
 /* ═════════════════════════════════════════════════════════════════════
    EDIT ORDER
    ═════════════════════════════════════════════════════════════════════ */
-function editOrder(iid) {
+async function editOrder(iid) {
   const order = state.orders.find(o => o.iid === iid);
   if (!order) {
     showToast(T('order_not_found'), 'error');
     return;
   }
 
+  await loadReferenceData({force: true});
   state.editingOrder = order;
   loadSubtypeDraftsFromOrder(order);
 
@@ -3258,7 +3338,7 @@ function startAutoRefresh() {
     if (state.activeTab === 'orders') {
       loadOrders();
     }
-  }, API.isStaticMode() ? 30000 : 15000);
+  }, API.isStaticMode() ? 5000 : 15000);
 }
 
 function stopAutoRefresh() {
@@ -3266,6 +3346,22 @@ function stopAutoRefresh() {
     clearInterval(state.refreshTimer);
     state.refreshTimer = null;
   }
+}
+
+function startReferenceRefresh() {
+  if (state.referenceRefreshTimer) return;
+  state.referenceRefreshTimer = setInterval(function() {
+    loadReferenceData();
+  }, 5000);
+}
+
+function startReferenceFocusRefresh() {
+  window.addEventListener('focus', function() {
+    loadReferenceData({force: true});
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) loadReferenceData({force: true});
+  });
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -3459,11 +3555,7 @@ async function init() {
 
   // Load everything concurrently
   await Promise.allSettled([
-    loadAgents(),
-    loadProducts(),
-    loadPages(),
-    loadDeliveryFees(),
-    loadPaymentMethods(),
+    loadReferenceData({force: true}),
     loadOrders(),
     refreshHistoryState()
   ]);
@@ -3480,6 +3572,8 @@ async function init() {
   } catch(e) { /* use local date */ }
 
   startAutoRefresh();
+  startReferenceRefresh();
+  startReferenceFocusRefresh();
   applyLanguage();
 }
 

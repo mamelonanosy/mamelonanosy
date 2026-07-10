@@ -58,5 +58,17 @@
     "accent_color": "#8D6E63",
     "text_color": "#4E342E",
     "font_style": "serif"
+  },
+  {
+    "name": "Fashion`Elle MDG",
+    "phone": "0382185421",
+    "facebook": "Fashion`Elle MDG",
+    "product_codes": [
+      "ENSEMBLE"
+    ],
+    "is_default": false,
+    "accent_color": "#355C7D",
+    "text_color": "#1F2A44",
+    "font_style": "sans"
   }
 ]
