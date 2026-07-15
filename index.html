@@ -645,7 +645,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <div class="form-group" id="pageSelectGroup" style="display:none">
         <label id="lPageSelect">Page</label>
         <select id="fPage"><option value="">--</option></select>
-        <div class="hint" id="hPageSelect">Ce produit appartient &agrave; plusieurs pages, veuillez choisir</div>
+        <div class="hint" id="hPageSelect">Liste complete des pages. Laissez vide pour detection automatique.</div>
       </div>
 
       <div class="form-group" id="exchangeProductsGroup" style="display:none">
@@ -800,8 +800,9 @@ const LANG = {
     delivery_fee_label: { fr: 'Frais de livraison', en: 'Delivery Fee' },
     total_price_label: { fr: 'Total (modifiable)', en: 'Total (editable)' },
     page_label: { fr: 'Page', en: 'Page' },
-    page_hint: { fr: 'Ce produit appartient à plusieurs pages, veuillez choisir', en: 'This product belongs to multiple pages, please choose' },
-    page_select_default: { fr: '-- Choisir la page --', en: '-- Choose page --' },
+    page_hint: { fr: 'Ce produit appartient a plusieurs pages, veuillez choisir', en: 'This product belongs to multiple pages, please choose' },
+    page_auto_hint: { fr: 'Liste complete des pages. Laissez vide pour detection automatique.', en: 'Complete page list. Leave blank for automatic product/default page.' },
+    page_select_default: { fr: '-- Auto --', en: '-- Auto --' },
     copied_name: { fr: 'Nom copie', en: 'Name copied' },
     copied_order: { fr: 'Details de la commande copies', en: 'Order details copied' },
     total_price_hint: { fr: 'Laissez vide pour le calcul automatique, ou saisissez un montant n\u00e9goci\u00e9', en: 'Leave empty for auto-calculation, or enter a negotiated amount' },
@@ -949,6 +950,7 @@ const state = {
   pages: [],
   paymentMethods: {},
   paymentDefault: 'cash',
+  formPaymentMethod: '',
   deliveryFees: ['3000','4000','5000'],
   activeTab: 'orders',
   editingOrder: null,
@@ -958,8 +960,12 @@ const state = {
   searchQuery: '',
   refreshTimer: null,
   referenceRefreshTimer: null,
+  instantSyncRunning: false,
+  instantSyncVersion: 0,
   referencesLoading: false,
+  referenceLoadPromise: null,
   ordersLoading: false,
+  ordersSignature: '',
   statsLoading: false,
   orderHoldTimer: null,
   orderHoldSource: '',
@@ -977,7 +983,7 @@ const API = {
   firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
   firebaseOrdersPath: '/orders',
   firebaseReferencePath: '/orders/__reference_data',
-  staticConfigVersion: '2026-07-10-3',
+  staticConfigVersion: '2026-07-15-1',
   staticConfigCache: {},
   referenceCache: null,
   referenceCacheAt: 0,
@@ -1054,6 +1060,7 @@ const API = {
     }
     const opts = {
       method,
+      cache: 'no-store',
       headers: { 'Content-Type': 'application/json' }
     };
     if (body) opts.body = JSON.stringify(body);
@@ -1100,13 +1107,19 @@ const API = {
   },
 
   async staticJson(path) {
-    if (this.staticConfigCache[path]) return this.staticConfigCache[path];
     const url = path + '?v=' + encodeURIComponent(this.staticConfigVersion);
     const r = await fetch(url, { cache: 'no-store' });
     if (!r.ok) throw new Error('Static config failed (' + r.status + ')');
     const data = await r.json();
     this.staticConfigCache[path] = data;
     return data;
+  },
+
+  async staticText(path) {
+    const url = path + '?v=' + encodeURIComponent(this.staticConfigVersion);
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('Static config failed (' + r.status + ')');
+    return r.text();
   },
 
   productMap() {
@@ -1304,6 +1317,8 @@ const API = {
   createOrder(data) {
     if (this.isStaticMode()) {
       const order = this.makeOrder(data);
+      order.source = 'web_ui';
+      order.updated_at = this.nowStamp();
       return this.fb('POST', this.firebaseOrdersPath, order).then((result) => {
         order.iid = result.name;
         return {success: true, iid: result.name, order: order};
@@ -1315,6 +1330,8 @@ const API = {
     if (this.isStaticMode()) {
       return this.fb('GET', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then((raw) => {
         const order = this.makeOrder(data, raw || {});
+        order.source = 'web_ui';
+        order.updated_at = this.nowStamp();
         return this.fb('PATCH', this.firebaseOrdersPath + '/' + encodeURIComponent(iid), order).then(() => {
           order.iid = iid;
           return {success: true, order: order};
@@ -1424,6 +1441,11 @@ const API = {
   getHistory() {
     if (this.isStaticMode()) return Promise.resolve({can_undo: false, can_redo: false, undo_label: '', redo_label: ''});
     return this.request('GET', '/api/history');
+  },
+  waitForChanges(since) {
+    if (this.isStaticMode()) return Promise.resolve({version: since || 0, changed: false, reason: ''});
+    const v = Number(since || 0) || 0;
+    return this.request('GET', '/api/changes?since=' + encodeURIComponent(v) + '&timeout=25');
   },
   undo() {
     if (this.isStaticMode()) return Promise.resolve({success: false, error: 'Undo requires the desktop Python server.'});
@@ -2020,8 +2042,13 @@ async function loadOrders(options) {
   try {
     const data = await API.getOrders(state.currentDate, '', '');
     if (reqId !== _ordersReqId) return; // Stale response, discard
-    state.orders = data.orders || [];
-    renderOrders();
+    const nextOrders = data.orders || [];
+    const signature = state.currentDate + '|' + JSON.stringify(nextOrders);
+    if (signature !== state.ordersSignature) {
+      state.orders = nextOrders;
+      state.ordersSignature = signature;
+      renderOrders();
+    }
   } catch(e) {
     if (reqId !== _ordersReqId) return;
     console.error('loadOrders error:', e);
@@ -2033,8 +2060,11 @@ async function loadOrders(options) {
 async function loadAgents() {
   try {
     const data = await API.getAgents();
-    state.agents = data.agents || [];
-    populateAgentDropdowns();
+    const next = data.agents || [];
+    if (JSON.stringify(next) !== JSON.stringify(state.agents)) {
+      state.agents = next;
+      populateAgentDropdowns();
+    }
   } catch(e) {
     console.error('loadAgents error:', e);
   }
@@ -2043,7 +2073,11 @@ async function loadAgents() {
 async function loadProducts() {
   try {
     const data = await API.getProducts();
-    state.products = data.products || [];
+    const next = data.products || [];
+    if (JSON.stringify(next) !== JSON.stringify(state.products)) {
+      state.products = next;
+      updatePricePreview();
+    }
   } catch(e) {
     console.error('loadProducts error:', e);
   }
@@ -2052,11 +2086,13 @@ async function loadProducts() {
 async function loadPages() {
   try {
     const data = await API.getPages();
-    state.pages = data.pages || [];
-    const productInput = document.getElementById('fProducts');
-    if (productInput) checkPageSelection(parseProductsInput(productInput.value || ''));
-    if (state.orders && state.orders.length) {
-      renderOrders();
+    const next = data.pages || [];
+    if (JSON.stringify(next) !== JSON.stringify(state.pages)) {
+      state.pages = next;
+      populatePageDropdown();
+      const productInput = document.getElementById('fProducts');
+      if (productInput) checkPageSelection(parseProductsInput(productInput.value || ''));
+      if (state.orders && state.orders.length) renderOrders();
     }
   } catch(e) {
     console.error('loadPages error:', e);
@@ -2064,16 +2100,24 @@ async function loadPages() {
 }
 
 async function loadDeliveryFees() {
+  const previous = getActiveToggle('feeToggles');
   try {
     const data = await API.getDeliveryFees();
-    state.deliveryFees = data.fees || ['3000','4000','5000'];
+    const next = data.fees || ['3000','4000','5000'];
+    if (JSON.stringify(next) !== JSON.stringify(state.deliveryFees)) {
+      state.deliveryFees = next;
+      buildFeeToggles(getActiveToggle('feeToggles') || previous);
+    }
   } catch(e) {
     console.error('loadDeliveryFees error:', e);
   }
-  buildFeeToggles();
+  if (!document.querySelector('#feeToggles .toggle-btn')) buildFeeToggles(previous);
 }
 
 async function loadPaymentMethods() {
+  const previous = state.formPaymentMethod || getActiveToggle('paymentToggles');
+  const previousMethods = JSON.stringify(state.paymentMethods);
+  const previousDefault = state.paymentDefault;
   try {
     const data = await API.getPaymentMethods();
     state.paymentMethods = data.methods || {};
@@ -2089,25 +2133,31 @@ async function loadPaymentMethods() {
     };
     state.paymentDefault = 'cash';
   }
-  buildPaymentToggles();
+  if (
+    previousMethods !== JSON.stringify(state.paymentMethods) ||
+    previousDefault !== state.paymentDefault ||
+    !document.querySelector('#paymentToggles .toggle-btn')
+  ) {
+    buildPaymentToggles(state.formPaymentMethod || getActiveToggle('paymentToggles') || previous);
+  }
 }
 
-async function loadReferenceData(options) {
+function loadReferenceData(options) {
   const force = options && options.force;
-  if (state.referencesLoading && !force) return;
+  if (state.referenceLoadPromise) return state.referenceLoadPromise;
   if (force && API.isStaticMode()) API.invalidateReferenceCache();
   state.referencesLoading = true;
-  try {
-    await Promise.allSettled([
+  state.referenceLoadPromise = Promise.allSettled([
       loadAgents(),
       loadProducts(),
       loadPages(),
       loadDeliveryFees(),
       loadPaymentMethods()
-    ]);
-  } finally {
-    state.referencesLoading = false;
-  }
+    ]).finally(function() {
+      state.referencesLoading = false;
+      state.referenceLoadPromise = null;
+    });
+  return state.referenceLoadPromise;
 }
 
 let _statsReqId = 0;
@@ -2148,7 +2198,15 @@ function populateAgentDropdowns() {
   state.agents.forEach(a => {
     fa.innerHTML += '<option value="' + escHtml(a) + '">' + escHtml(a) + '</option>';
   });
-  fa.value = oldVal;
+  if (oldVal && state.agents.indexOf(oldVal) >= 0) {
+    fa.value = oldVal;
+  } else {
+    fa.value = '';
+    if (state.filterAgent && state.agents.indexOf(state.filterAgent) < 0) {
+      state.filterAgent = '';
+      renderOrders();
+    }
+  }
 
   // Form agent dropdown
   const fm = document.getElementById('fAgent');
@@ -2157,19 +2215,48 @@ function populateAgentDropdowns() {
   state.agents.forEach(a => {
     fm.innerHTML += '<option value="' + escHtml(a) + '">' + escHtml(a) + '</option>';
   });
-  fm.value = oldV2;
+  if (oldV2 && state.agents.indexOf(oldV2) >= 0) {
+    fm.value = oldV2;
+  } else {
+    fm.value = '';
+  }
+}
+
+function populatePageDropdown(selectedValue) {
+  const group = document.getElementById('pageSelectGroup');
+  const sel = document.getElementById('fPage');
+  if (!group || !sel) return;
+
+  const previous = selectedValue !== undefined ? selectedValue : sel.value;
+  sel.innerHTML = '<option value="">' + escHtml(T('page_select_default')) + '</option>';
+  state.pages.forEach(function(page) {
+    const name = String(page.name || '').trim();
+    if (!name) return;
+    const label = name + (page.is_default ? ' *' : '');
+    sel.innerHTML += '<option value="' + escHtml(name) + '">' + escHtml(label) + '</option>';
+  });
+
+  if (previous && state.pages.some(function(page) { return String(page.name || '').trim() === previous; })) {
+    sel.value = previous;
+  } else {
+    sel.value = '';
+  }
+
+  group.style.display = state.pages.length ? '' : 'none';
 }
 
 /* ═════════════════════════════════════════════════════════════════════
    BUILD TOGGLE BUTTONS
    ═════════════════════════════════════════════════════════════════════ */
-function buildFeeToggles() {
+function buildFeeToggles(preferredValue) {
   const c = document.getElementById('feeToggles');
+  const current = preferredValue || getActiveToggle('feeToggles') ||
+    (state.editingOrder ? String(state.editingOrder.delivery_fee || '') : '') || '3000';
   c.innerHTML = '';
   state.deliveryFees.forEach((f, i) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'toggle-btn' + (String(f) === '3000' ? ' active' : '');
+    btn.className = 'toggle-btn' + (String(f) === String(current) ? ' active' : '');
     btn.textContent = formatCurrency(f);
     btn.dataset.value = f;
     btn.onclick = function() {
@@ -2181,9 +2268,8 @@ function buildFeeToggles() {
   });
 }
 
-function buildPaymentToggles() {
+function buildPaymentToggles(preferredValue) {
   const c = document.getElementById('paymentToggles');
-  c.innerHTML = '';
   const keys = Object.keys(state.paymentMethods);
   if (keys.length === 0) {
     // fallback
@@ -2192,15 +2278,23 @@ function buildPaymentToggles() {
       state.paymentMethods[k] = { label: k.charAt(0).toUpperCase()+k.slice(1).replace('_',' '), short: k };
     });
   }
+  const requested = preferredValue || state.formPaymentMethod || getActiveToggle('paymentToggles') ||
+    (state.editingOrder ? state.editingOrder.payment_method : '') || state.paymentDefault;
+  const current = keys.includes(String(requested))
+    ? String(requested)
+    : (keys.includes(String(state.paymentDefault)) ? String(state.paymentDefault) : keys[0]);
+  state.formPaymentMethod = current;
+  c.innerHTML = '';
   keys.forEach(k => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'toggle-btn' + (k === state.paymentDefault ? ' active' : '');
+    btn.className = 'toggle-btn' + (k === current ? ' active' : '');
     btn.textContent = paymentLabel(k);
     btn.dataset.value = k;
     btn.onclick = function() {
       c.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      state.formPaymentMethod = k;
       updatePricePreview();
       toggleExchangeFields();
     };
@@ -2281,6 +2375,10 @@ function setActiveToggle(containerId, val) {
   });
   // If no match, activate first
   if (!found && btns.length) btns[0].classList.add('active');
+  if (containerId === 'paymentToggles') {
+    const active = document.getElementById(containerId).querySelector('.toggle-btn.active');
+    state.formPaymentMethod = active ? active.dataset.value : '';
+  }
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -2350,7 +2448,9 @@ function updatePricePreview() {
 function checkPageSelection(items) {
   const group = document.getElementById('pageSelectGroup');
   const sel = document.getElementById('fPage');
-  if (!items || items.length === 0 || state.pages.length === 0) {
+  const hint = document.getElementById('hPageSelect');
+
+  if (!items || items.length === 0 || !state.pages || state.pages.length === 0) {
     group.style.display = 'none';
     return;
   }
@@ -2358,7 +2458,9 @@ function checkPageSelection(items) {
   const orderCodes = new Set(items.map(it => it.code.toUpperCase()));
   const defaultPage = state.pages.find(function(page) { return page.is_default; }) || null;
   const matchingPages = state.pages.filter(function(page) {
-    const pageCodes = new Set((page.product_codes || []).map(function(code) { return String(code || '').toUpperCase(); }));
+    const pageCodes = new Set((page.product_codes || []).map(function(code) {
+      return String(code || '').toUpperCase();
+    }));
     if (pageCodes.size === 0) return false;
     for (const code of orderCodes) {
       if (pageCodes.has(code)) return true;
@@ -2366,7 +2468,6 @@ function checkPageSelection(items) {
     return false;
   });
 
-  // Only show selector if a product code matches more than one page
   let needsChoice = false;
   for (const code of orderCodes) {
     const pagesForCode = state.pages.filter(p =>
@@ -2379,24 +2480,25 @@ function checkPageSelection(items) {
   }
 
   const availablePages = matchingPages.length > 0 ? matchingPages : (defaultPage ? [defaultPage] : []);
-  const prevVal = sel.value;
+  const previous = sel.value;
   sel.innerHTML = '<option value="">' + escHtml(T('page_select_default')) + '</option>';
   availablePages.forEach(function(page) {
-    sel.innerHTML += '<option value="' + escHtml(page.name) + '">' + escHtml(page.name) + '</option>';
+    const name = String(page.name || '').trim();
+    if (name) sel.innerHTML += '<option value="' + escHtml(name) + '">' + escHtml(name) + '</option>';
   });
-  if (prevVal && availablePages.some(function(page) { return page.name === prevVal; })) {
-    sel.value = prevVal;
+  if (previous && availablePages.some(function(page) { return page.name === previous; })) {
+    sel.value = previous;
   }
 
   if (!needsChoice) {
     group.style.display = 'none';
-    if (availablePages.length === 1) {
-      sel.value = availablePages[0].name;
-    }
+    if (availablePages.length === 1) sel.value = availablePages[0].name;
+    if (hint) hint.textContent = T('page_auto_hint');
     return;
   }
 
   group.style.display = '';
+  if (hint) hint.textContent = needsChoice ? T('page_hint') : T('page_auto_hint');
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -3153,7 +3255,11 @@ async function editOrder(iid) {
     return;
   }
 
-  await loadReferenceData({force: true});
+  const referencesReady = state.agents.length && state.products.length && state.pages.length &&
+    Object.keys(state.paymentMethods).length;
+  if (!referencesReady) {
+    await loadReferenceData();
+  }
   state.editingOrder = order;
   loadSubtypeDraftsFromOrder(order);
 
@@ -3210,6 +3316,9 @@ async function editOrder(iid) {
   if (order.page) {
     document.getElementById('fPage').value = order.page;
   }
+  if (referencesReady) {
+    loadReferenceData().catch(function(e) { console.warn('reference refresh error:', e); });
+  }
 }
 
 function cancelEdit() {
@@ -3230,8 +3339,8 @@ function cancelEdit() {
   const tp = document.getElementById('fTotalPrice');
   tp.value = '';
   tp.dataset.manual = '';
-  document.getElementById('fPage').value = '';
-  document.getElementById('pageSelectGroup').style.display = 'none';
+  populatePageDropdown('');
+  checkPageSelection([]);
   document.getElementById('subtypeSelection').innerHTML = '';
   document.getElementById('fExchangeProducts').value = '';
   document.getElementById('exchangeProductsGroup').style.display = 'none';
@@ -3276,18 +3385,15 @@ async function submitOrder(e) {
     products: products.trim(),
     delivery_fee: Number(getActiveToggle('feeToggles')) || 3000,
     agent: document.getElementById('fAgent').value,
-    payment_method: getActiveToggle('paymentToggles') || state.paymentDefault,
+    payment_method: state.formPaymentMethod || getActiveToggle('paymentToggles') || state.paymentDefault,
     notes: document.getElementById('fNotes').value.trim()
   };
   // Include total_price if user entered a value (manual override or auto-filled)
   if (totalVal !== '') {
     body.total_price = Number(totalVal);
   }
-  // Include page selection
-  const pageVal = document.getElementById('fPage').value;
-  if (pageVal) {
-    body.page = pageVal;
-  }
+  // Include page selection, including blank values so edits can return to auto.
+  body.page = document.getElementById('fPage').value.trim();
 
   // Include exchange products if exchange payment method
   if (body.payment_method === 'exchange') {
@@ -3338,7 +3444,7 @@ function startAutoRefresh() {
     if (state.activeTab === 'orders') {
       loadOrders();
     }
-  }, API.isStaticMode() ? 5000 : 15000);
+  }, API.isStaticMode() ? 10000 : 60000);
 }
 
 function stopAutoRefresh() {
@@ -3352,7 +3458,40 @@ function startReferenceRefresh() {
   if (state.referenceRefreshTimer) return;
   state.referenceRefreshTimer = setInterval(function() {
     loadReferenceData();
-  }, 5000);
+  }, API.isStaticMode() ? 30000 : 60000);
+}
+
+async function refreshFromInstantSync(reason) {
+  const jobs = [loadOrders({force: true}), refreshHistoryState()];
+  if (/agent|page|product|reference/i.test(String(reason || ''))) {
+    jobs.push(loadReferenceData({force: true}));
+  }
+  if (state.activeTab === 'dashboard') jobs.push(loadStats());
+  await Promise.allSettled(jobs);
+}
+
+function startInstantSync() {
+  if (API.isStaticMode() || state.instantSyncRunning) return;
+  state.instantSyncRunning = true;
+
+  async function poll() {
+    if (!state.instantSyncRunning) return;
+    let retryDelay = 0;
+    try {
+      const data = await API.waitForChanges(state.instantSyncVersion);
+      const nextVersion = Number(data.version || 0) || 0;
+      if (nextVersion > state.instantSyncVersion) {
+        state.instantSyncVersion = nextVersion;
+        await refreshFromInstantSync(data.reason || '');
+      }
+    } catch(e) {
+      console.warn('instant sync error:', e);
+      retryDelay = 2500;
+    }
+    if (state.instantSyncRunning) setTimeout(poll, retryDelay);
+  }
+
+  poll();
 }
 
 function startReferenceFocusRefresh() {
@@ -3464,7 +3603,7 @@ function applyLanguage() {
   const hints = document.querySelectorAll('#orderForm .hint');
   if (hints[0]) hints[0].textContent = T('date_hint');
   if (hints[1]) hints[1].textContent = T('products_hint');
-  if (hints[2]) hints[2].textContent = T('page_hint');
+  if (hints[2]) hints[2].textContent = T('page_auto_hint');
   if (hints[3]) hints[3].textContent = T('exchange_products_hint');
   if (hints[4]) hints[4].textContent = T('exchange_amount_hint');
   if (hints[5]) hints[5].textContent = T('total_price_hint');
@@ -3475,7 +3614,7 @@ function applyLanguage() {
 
   // Page selector labels
   document.getElementById('lPageSelect').textContent = T('page_label');
-  document.getElementById('hPageSelect').textContent = T('page_hint');
+  document.getElementById('hPageSelect').textContent = T('page_auto_hint');
 
   // Exchange fields
   document.getElementById('lExchangeProducts').textContent = T('exchange_products_label');
@@ -3527,8 +3666,10 @@ function applyLanguage() {
   });
 
   // Re-render current data to apply translations in dynamic content
-  buildPaymentToggles();
-  setActiveToggle('paymentToggles', state.editingOrder ? state.editingOrder.payment_method : state.paymentDefault);
+  const selectedPayment = state.formPaymentMethod || getActiveToggle('paymentToggles') ||
+    (state.editingOrder ? state.editingOrder.payment_method : state.paymentDefault);
+  buildPaymentToggles(selectedPayment);
+  populatePageDropdown();
   renderOrders();
   if (state.activeTab === 'dashboard') loadStats();
   updatePricePreview();
@@ -3574,6 +3715,7 @@ async function init() {
   startAutoRefresh();
   startReferenceRefresh();
   startReferenceFocusRefresh();
+  startInstantSync();
   applyLanguage();
 }
 
