@@ -558,7 +558,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
   <!-- Search -->
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Rechercher..." oninput="doSearch()">
+    <input type="text" id="searchInput" placeholder="Rechercher client, produit ou sous-type..." oninput="doSearch()">
     <button class="search-clear" onclick="clearSearch()">X</button>
   </div>
 
@@ -887,7 +887,7 @@ const LANG = {
     new_order: { fr: 'Nouvelle commande', en: 'New Order' },
 
     // Search
-    search_placeholder: { fr: 'Rechercher...', en: 'Search...' },
+    search_placeholder: { fr: 'Rechercher client, produit ou sous-type...', en: 'Search client, product, or subtype...' },
 
     // Undo/Redo
     undo: { fr: 'Annuler', en: 'Undo' },
@@ -2019,8 +2019,66 @@ function filterByPayment() {
 /* ═════════════════════════════════════════════════════════════════════
    SEARCH
    ═════════════════════════════════════════════════════════════════════ */
+function normalizeSearchText(value) {
+  let text = String(value == null ? '' : value);
+  if (text.normalize) text = text.normalize('NFD');
+  return text
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\u0153/g, 'oe')
+    .replace(/\u00e6/g, 'ae')
+    .replace(/[\u2018\u2019'\u00b4\u0060]/g, '')
+    .replace(/[\s\-_\/\\.,;:!?\(\)\[\]\{\}"\u201c\u201d\u2013\u2014+*=<>@#$%^&|]+/g, ' ')
+    .trim();
+}
+
+function searchValueText(value) {
+  if (value == null) return '';
+  if (Array.isArray(value)) return value.map(searchValueText).join(' ');
+  if (typeof value === 'object') return Object.keys(value).map(function(key) {
+    return searchValueText(value[key]);
+  }).join(' ');
+  return String(value);
+}
+
+function orderSearchText(order) {
+  const source = order || {};
+  const lines = Array.isArray(source.order_lines) ? source.order_lines : [];
+  const lineSubtypes = lines.map(function(line) {
+    if (!line || typeof line !== 'object') return '';
+    return searchValueText(line.subtypes || line.subtype || line.variant);
+  }).join(' ');
+
+  return [
+    source.client_name,
+    source.name,
+    source.phone,
+    source.address,
+    source.products,
+    source.notes,
+    source.agent,
+    source.exchange_products,
+    lineSubtypes,
+    searchValueText(source.subtypes)
+  ].join(' ');
+}
+
+function matchesSearchQuery(value, query) {
+  const text = normalizeSearchText(value);
+  if (!text || !query) return false;
+  if (text.includes(query)) return true;
+
+  const compactText = text.replace(/\s/g, '');
+  const compactQuery = query.replace(/\s/g, '');
+  if (compactQuery && compactText.includes(compactQuery)) return true;
+
+  return query.split(' ').every(function(token) {
+    return text.includes(token);
+  });
+}
+
 function doSearch() {
-  state.searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+  state.searchQuery = normalizeSearchText(document.getElementById('searchInput').value);
   renderOrders();
 }
 
@@ -2723,13 +2781,8 @@ function renderOrders() {
   }
   if (state.searchQuery) {
     const q = state.searchQuery;
-    filtered = filtered.filter(o => {
-      return (o.client_name && o.client_name.toLowerCase().includes(q)) ||
-        (o.phone && o.phone.toLowerCase().includes(q)) ||
-        (o.address && o.address.toLowerCase().includes(q)) ||
-        (o.products && o.products.toLowerCase().includes(q)) ||
-        (o.notes && o.notes.toLowerCase().includes(q)) ||
-        (o.agent && o.agent.toLowerCase().includes(q));
+    filtered = filtered.filter(function(order) {
+      return matchesSearchQuery(orderSearchText(order), q);
     });
   }
 
