@@ -3481,10 +3481,160 @@ function downloadBlob(blob, filename) {
   setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
 }
 
+/*
+   LIVE PDF EXPORTS
+
+   The desktop app keeps using its ReportLab endpoints below.  On the public
+   Firebase/GitHub Pages app the same printable layouts are rendered locally
+   by web_pdf_export.js, so an operator does not need the desktop server to be
+   running in order to download an export.
+*/
+function getLivePdfExporter() {
+  if (!window.WebPdfExport) {
+    throw new Error('PDF export module is still loading. Please try again.');
+  }
+  return window.WebPdfExport;
+}
+
+async function getLivePdfOrders() {
+  if (!state.currentDate) return [];
+  await loadReferenceData();
+  try {
+    var orders = await API.getFirebaseOrders(state.currentDate);
+    return applyOrderMemos(orders || [], state.orderMemos || {});
+  } catch (error) {
+    // Keep an already-loaded day usable if a short Firebase request fails.
+    if (state.orders && state.orders.length) return state.orders.slice();
+    throw error;
+  }
+}
+
+function pdfValueIsSet(value) {
+  return value !== undefined && value !== null && String(value).trim() !== '' && String(value) !== '0';
+}
+
+function isDuplicateTransferForPdf(order) {
+  return String((order && order.resolution) || '').indexOf('Duplicate Products') >= 0;
+}
+
+function isLabelEligibleForPdf(order) {
+  if (!order) return false;
+  if (isDuplicateTransferForPdf(order)) return true;
+  return !pdfValueIsSet(order.reschedule_metadata) && !pdfValueIsSet(order.reassigned_metadata);
+}
+
+function ensurePendingPdfExport(orders, title) {
+  var nonPending = (orders || []).filter(function(order) {
+    return String(order.status || 'Pending') !== 'Pending';
+  });
+  if (!nonPending.length) return true;
+  var names = nonPending.slice(0, 3).map(function(order) {
+    return order.client_name || 'Unknown';
+  }).join(', ');
+  var extra = nonPending.length > 3 ? ' +' + (nonPending.length - 3) : '';
+  showToast('Export bloqué (' + title + ') : toutes les commandes doivent être Pending. ' + names + extra, 'error');
+  return false;
+}
+
+function visiblePdfOrders(orders) {
+  return (orders || []).filter(function(order) {
+    if (state.filterStatus && order.status !== state.filterStatus) return false;
+    if (state.filterAgent && order.agent !== state.filterAgent) return false;
+    if (state.filterPayment && (order.payment_method || 'cash') !== state.filterPayment) return false;
+    if (state.searchQuery && !matchesSearchQuery(orderSearchText(order), state.searchQuery)) return false;
+    return true;
+  });
+}
+
+function selectedPdfOrders(orders) {
+  var selected = new Set(Array.from(state.selectedOrders).map(function(iid) { return String(iid); }));
+  return (orders || []).filter(function(order) { return selected.has(String(order.iid)); });
+}
+
+function groupPdfOrdersByAgent(orders, includeUnassigned) {
+  var groups = {};
+  (orders || []).forEach(function(order) {
+    var agent = String(order.agent || '').trim();
+    if (!agent) agent = 'Non assigné';
+    if (!includeUnassigned && agent === 'Non assigné') return;
+    if (!groups[agent]) groups[agent] = [];
+    groups[agent].push(order);
+  });
+  return groups;
+}
+
+function choosePdfAgent(groups) {
+  var agents = Object.keys(groups || {}).sort(function(a, b) { return a.localeCompare(b); });
+  if (!agents.length) return Promise.resolve('');
+  if (agents.length === 1) return Promise.resolve(agents[0]);
+
+  return new Promise(function(resolve) {
+    var container = document.getElementById('modalContainer');
+    var options = agents.map(function(agent) {
+      return '<option value="' + escHtml(agent) + '">' + escHtml(agent) +
+        ' (' + groups[agent].length + ' colis)</option>';
+    }).join('');
+    container.innerHTML = '<div class="modal-backdrop"><div class="modal">' +
+      '<h3>Sélectionner Agent</h3>' +
+      '<p style="margin:-4px 0 12px">Choisir un agent pour le bon :</p>' +
+      '<select id="pdfAgentSelect">' + options + '</select>' +
+      '<div class="modal-actions">' +
+      '<button class="btn-modal-cancel" id="pdfAgentCancel">' + escHtml(T('cancel')) + '</button>' +
+      '<button class="btn-confirm" id="pdfAgentConfirm">Exporter</button>' +
+      '</div></div></div>';
+    var backdrop = container.querySelector('.modal-backdrop');
+    var finish = function(value) {
+      container.innerHTML = '';
+      resolve(value || '');
+    };
+    document.getElementById('pdfAgentCancel').onclick = function() { finish(''); };
+    document.getElementById('pdfAgentConfirm').onclick = function() {
+      finish(document.getElementById('pdfAgentSelect').value);
+    };
+    backdrop.onclick = function(event) {
+      if (event.target === backdrop) finish('');
+    };
+  });
+}
+
+function pdfFilenameDate(date) {
+  return String(date || '').replace(/[\\/]/g, '-').replace(/-/g, '_');
+}
+
+async function exportLiveLabels(orders, filename) {
+  if (!orders.length) throw new Error('Aucune commande à exporter.');
+  showToast('Génération des étiquettes…', 'warning');
+  var blob = await getLivePdfExporter().exportLabels(orders, state.pages || []);
+  downloadBlob(blob, filename);
+}
+
+async function exportLiveBon(orders, agent, filename) {
+  if (!orders.length || !agent) throw new Error('Aucune commande assignée à exporter.');
+  showToast('Génération du bon…', 'warning');
+  var blob = await getLivePdfExporter().exportBon(orders, agent, state.currentDate);
+  downloadBlob(blob, filename);
+}
+
+async function exportLiveReport(orders, filename) {
+  if (!orders.length) throw new Error('Aucune commande à exporter.');
+  showToast('Génération du rapport…', 'warning');
+  var blob = await getLivePdfExporter().exportReport(orders, state.currentDate);
+  downloadBlob(blob, filename);
+}
+
 function exportSelectedLabels() {
-  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
   var iids = Array.from(state.selectedOrders);
   if (iids.length === 0) { showToast(T('no_selection'), 'warning'); return; }
+  if (API.isStaticMode()) {
+    getLivePdfOrders().then(function(orders) {
+      return exportLiveLabels(selectedPdfOrders(orders), 'Etiquettes_selection_' + iids.length + '.pdf');
+    }).then(function() {
+      showToast(T('export_success'), 'success');
+    }).catch(function(error) {
+      showToast(error.message || 'Export failed', 'error');
+    });
+    return;
+  }
   fetch(API.base + '/api/export/selected-labels', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -3501,9 +3651,24 @@ function exportSelectedLabels() {
 }
 
 function exportSelectedBon() {
-  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
   var iids = Array.from(state.selectedOrders);
   if (iids.length === 0) { showToast(T('no_selection'), 'warning'); return; }
+  if (API.isStaticMode()) {
+    getLivePdfOrders().then(async function(orders) {
+      var selected = selectedPdfOrders(orders);
+      var groups = groupPdfOrdersByAgent(selected, true);
+      var agent = await choosePdfAgent(groups);
+      if (!agent) return null;
+      var filename = 'BON_ENLEVEMENT_' + agent.replace(/ /g, '_') + '_' + pdfFilenameDate(state.currentDate) + '.pdf';
+      await exportLiveBon(groups[agent], agent, filename);
+      return true;
+    }).then(function(exported) {
+      if (exported) showToast(T('export_success'), 'success');
+    }).catch(function(error) {
+      showToast(error.message || 'Export failed', 'error');
+    });
+    return;
+  }
   fetch(API.base + '/api/export/selected-bon', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -3520,8 +3685,19 @@ function exportSelectedBon() {
 }
 
 function exportAllLabels() {
-  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
   if (!state.currentDate) return;
+  if (API.isStaticMode()) {
+    getLivePdfOrders().then(function(orders) {
+      var printable = orders.filter(isLabelEligibleForPdf);
+      if (!ensurePendingPdfExport(printable, 'étiquettes')) return null;
+      return exportLiveLabels(printable, 'Etiquettes_' + state.currentDate + '.pdf');
+    }).then(function(exported) {
+      if (exported !== null) showToast(T('export_success'), 'success');
+    }).catch(function(error) {
+      showToast(error.message || 'Export failed', 'error');
+    });
+    return;
+  }
   fetch(API.base + '/api/export/labels?date=' + encodeURIComponent(state.currentDate))
     .then(function(r) {
       if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
@@ -3535,8 +3711,24 @@ function exportAllLabels() {
 }
 
 function exportAllBon() {
-  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
   if (!state.currentDate) return;
+  if (API.isStaticMode()) {
+    getLivePdfOrders().then(async function(orders) {
+      var groups = groupPdfOrdersByAgent(visiblePdfOrders(orders), false);
+      var agent = state.filterAgent && groups[state.filterAgent]
+        ? state.filterAgent
+        : await choosePdfAgent(groups);
+      if (!agent) return null;
+      var filename = 'BON_ENLEVEMENT_' + agent.replace(/ /g, '_') + '_' + pdfFilenameDate(state.currentDate) + '.pdf';
+      await exportLiveBon(groups[agent], agent, filename);
+      return true;
+    }).then(function(exported) {
+      if (exported) showToast(T('export_success'), 'success');
+    }).catch(function(error) {
+      showToast(error.message || 'Export failed', 'error');
+    });
+    return;
+  }
   var url = API.base + '/api/export/bon?date=' + encodeURIComponent(state.currentDate);
   if (state.filterAgent) {
     url += '&agent=' + encodeURIComponent(state.filterAgent);
@@ -3557,8 +3749,18 @@ function exportAllBon() {
 }
 
 function exportAllReport() {
-  if (API.isStaticMode()) { showToast('PDF export requires the desktop Python server.', 'warning'); return; }
   if (!state.currentDate) return;
+  if (API.isStaticMode()) {
+    getLivePdfOrders().then(function(orders) {
+      if (!ensurePendingPdfExport(orders, 'rapport')) return null;
+      return exportLiveReport(orders, 'Livraisons_' + state.currentDate + '.pdf');
+    }).then(function(exported) {
+      if (exported !== null) showToast(T('export_success'), 'success');
+    }).catch(function(error) {
+      showToast(error.message || 'Export failed', 'error');
+    });
+    return;
+  }
   fetch(API.base + '/api/export/report?date=' + encodeURIComponent(state.currentDate))
     .then(function(r) {
       if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Export failed'); });
@@ -4240,5 +4442,6 @@ async function init() {
 // Kick it off
 init();
 </script>
+<script src="web_pdf_export.js"></script>
 </body>
 </html>
