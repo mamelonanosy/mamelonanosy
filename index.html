@@ -180,6 +180,32 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-sms:hover{background:#bbdefb}
 .btn-sm:disabled,.btn-sm.is-disabled{opacity:.55;cursor:not-allowed}
 
+/*───────────────────────────── INTERNAL WEB MEMOS ─────────────────────────────*/
+.order-card.has-web-memo{
+  border-left:5px solid var(--memo-accent,#64748b);
+  background:linear-gradient(135deg,var(--memo-background,#f8fafc) 0%,#fff 60%);
+}
+.order-card.memo-urgent{--memo-accent:#d32f2f;--memo-background:#fff5f5;--memo-panel:#ffebee;--memo-text:#a51d1d}
+.order-card.memo-call{--memo-accent:#e58b00;--memo-background:#fffaf0;--memo-panel:#fff3cd;--memo-text:#8a5900}
+.order-card.memo-delivery{--memo-accent:#1976d2;--memo-background:#f2f8ff;--memo-panel:#e3f2fd;--memo-text:#155fa0}
+.order-card.memo-payment{--memo-accent:#8e44ad;--memo-background:#fbf4ff;--memo-panel:#f1e4f8;--memo-text:#6c3483}
+.order-card.memo-info{--memo-accent:#07827a;--memo-background:#f0fdfa;--memo-panel:#d9f6f1;--memo-text:#09645e}
+.order-card.memo-custom{--memo-accent:#64748b;--memo-background:#f8fafc;--memo-panel:#e9eef4;--memo-text:#475569}
+.card-memo{
+  display:flex;gap:7px;align-items:flex-start;margin:0 0 10px;padding:8px 9px;
+  border-radius:9px;background:var(--memo-panel,#e9eef4);color:var(--memo-text,#475569);
+  font-size:.78rem;line-height:1.4;
+}
+.memo-category-label{
+  flex:0 0 auto;border:1px solid var(--memo-accent,#64748b);border-radius:999px;
+  background:#fff;padding:2px 7px;font-size:.67rem;font-weight:800;letter-spacing:.15px;
+  text-transform:uppercase;color:var(--memo-text,#475569);
+}
+.memo-text{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.btn-memo{background:#eef2f7;color:#475569}
+.btn-memo:hover{background:#dce5ee}
+.btn-memo.has-memo{background:var(--memo-panel,#e9eef4);color:var(--memo-text,#475569);border:1px solid var(--memo-accent,#64748b)}
+
 /*───────────────────────────── SEARCH BAR ─────────────────────────────*/
 .search-bar{
   display:flex;gap:6px;align-items:center;
@@ -386,16 +412,23 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);
 }
 .modal h3{font-size:1.05rem;margin-bottom:14px;color:#444}
-.modal input,.modal select{
+.modal input,.modal select,.modal textarea{
   width:100%;border:1.5px solid #ddd;border-radius:10px;
   padding:10px 12px;font-size:.92rem;margin-bottom:12px;
 }
+.modal textarea{min-height:102px;resize:vertical;line-height:1.4}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end}
 .modal-actions button{
   padding:8px 20px;border-radius:10px;font-size:.85rem;font-weight:600;border:none;
 }
 .modal-actions .btn-confirm{background:#667eea;color:#fff}
 .modal-actions .btn-modal-cancel{background:#eee;color:#666}
+.memo-modal{max-width:460px}
+.memo-field-label{display:block;margin:0 0 5px;font-size:.78rem;font-weight:700;color:#667085}
+.memo-helper{font-size:.72rem;line-height:1.35;color:#7a8596;margin:-5px 0 11px}
+.memo-check{display:flex;gap:7px;align-items:flex-start;margin:1px 0 14px;color:#52616b;font-size:.8rem;line-height:1.3}
+.memo-check input{width:auto!important;margin:1px 0 0!important}
+.modal-actions .btn-memo-remove{margin-right:auto;background:#ffebee;color:#b42318}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /*───────────────────────────── FAB (Floating Action Button) ─────────────────────────────*/
@@ -558,7 +591,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
   <!-- Search -->
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Rechercher client, produit ou sous-type..." oninput="doSearch()">
+    <input type="text" id="searchInput" placeholder="Rechercher client, produit, sous-type ou memo..." oninput="doSearch()">
     <button class="search-clear" onclick="clearSearch()">X</button>
   </div>
 
@@ -777,11 +810,15 @@ const LANG = {
     revenue: { fr: 'Revenu', en: 'Revenue' },
     notes: { fr: 'Notes', en: 'Notes' },
 
+    memo_internal: { fr: 'Mémo interne', en: 'Internal memo' },
+
     // Card actions
     edit: { fr: 'Modifier', en: 'Edit' },
     call: { fr: 'Appeler', en: 'Call' },
     sms: { fr: 'Message', en: 'Message' },
     delete: { fr: 'Supprimer', en: 'Delete' },
+
+    memo_action: { fr: 'Mémo', en: 'Memo' },
 
     // Order count
     orders_count: { fr: 'commande(s)', en: 'order(s)' },
@@ -867,6 +904,23 @@ const LANG = {
     confirm: { fr: 'Confirmer', en: 'Confirm' },
     cancel: { fr: 'Annuler', en: 'Cancel' },
 
+    memo_title: { fr: 'Mémo interne', en: 'Internal memo' },
+    memo_saved: { fr: 'Utiliser un mémo enregistré', en: 'Use a saved memo' },
+    memo_choose_saved: { fr: '-- Nouveau mémo personnalisé --', en: '-- New custom memo --' },
+    memo_category: { fr: 'Catégorie', en: 'Category' },
+    memo_text: { fr: 'Texte du mémo', en: 'Memo text' },
+    memo_text_placeholder: { fr: 'Rappel visible seulement sur le web...', en: 'Reminder visible only on the web...' },
+    memo_save_preset: { fr: 'Enregistrer ce texte pour le réutiliser', en: 'Save this text for reuse' },
+    memo_save: { fr: 'Enregistrer le mémo', en: 'Save memo' },
+    memo_remove: { fr: 'Supprimer le mémo', en: 'Remove memo' },
+    memo_remove_preset: { fr: 'Supprimer le mémo enregistré', en: 'Remove saved memo' },
+    memo_urgent: { fr: 'Urgent', en: 'Urgent' },
+    memo_call: { fr: 'Relancer / appeler', en: 'Follow up / call' },
+    memo_delivery: { fr: 'Livraison', en: 'Delivery' },
+    memo_payment: { fr: 'Paiement', en: 'Payment' },
+    memo_info: { fr: 'Information', en: 'Information' },
+    memo_custom: { fr: 'Personnalisé', en: 'Custom' },
+
     // Toasts
     status_updated: { fr: 'Statut mis \u00e0 jour:', en: 'Status updated to' },
     order_deleted: { fr: 'Commande supprim\u00e9e', en: 'Order deleted' },
@@ -874,6 +928,14 @@ const LANG = {
     order_created: { fr: 'Commande cr\u00e9\u00e9e avec succ\u00e8s', en: 'Order created successfully' },
     order_not_found: { fr: 'Commande introuvable', en: 'Order not found' },
     error_prefix: { fr: 'Erreur:', en: 'Error:' },
+
+    memo_saved_success: { fr: 'Mémo enregistré', en: 'Memo saved' },
+    memo_removed_success: { fr: 'Mémo supprimé', en: 'Memo removed' },
+    memo_preset_saved: { fr: 'Mémo enregistré pour réutilisation', en: 'Memo saved for reuse' },
+    memo_preset_removed: { fr: 'Mémo enregistré supprimé', en: 'Saved memo removed' },
+    memo_text_required: { fr: 'Saisissez un texte de mémo', en: 'Enter memo text' },
+
+    memo_web_only: { fr: 'Visible uniquement sur le web - distinct des notes de commande.', en: 'Visible only on the web - separate from order notes/comments.' },
 
     // Loading
     loading_orders: { fr: 'Chargement des commandes...', en: 'Loading orders...' },
@@ -971,6 +1033,8 @@ const state = {
   orderHoldSource: '',
   selectedOrders: new Set(),
   subtypeDrafts: {},
+  orderMemos: {},
+  memoPresets: [],
   sortField: '',
   sortAsc: true
 };
@@ -983,11 +1047,16 @@ const API = {
   firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
   firebaseOrdersPath: '/orders',
   firebaseReferencePath: '/orders/__reference_data',
+  firebaseOrderMemoPath: '/orders/__web_order_memos',
+  firebaseMemoPresetPath: '/orders/__web_memo_presets',
   staticConfigVersion: '2026-07-15-1',
   staticConfigCache: {},
   referenceCache: null,
   referenceCacheAt: 0,
   referenceRequest: null,
+  memoCache: null,
+  memoCacheAt: 0,
+  memoRequest: null,
   staticHost: (function() {
     const params = new URLSearchParams(window.location.search);
     const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
@@ -1080,6 +1149,98 @@ const API = {
     const r = await fetch(this.firebaseBase + jsonPath, opts);
     if (!r.ok) throw new Error('Firebase request failed (' + r.status + ')');
     return r.json();
+  },
+
+  invalidateMemoCache() {
+    this.memoCacheAt = 0;
+    this.memoRequest = null;
+    this.memoRequestVersion = (this.memoRequestVersion || 0) + 1;
+  },
+
+  async getWebMemoData(options) {
+    const force = options && options.force;
+    const now = Date.now();
+    if (!force && this.memoCache && now - this.memoCacheAt < 8000) {
+      return this.memoCache;
+    }
+    if (this.memoRequest && !force) return this.memoRequest;
+
+    const requestVersion = (this.memoRequestVersion || 0) + 1;
+    this.memoRequestVersion = requestVersion;
+    const request = Promise.all([
+      this.fb('GET', this.firebaseOrderMemoPath),
+      this.fb('GET', this.firebaseMemoPresetPath)
+    ]).then((results) => {
+      const rawMemos = results[0] && typeof results[0] === 'object' ? results[0] : {};
+      const rawPresets = results[1] && typeof results[1] === 'object' ? results[1] : {};
+      const memos = {};
+      Object.keys(rawMemos).forEach((key) => {
+        const memo = normalizeOrderMemo(rawMemos[key]);
+        if (memo) memos[String(key)] = memo;
+      });
+      const presets = Object.keys(rawPresets).map((key) => normalizeMemoPreset(key, rawPresets[key]))
+        .filter(Boolean)
+        .sort((a, b) => a.label.localeCompare(b.label));
+      const result = {memos: memos, presets: presets};
+      if (requestVersion === this.memoRequestVersion) {
+        this.memoCache = result;
+        this.memoCacheAt = Date.now();
+      }
+      return result;
+    });
+    this.memoRequest = request;
+    request.then(function() {
+      if (API.memoRequest === request) API.memoRequest = null;
+    }, function() {
+      if (API.memoRequest === request) API.memoRequest = null;
+    });
+    return request;
+  },
+
+  async saveWebMemo(orderKey, memo) {
+    const key = String(orderKey || '').trim();
+    const normalized = normalizeOrderMemo(memo);
+    if (!key || !normalized) throw new Error('Memo data is invalid');
+    const now = new Date().toISOString();
+    const payload = Object.assign({}, normalized, {
+      schema_version: 1,
+      order_key: key,
+      created_at: normalized.created_at || now,
+      updated_at: now,
+      updated_ms: Date.now()
+    });
+    await this.fb('PUT', this.firebaseOrderMemoPath + '/' + encodeURIComponent(key), payload);
+    this.invalidateMemoCache();
+    return payload;
+  },
+
+  async deleteWebMemo(orderKey) {
+    const key = String(orderKey || '').trim();
+    if (!key) return;
+    await this.fb('DELETE', this.firebaseOrderMemoPath + '/' + encodeURIComponent(key));
+    this.invalidateMemoCache();
+  },
+
+  async saveMemoPreset(preset) {
+    const normalized = normalizeMemoPreset('', preset);
+    if (!normalized) throw new Error('Memo preset is invalid');
+    const now = new Date().toISOString();
+    const payload = Object.assign({}, normalized, {
+      schema_version: 1,
+      created_at: normalized.created_at || now,
+      updated_at: now
+    });
+    delete payload.id;
+    const result = await this.fb('POST', this.firebaseMemoPresetPath, payload);
+    this.invalidateMemoCache();
+    return Object.assign({}, payload, {id: result && result.name ? result.name : ''});
+  },
+
+  async deleteMemoPreset(presetId) {
+    const id = String(presetId || '').trim();
+    if (!id) return;
+    await this.fb('DELETE', this.firebaseMemoPresetPath + '/' + encodeURIComponent(id));
+    this.invalidateMemoCache();
   },
 
   invalidateReferenceCache() {
@@ -1895,6 +2056,188 @@ function closeModal() {
   document.getElementById('modalContainer').innerHTML = '';
 }
 
+function memoPresetOptionLabel(preset) {
+  return memoCategoryLabel(preset.category_id) + ' - ' + (preset.label || preset.text);
+}
+
+function memoModalOrderIid() {
+  const modal = document.querySelector('.memo-modal');
+  return modal ? String(modal.getAttribute('data-order-iid') || '') : '';
+}
+
+function updateMemoPresetControls() {
+  const select = document.getElementById('memoPresetSelect');
+  const removeButton = document.getElementById('memoRemovePresetBtn');
+  if (removeButton) removeButton.disabled = !select || !select.value;
+}
+
+function applyMemoPreset(presetId) {
+  const preset = (state.memoPresets || []).find(function(item) {
+    return item.id === presetId;
+  });
+  if (preset) {
+    const text = document.getElementById('memoText');
+    const category = document.getElementById('memoCategory');
+    const savePreset = document.getElementById('memoSavePreset');
+    if (text) text.value = preset.text;
+    if (category) category.value = MEMO_CATEGORIES[preset.category_id] ? preset.category_id : 'custom';
+    if (savePreset) savePreset.checked = false;
+  }
+  updateMemoPresetControls();
+}
+
+function openOrderMemo(iid) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  if (!order) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+
+  const memo = normalizeOrderMemo(order.web_memo) || memoForOrder(order);
+  const presets = (state.memoPresets || []).filter(Boolean);
+  const selectedPresetId = memo && presets.some(function(preset) {
+    return preset.id === memo.preset_id;
+  }) ? memo.preset_id : '';
+  const presetOptions = ['<option value="">' + escHtml(T('memo_choose_saved')) + '</option>']
+    .concat(presets.map(function(preset) {
+      return '<option value="' + escHtml(preset.id) + '"' + (preset.id === selectedPresetId ? ' selected' : '') + '>' +
+        escHtml(memoPresetOptionLabel(preset)) + '</option>';
+    })).join('');
+  const categoryOptions = Object.keys(MEMO_CATEGORIES).map(function(categoryId) {
+    const selected = (memo ? memo.category_id : 'custom') === categoryId ? ' selected' : '';
+    return '<option value="' + categoryId + '"' + selected + '>' + escHtml(memoCategoryLabel(categoryId)) + '</option>';
+  }).join('');
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">' +
+    '<div class="modal memo-modal" data-order-iid="' + escHtml(String(order.iid)) + '">' +
+      '<h3>' + escHtml(T('memo_title')) + (order.client_name ? ' - ' + escHtml(order.client_name) : '') + '</h3>' +
+      '<div class="memo-helper">' + escHtml(T('memo_web_only')) + '</div>' +
+      '<label class="memo-field-label" for="memoPresetSelect">' + escHtml(T('memo_saved')) + '</label>' +
+      '<select id="memoPresetSelect" onchange="applyMemoPreset(this.value)">' + presetOptions + '</select>' +
+      '<button type="button" class="btn-sm" id="memoRemovePresetBtn" onclick="removeSelectedMemoPreset()"' +
+        (selectedPresetId ? '' : ' disabled') + '>' + escHtml(T('memo_remove_preset')) + '</button>' +
+      '<label class="memo-field-label" for="memoCategory">' + escHtml(T('memo_category')) + '</label>' +
+      '<select id="memoCategory">' + categoryOptions + '</select>' +
+      '<label class="memo-field-label" for="memoText">' + escHtml(T('memo_text')) + '</label>' +
+      '<textarea id="memoText" maxlength="600" placeholder="' + escHtml(T('memo_text_placeholder')) + '">' +
+        escHtml(memo ? memo.text : '') + '</textarea>' +
+      '<label class="memo-check"><input type="checkbox" id="memoSavePreset"><span>' +
+        escHtml(T('memo_save_preset')) + '</span></label>' +
+      '<div class="modal-actions">' +
+        (memo ? '<button type="button" class="btn-memo-remove" onclick="removeOrderMemo()">' + escHtml(T('memo_remove')) + '</button>' : '') +
+        '<button type="button" class="btn-modal-cancel" onclick="closeModal()">' + escHtml(T('cancel')) + '</button>' +
+        '<button type="button" class="btn-confirm" id="memoSaveBtn" onclick="saveOrderMemo()">' + escHtml(T('memo_save')) + '</button>' +
+      '</div>' +
+    '</div></div>';
+  updateMemoPresetControls();
+  const text = document.getElementById('memoText');
+  if (text) setTimeout(function() { text.focus(); }, 0);
+}
+
+async function saveOrderMemo() {
+  const iid = memoModalOrderIid();
+  const order = state.orders.find(function(item) { return String(item.iid) === iid; });
+  const textInput = document.getElementById('memoText');
+  const categoryInput = document.getElementById('memoCategory');
+  const presetInput = document.getElementById('memoPresetSelect');
+  const savePresetInput = document.getElementById('memoSavePreset');
+  const saveButton = document.getElementById('memoSaveBtn');
+  const text = String(textInput ? textInput.value : '').trim().slice(0, 600);
+  if (!text) {
+    showToast(T('memo_text_required'), 'error');
+    if (textInput) textInput.focus();
+    return;
+  }
+  if (!order) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+  const key = memoKeyForOrder(order);
+  if (!key) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+  const requestedCategory = categoryInput ? categoryInput.value : 'custom';
+  const categoryId = MEMO_CATEGORIES[requestedCategory] ? requestedCategory : 'custom';
+  let presetId = presetInput ? presetInput.value : '';
+  const shouldSavePreset = !!(savePresetInput && savePresetInput.checked);
+  const existingMemo = memoForOrder(order);
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = '...';
+  }
+  try {
+    if (shouldSavePreset) {
+      const existingPreset = (state.memoPresets || []).find(function(preset) {
+        return preset.text === text && preset.category_id === categoryId;
+      });
+      if (existingPreset) {
+        presetId = existingPreset.id;
+      } else {
+        const label = text.replace(/\s+/g, ' ').slice(0, 100);
+        const savedPreset = await API.saveMemoPreset({label: label, text: text, category_id: categoryId});
+        presetId = savedPreset.id;
+      }
+    }
+    await API.saveWebMemo(key, {
+      text: text,
+      category_id: categoryId,
+      order_key: key,
+      order_created_at: memoOrderCreatedAt(order),
+      preset_id: presetId,
+      created_at: existingMemo && existingMemo.created_at ? existingMemo.created_at : ''
+    });
+    closeModal();
+    showToast(shouldSavePreset ? T('memo_preset_saved') : T('memo_saved_success'));
+    await loadOrders({force: true});
+  } catch (error) {
+    showToast(T('error_prefix') + ' ' + error.message, 'error');
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = T('memo_save');
+    }
+  }
+}
+
+async function removeOrderMemo() {
+  const iid = memoModalOrderIid();
+  const order = state.orders.find(function(item) { return String(item.iid) === iid; });
+  const key = memoKeyForOrder(order);
+  if (!order || !key) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+  try {
+    await API.deleteWebMemo(key);
+    closeModal();
+    showToast(T('memo_removed_success'));
+    await loadOrders({force: true});
+  } catch (error) {
+    showToast(T('error_prefix') + ' ' + error.message, 'error');
+  }
+}
+
+async function removeSelectedMemoPreset() {
+  const select = document.getElementById('memoPresetSelect');
+  const presetId = select ? select.value : '';
+  const iid = memoModalOrderIid();
+  if (!presetId) return;
+  const removeButton = document.getElementById('memoRemovePresetBtn');
+  if (removeButton) removeButton.disabled = true;
+  try {
+    await API.deleteMemoPreset(presetId);
+    const memoData = await API.getWebMemoData({force: true});
+    state.memoPresets = memoData.presets || [];
+    state.orderMemos = memoData.memos || state.orderMemos;
+    openOrderMemo(iid);
+    showToast(T('memo_preset_removed'));
+  } catch (error) {
+    showToast(T('error_prefix') + ' ' + error.message, 'error');
+    updateMemoPresetControls();
+  }
+}
+
 /* ═════════════════════════════════════════════════════════════════════
    TAB SWITCHING
    ═════════════════════════════════════════════════════════════════════ */
@@ -2056,6 +2399,8 @@ function orderSearchText(order) {
     source.address,
     source.products,
     source.notes,
+    source.web_memo && source.web_memo.text,
+    source.web_memo && memoCategoryLabel(source.web_memo.category_id),
     source.agent,
     source.exchange_products,
     lineSubtypes,
@@ -2088,6 +2433,101 @@ function clearSearch() {
   renderOrders();
 }
 
+const MEMO_CATEGORIES = {
+  urgent: {labelKey: 'memo_urgent'},
+  call: {labelKey: 'memo_call'},
+  delivery: {labelKey: 'memo_delivery'},
+  payment: {labelKey: 'memo_payment'},
+  info: {labelKey: 'memo_info'},
+  custom: {labelKey: 'memo_custom'}
+};
+
+function normalizeOrderMemo(value) {
+  if (!value || typeof value !== 'object') return null;
+  const text = String(value.text || value.note || '').trim().slice(0, 600);
+  if (!text) return null;
+  const rawCategory = String(value.category_id || value.category || 'custom').trim().toLowerCase();
+  const categoryId = MEMO_CATEGORIES[rawCategory] ? rawCategory : 'custom';
+  return {
+    text: text,
+    category_id: categoryId,
+    order_key: String(value.order_key || '').trim().slice(0, 180),
+    order_created_at: String(value.order_created_at || '').trim().slice(0, 120),
+    preset_id: String(value.preset_id || '').trim().slice(0, 180),
+    created_at: String(value.created_at || '').trim().slice(0, 120),
+    updated_at: String(value.updated_at || '').trim().slice(0, 120),
+    updated_ms: Math.max(0, Number(value.updated_ms) || 0)
+  };
+}
+
+function normalizeMemoPreset(id, value) {
+  if (!value || typeof value !== 'object') return null;
+  const text = String(value.text || value.label || '').trim().slice(0, 600);
+  if (!text) return null;
+  const rawCategory = String(value.category_id || value.category || 'custom').trim().toLowerCase();
+  const categoryId = MEMO_CATEGORIES[rawCategory] ? rawCategory : 'custom';
+  const presetId = String(id || value.id || '').trim().slice(0, 180);
+  if (!presetId && id) return null;
+  return {
+    id: presetId,
+    label: String(value.label || text).trim().slice(0, 100) || text.slice(0, 100),
+    text: text,
+    category_id: categoryId,
+    created_at: String(value.created_at || '').trim().slice(0, 120),
+    updated_at: String(value.updated_at || '').trim().slice(0, 120)
+  };
+}
+
+function memoCategoryLabel(categoryId) {
+  const category = MEMO_CATEGORIES[categoryId] || MEMO_CATEGORIES.custom;
+  return T(category.labelKey);
+}
+
+function memoOrderCreatedAt(order) {
+  const source = order || {};
+  return String(source.created_at || source.timestamp || '').trim().slice(0, 120);
+}
+
+function memoKeyForOrder(order) {
+  const source = order || {};
+  const explicitKey = String(source.memo_key || source.firebase_key || '').trim();
+  if (explicitKey) return explicitKey.slice(0, 180);
+
+  const iid = String(source.iid || source.id || '').trim();
+  if (!iid) return '';
+  if (API.isStaticMode()) return iid;
+
+  const rowMatch = iid.match(/^row_(\d+)$/);
+  if (rowMatch) return 'local_row_' + rowMatch[1];
+  if (/^(local_row_|desktop_)/.test(iid)) return iid;
+  return 'desktop_' + iid.replace(/[^A-Za-z0-9_-]/g, '_');
+}
+
+function memoMatchesOrder(memo, order, key) {
+  if (!memo) return false;
+  if (memo.order_key && memo.order_key !== key) return false;
+  const createdAt = memoOrderCreatedAt(order);
+  if (memo.order_created_at && createdAt && memo.order_created_at !== createdAt) return false;
+  return true;
+}
+
+function memoForOrder(order) {
+  const key = memoKeyForOrder(order);
+  const memo = normalizeOrderMemo(key && state.orderMemos ? state.orderMemos[key] : null);
+  return memo && memoMatchesOrder(memo, order, key) ? memo : null;
+}
+
+function applyOrderMemos(orders, memos) {
+  const orderList = Array.isArray(orders) ? orders : [];
+  const memoMap = memos && typeof memos === 'object' ? memos : {};
+  return orderList.map(function(order) {
+    const key = memoKeyForOrder(order);
+    const memo = normalizeOrderMemo(key ? memoMap[key] : null);
+    if (!memo || !memoMatchesOrder(memo, order, key)) return order;
+    return Object.assign({}, order, {web_memo: memo});
+  });
+}
+
 /* ═════════════════════════════════════════════════════════════════════
    LOAD DATA
    ═════════════════════════════════════════════════════════════════════ */
@@ -2098,10 +2538,20 @@ async function loadOrders(options) {
   const reqId = ++_ordersReqId;
   state.ordersLoading = true;
   try {
-    const data = await API.getOrders(state.currentDate, '', '');
+    const results = await Promise.all([
+      API.getOrders(state.currentDate, '', ''),
+      API.getWebMemoData({force: force}).catch(function(error) {
+        console.warn('load web memos error:', error);
+        return {memos: state.orderMemos || {}, presets: state.memoPresets || []};
+      })
+    ]);
     if (reqId !== _ordersReqId) return; // Stale response, discard
-    const nextOrders = data.orders || [];
-    const signature = state.currentDate + '|' + JSON.stringify(nextOrders);
+    const data = results[0] || {};
+    const memoData = results[1] || {};
+    state.orderMemos = memoData.memos || {};
+    state.memoPresets = memoData.presets || [];
+    const nextOrders = applyOrderMemos(data.orders || [], state.orderMemos);
+    const signature = state.currentDate + '|' + JSON.stringify(nextOrders) + '|' + JSON.stringify(state.memoPresets);
     if (signature !== state.ordersSignature) {
       state.orders = nextOrders;
       state.ordersSignature = signature;
@@ -2844,6 +3294,8 @@ function renderOrders() {
     const pageThemeStyle = pageInfo || o.resolved_page_style
       ? ' style="--page-accent:' + escHtml(resolvedPageStyle.accent_color) + ';--page-text:' + escHtml(resolvedPageStyle.text_color) + ';"'
       : '';
+    const webMemo = normalizeOrderMemo(o.web_memo) || memoForOrder(o);
+    const memoClass = webMemo ? ' has-web-memo memo-' + webMemo.category_id : '';
     html += '<div class="order-card has-checkbox' + pageThemeClass + (isSelected ? ' selected' : '') + '" data-iid="' + escHtml(o.iid) + '"' + pageThemeStyle + '>' +
       '<input type="checkbox" class="card-checkbox"' + (isSelected ? ' checked' : '') +
       ' onchange="toggleOrderSelection(\'' + escHtml(o.iid) + '\',this.checked)">' +
@@ -2857,6 +3309,9 @@ function renderOrders() {
           '<span class="badge ' + pc + '">' + escHtml(paymentLabel(o.payment_method)) + '</span>' +
         '</div>' +
       '</div>' +
+      (webMemo ? '<div class="card-memo" aria-label="' + escHtml(T('memo_internal')) + '">' +
+        '<span class="memo-category-label">' + escHtml(memoCategoryLabel(webMemo.category_id)) + '</span>' +
+        '<span class="memo-text">' + escHtml(webMemo.text) + '</span></div>' : '') +
       '<div class="card-body">' +
         '<div class="card-row"><span class="card-label">' + escHtml(T('phone')) + '</span>' +
           '<a href="tel:' + escHtml(phoneClean) + '">' + escHtml(o.phone) + '</a></div>' +
@@ -2921,6 +3376,7 @@ function renderOrders() {
     });
     html += '</select>' +
       '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' +
+      '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' +
       '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
       '<a class="btn-sm btn-sms" href="sms:' + escHtml(phoneClean) + '">' + escHtml(T('sms')) + '</a>' +
       '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
@@ -3282,12 +3738,21 @@ async function doStatusUpdate(iid, newStatus, extra, selectEl, oldStatus) {
    DELETE ORDER
    ═════════════════════════════════════════════════════════════════════ */
 function deleteOrder(iid, name) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  const memoKey = memoKeyForOrder(order);
   showModal(T('delete_order'),
     '<p style="font-size:.9rem;color:#666;">' + escHtml(T('delete_confirm')) + ' <strong>' +
     escHtml(name) + '</strong>' + escHtml(T('cannot_undo')) + '</p>',
     async function() {
       try {
         await API.deleteOrder(iid);
+        if (memoKey) {
+          try {
+            await API.deleteWebMemo(memoKey);
+          } catch (error) {
+            console.warn('delete order memo error:', error);
+          }
+        }
         showToast(T('order_deleted'));
         loadOrders();
         refreshHistoryState();
