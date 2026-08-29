@@ -1066,6 +1066,13 @@ const API = {
     if (!host || window.location.origin === 'null') return true;
     return /(^|\.)github\.io$|(^|\.)pages\.dev$|(^|\.)netlify\.app$|(^|\.)vercel\.app$|(^|\.)web\.app$|(^|\.)firebaseapp\.com$|(^|\.)surge\.sh$/.test(host);
   })(),
+  firebaseFirst: (function() {
+    // Orders must not depend on the desktop process being open.  Keep
+    // ?api=local as an explicit diagnostic fallback only.
+    const params = new URLSearchParams(window.location.search);
+    const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
+    return forced !== 'local';
+  })(),
   staticProducts: [
     {code:'CA',name:'Creme Affinante',price:25000,subtypes:[]},
     {code:'TA',name:'Tisane Affinante',price:15000,subtypes:[]},
@@ -1120,11 +1127,11 @@ const API = {
   },
 
   isStaticMode() {
-    return this.staticHost;
+    return this.staticHost || this.firebaseFirst;
   },
 
   async request(method, path, body) {
-    if (this.isStaticMode() && path.indexOf('/api/export/') === 0) {
+    if (this.staticHost && path.indexOf('/api/export/') === 0) {
       throw new Error('PDF export requires the desktop Python server.');
     }
     const opts = {
