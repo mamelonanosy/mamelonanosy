@@ -4185,7 +4185,7 @@ function startReferenceRefresh() {
   if (state.referenceRefreshTimer) return;
   state.referenceRefreshTimer = setInterval(function() {
     loadReferenceData();
-  }, API.isStaticMode() ? 30000 : 60000);
+  }, API.isStaticMode() ? 5000 : 60000);
 }
 
 async function refreshFromInstantSync(reason) {
