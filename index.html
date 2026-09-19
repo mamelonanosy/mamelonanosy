@@ -3803,6 +3803,7 @@ function normalizedChoice(value) {
 function parseSubtypeTextStrict(text, allowedSubtypes) {
   const raw = String(text || '').trim();
   if (!raw) return {items: [], errors: []};
+  // Configured names are suggestions only. Custom labels are valid.
   const allowed = {};
   (allowedSubtypes || []).forEach(function(name) {
     const clean = String(name || '').trim();
@@ -3810,7 +3811,7 @@ function parseSubtypeTextStrict(text, allowedSubtypes) {
   });
   const items = [];
   const errors = [];
-  const seen = new Set();
+  const itemIndexes = {};
   raw.split(/[,;\r\n]+/).map(function(part) { return part.trim(); }).filter(Boolean).forEach(function(part) {
     let name = '';
     let qty = 1;
@@ -3823,14 +3824,18 @@ function parseSubtypeTextStrict(text, allowedSubtypes) {
       if (match) {
         name = match[1].trim();
         qty = parseInt(match[2], 10);
-      } else if (/^[\p{L}\p{N}][\p{L}\p{N}\s'’._-]*$/u.test(part)) {
-        name = part;
       } else {
-        errors.push(duplicateUiText('Sous-type mal écrit : “' + part + '”.', 'Malformed subtype entry: “' + part + '”.'));
-        return;
+        name = part.trim();
       }
     }
     const key = normalizedChoice(name);
+    if (!name || !/[\p{L}\p{N}]/u.test(name)) {
+      errors.push(duplicateUiText(
+        'Le nom du sous-type est manquant dans “' + part + '”.',
+        'Subtype name is missing in “' + part + '”.'
+      ));
+      return;
+    }
     if (qty < 1 || qty > MAX_PRODUCT_QUANTITY) {
       errors.push(duplicateUiText(
         'La quantité du sous-type “' + name + '” doit être comprise entre 1 et ' + MAX_PRODUCT_QUANTITY + '.',
@@ -3838,22 +3843,13 @@ function parseSubtypeTextStrict(text, allowedSubtypes) {
       ));
       return;
     }
-    if (Object.keys(allowed).length && !allowed[key]) {
-      errors.push(duplicateUiText(
-        'Sous-type inconnu “' + name + '”. Choisissez : ' + Object.values(allowed).join(', ') + '.',
-        'Unknown subtype “' + name + '”. Choose: ' + Object.values(allowed).join(', ') + '.'
-      ));
-      return;
+    const canonicalName = allowed[key] || name;
+    if (Object.prototype.hasOwnProperty.call(itemIndexes, key)) {
+      items[itemIndexes[key]].qty += qty;
+    } else {
+      itemIndexes[key] = items.length;
+      items.push({name: canonicalName, qty: qty});
     }
-    if (seen.has(key)) {
-      errors.push(duplicateUiText(
-        'Le sous-type “' + name + '” est répété ; regroupez sa quantité.',
-        'Subtype “' + name + '” is repeated; combine its quantity.'
-      ));
-      return;
-    }
-    seen.add(key);
-    items.push({name: allowed[key] || name, qty: qty});
   });
   return {items: items, errors: errors};
 }
@@ -3953,7 +3949,10 @@ function updateSubtypeSelection(items) {
   productsWithSubtypes.forEach(it => {
     const prod = state.products.find(p => p.code === it.code);
     const subtypes = prod.subtypes || [];
-    const hintText = subtypes.join(', ');
+    const hintText = duplicateUiText(
+      'Suggestions : ' + subtypes.join(', ') + ' — autre texte accepté',
+      'Suggestions: ' + subtypes.join(', ') + ' — other text accepted'
+    );
 
     const existingVal = state.subtypeDrafts[String(it.code).toUpperCase()] || '';
 
