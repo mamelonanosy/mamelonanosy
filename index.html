@@ -271,6 +271,13 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   outline:none;border-color:#667eea;
   box-shadow:0 0 0 3px rgba(102,126,234,.15);
 }
+.form-group input.field-invalid,.form-group select.field-invalid,.form-group textarea.field-invalid,
+.subtype-input.field-invalid{border-color:#c62828;background:#fff8f8;box-shadow:0 0 0 3px rgba(198,40,40,.10)}
+.order-validation-summary{display:none;background:#fff3f3;border:1.5px solid #ef9a9a;border-left:5px solid #c62828;border-radius:10px;padding:12px 14px;margin-bottom:16px;color:#7f1d1d;font-size:.84rem;line-height:1.45}
+.order-validation-summary.visible{display:block}
+.order-validation-summary strong{display:block;margin-bottom:5px;font-size:.9rem}
+.order-validation-summary ul{margin:4px 0 0 19px;padding:0}
+.order-validation-summary li{margin:3px 0}
 .form-group textarea{resize:vertical;min-height:60px}
 .form-group .hint{font-size:.72rem;color:#aaa;margin-top:3px}
 .form-row{display:flex;gap:10px}
@@ -343,6 +350,16 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .financial-grid{
   display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;
 }
+
+/* Daily Close — guided delivery and cash reconciliation */
+.close-guide{background:#f7f9fc;border:1px solid #dce4ee;border-radius:12px;padding:14px;margin-bottom:14px;color:#405064;line-height:1.45}
+.close-summary{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:10px;margin:12px 0}
+.close-summary-card{background:#fff;border:1px solid #e0e6ef;border-radius:10px;padding:11px}
+.close-summary-value{font-size:1.18rem;font-weight:800;color:#253858}.close-summary-label{font-size:.75rem;color:#667085;margin-top:3px}
+.close-status{border-radius:10px;padding:11px 13px;font-weight:700;margin:10px 0}.close-status.open{background:#fff8e1;color:#8a5b00}.close-status.closed{background:#e8f5e9;color:#1b5e20}.close-status.warning{background:#ffebee;color:#b71c1c}
+.close-section{margin-top:18px}.close-section h3{font-size:1rem;margin:0 0 8px;color:#253858}.close-table-wrap{overflow-x:auto;border:1px solid #e0e6ef;border-radius:10px;background:#fff}
+.close-table{width:100%;border-collapse:collapse;font-size:.86rem}.close-table th{background:#f3f6fa;color:#52616b;text-align:left;padding:10px;white-space:nowrap}.close-table td{padding:9px 10px;border-top:1px solid #edf0f4;vertical-align:middle}.close-table input[type="text"],.close-table input[type="number"]{width:100%;min-width:105px;padding:7px;border:1px solid #cdd6e1;border-radius:7px;box-sizing:border-box}.close-table textarea{width:100%;min-width:160px;min-height:38px;padding:7px;border:1px solid #cdd6e1;border-radius:7px;box-sizing:border-box;resize:vertical}.close-check{width:18px;height:18px;accent-color:#2e7d32}.close-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.close-actions button{border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer;background:#667eea;color:#fff}.close-actions button.secondary{background:#eef2f6;color:#334155}.close-actions button.close-day{background:#2e7d32}.close-actions button:disabled{opacity:.5;cursor:not-allowed}.close-blockers{margin:8px 0;padding:10px 14px;border-left:4px solid #ef6c00;background:#fff8e1;color:#725000;border-radius:4px}.close-blockers ul{margin:5px 0 0;padding-left:18px}
+@media(max-width:700px){.close-summary{grid-template-columns:repeat(2,minmax(120px,1fr))}.close-table{font-size:.8rem}.close-table th,.close-table td{padding:7px}.close-guide{font-size:.9rem}}
 .fin-card{
   background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
   border-radius:12px;padding:14px;text-align:center;color:#fff;
@@ -429,6 +446,36 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .memo-check{display:flex;gap:7px;align-items:flex-start;margin:1px 0 14px;color:#52616b;font-size:.8rem;line-height:1.3}
 .memo-check input{width:auto!important;margin:1px 0 0!important}
 .modal-actions .btn-memo-remove{margin-right:auto;background:#ffebee;color:#b42318}
+
+.duplicate-modal{max-width:980px;max-height:92vh;overflow:auto;padding:0}
+.duplicate-head{padding:22px 24px 16px;border-bottom:1px solid #e8ecf2}
+.duplicate-head h3{margin:0 0 6px;font-size:1.25rem;color:#9a4d00}
+.duplicate-head p{margin:0;color:#667085;font-size:.88rem;line-height:1.45}
+.duplicate-alert{margin:14px 24px 0;padding:11px 13px;border-radius:10px;background:#fff4df;color:#7a4700;font-size:.84rem;line-height:1.4}
+.duplicate-progress{display:flex;justify-content:space-between;gap:12px;margin:12px 24px 0;color:#52606d;font-size:.78rem;font-weight:700}
+.duplicate-evidence{display:flex;gap:6px;flex-wrap:wrap;margin:8px 24px 0}
+.duplicate-chip{background:#eef2ff;color:#3f51b5;border-radius:999px;padding:4px 8px;font-size:.7rem;font-weight:700}
+.duplicate-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 24px}
+.duplicate-card{border:1px solid #dfe4ea;border-radius:12px;overflow:hidden;background:#fff}
+.duplicate-card h4{margin:0;padding:10px 12px;background:#f7f8fb;color:#344054;font-size:.82rem}
+.duplicate-field{display:grid;grid-template-columns:100px 1fr;gap:8px;padding:8px 12px;border-top:1px solid #f0f2f5;font-size:.8rem}
+.duplicate-field span{color:#7a8596;font-weight:600}
+.duplicate-field strong{color:#263238;overflow-wrap:anywhere}
+.duplicate-field.match{background:#f0fdf4}
+.duplicate-help{padding:0 24px 12px;color:#667085;font-size:.78rem;line-height:1.4}
+.duplicate-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:14px 24px 22px;border-top:1px solid #e8ecf2}
+.duplicate-actions button{border:0;border-radius:10px;padding:11px 8px;font-size:.78rem;font-weight:700;line-height:1.3;cursor:pointer}
+.duplicate-keep-old{background:#eef1f5;color:#344054}
+.duplicate-keep-both{background:#2e7d32;color:#fff}
+.duplicate-keep-new{background:#c62828;color:#fff}
+.duplicate-cancel{display:block;margin:0 24px 12px;border:0;background:transparent;color:#667085;text-decoration:underline;cursor:pointer;font-size:.76rem}
+@media(max-width:700px){
+  .duplicate-compare{grid-template-columns:1fr;padding:12px}
+  .duplicate-actions{grid-template-columns:1fr;padding:12px}
+  .duplicate-head{padding:18px 14px 12px}
+  .duplicate-alert,.duplicate-progress,.duplicate-evidence{margin-left:14px;margin-right:14px}
+  .duplicate-help{padding-left:14px;padding-right:14px}
+}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /*───────────────────────────── FAB (Floating Action Button) ─────────────────────────────*/
@@ -544,6 +591,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   <button class="tab-btn active" data-tab="orders" onclick="switchTab('orders')">Commandes</button>
   <button class="tab-btn" data-tab="form" onclick="switchTab('form')">Nouvelle</button>
   <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')">Tableau de bord</button>
+  <button class="tab-btn" data-tab="dailyClose" onclick="switchTab('dailyClose')">✅ Clôture</button>
 </div>
 
 <!-- DATE BANNER (always visible, sticky) -->
@@ -640,8 +688,9 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   <div class="form-card">
     <div class="form-title" id="formTitle">Nouvelle</div>
 
-    <form id="orderForm" onsubmit="submitOrder(event)">
+    <form id="orderForm" onsubmit="submitOrder(event)" novalidate>
       <input type="hidden" id="editIid" value="">
+      <div id="orderValidationSummary" class="order-validation-summary" role="alert" aria-live="assertive"></div>
 
       <div class="form-group">
         <label>Date de livraison</label>
@@ -663,8 +712,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       </div>
 
       <div class="form-group">
-        <label>Adresse</label>
-        <input type="text" id="fAddress" placeholder="Lot 123 Ambohijatovo" onblur="this.value=capitalizeName(this.value)">
+        <label>Adresse *</label>
+        <input type="text" id="fAddress" required placeholder="Lot 123 Ambohijatovo" onblur="this.value=capitalizeName(this.value)">
       </div>
 
       <div class="form-group">
@@ -708,7 +757,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       </div>
 
       <div class="form-group">
-        <label id="lTotalPrice">Total (modifiable)</label>
+        <label id="lTotalPrice">Total (modifiable) *</label>
         <input type="number" id="fTotalPrice" placeholder="Auto-calcul&eacute;" min="0" step="100" oninput="this.dataset.manual=this.value?'1':''">
         <div class="hint" id="hTotalPrice">Laissez vide pour le calcul automatique, ou saisissez un montant n&eacute;goci&eacute;</div>
       </div>
@@ -752,6 +801,21 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
   <div class="section-title">D&eacute;tail des produits</div>
   <div id="productsTableWrap"></div>
+</div>
+
+<!-- DAILY CLOSE: delivery validation and agent cash reconciliation -->
+<div class="tab-content" id="tabDailyClose">
+  <div class="date-nav" style="margin-bottom:16px">
+    <button onclick="prevDateClose()">&larr; Préc</button>
+    <input type="date" id="closeDatePicker" onchange="pickDateClose(this.value)">
+    <button onclick="nextDateClose()">Suiv &rarr;</button>
+    <button onclick="goTodayClose()" style="background:#43a047">Aujourd'hui</button>
+  </div>
+  <div class="close-guide">
+    <strong>Simple daily closing:</strong> check each completed delivery, confirm the cash for each agent, then close the day.
+    A difference is allowed only when you write the reason.
+  </div>
+  <div id="dailyCloseContent"><div class="loading-overlay"><span class="spinner"></span> Loading daily close…</div></div>
 </div>
 
 <script>
@@ -809,7 +873,6 @@ const LANG = {
     collected: { fr: 'Collect\u00e9', en: 'Collected' },
     revenue: { fr: 'Revenu', en: 'Revenue' },
     notes: { fr: 'Notes', en: 'Notes' },
-
     memo_internal: { fr: 'Mémo interne', en: 'Internal memo' },
 
     // Card actions
@@ -817,7 +880,6 @@ const LANG = {
     call: { fr: 'Appeler', en: 'Call' },
     sms: { fr: 'Message', en: 'Message' },
     delete: { fr: 'Supprimer', en: 'Delete' },
-
     memo_action: { fr: 'Mémo', en: 'Memo' },
 
     // Order count
@@ -831,11 +893,11 @@ const LANG = {
     date_hint: { fr: 'Accepte: "demain", "mardi", "25/03", ou AAAA-MM-JJ', en: 'Accepts: "demain", "mardi", "25/03", or YYYY-MM-DD' },
     client_name: { fr: 'Nom du client *', en: 'Client Name *' },
     phone_label: { fr: 'T\u00e9l\u00e9phone *', en: 'Phone *' },
-    address_label: { fr: 'Adresse', en: 'Address' },
+    address_label: { fr: 'Adresse *', en: 'Address *' },
     products_label: { fr: 'Produits *', en: 'Products *' },
     products_hint: { fr: 'Ex: CA x2, CG x1 ou CA CG TA', en: 'Ex: CA x2, CG x1 or CA CG TA' },
     delivery_fee_label: { fr: 'Frais de livraison', en: 'Delivery Fee' },
-    total_price_label: { fr: 'Total (modifiable)', en: 'Total (editable)' },
+    total_price_label: { fr: 'Total (modifiable) *', en: 'Total (editable) *' },
     page_label: { fr: 'Page', en: 'Page' },
     page_hint: { fr: 'Ce produit appartient a plusieurs pages, veuillez choisir', en: 'This product belongs to multiple pages, please choose' },
     page_auto_hint: { fr: 'Liste complete des pages. Laissez vide pour detection automatique.', en: 'Complete page list. Leave blank for automatic product/default page.' },
@@ -903,7 +965,6 @@ const LANG = {
     cannot_undo: { fr: '? Cette action est irr\u00e9versible.', en: '? This cannot be undone.' },
     confirm: { fr: 'Confirmer', en: 'Confirm' },
     cancel: { fr: 'Annuler', en: 'Cancel' },
-
     memo_title: { fr: 'Mémo interne', en: 'Internal memo' },
     memo_saved: { fr: 'Utiliser un mémo enregistré', en: 'Use a saved memo' },
     memo_choose_saved: { fr: '-- Nouveau mémo personnalisé --', en: '-- New custom memo --' },
@@ -928,7 +989,6 @@ const LANG = {
     order_created: { fr: 'Commande cr\u00e9\u00e9e avec succ\u00e8s', en: 'Order created successfully' },
     order_not_found: { fr: 'Commande introuvable', en: 'Order not found' },
     error_prefix: { fr: 'Erreur:', en: 'Error:' },
-
     memo_saved_success: { fr: 'Mémo enregistré', en: 'Memo saved' },
     memo_removed_success: { fr: 'Mémo supprimé', en: 'Memo removed' },
     memo_preset_saved: { fr: 'Mémo enregistré pour réutilisation', en: 'Memo saved for reuse' },
@@ -1006,6 +1066,10 @@ function toggleLanguage() {
 const state = {
   currentDate: '',
   dashDate: '',
+  closeDate: '',
+  dailyClose: null,
+  dailyCloseLoading: false,
+  dailyCloseRefreshTimer: null,
   orders: [],
   agents: [],
   products: [],
@@ -1047,6 +1111,7 @@ const API = {
   firebaseBase: 'https://louanh-52894-default-rtdb.firebaseio.com',
   firebaseOrdersPath: '/orders',
   firebaseReferencePath: '/orders/__reference_data',
+  firebaseDailyClosePath: '/orders/__daily_reconciliation',
   firebaseOrderMemoPath: '/orders/__web_order_memos',
   firebaseMemoPresetPath: '/orders/__web_memo_presets',
   staticConfigVersion: '2026-07-15-1',
@@ -1143,8 +1208,15 @@ const API = {
     const r = await fetch(this.base + path, opts);
     if (!r.ok) {
       let msg = 'Request failed (' + r.status + ')';
-      try { const j = await r.json(); msg = j.error || j.message || msg; } catch(e) {}
-      throw new Error(msg);
+      let details = null;
+      try {
+        details = await r.json();
+        msg = details.error || details.message || msg;
+      } catch(e) {}
+      const error = new Error(msg);
+      error.status = r.status;
+      error.data = details;
+      throw error;
     }
     return r.json();
   },
@@ -1310,31 +1382,14 @@ const API = {
   },
 
   parseProductText(text) {
-    const productMap = this.productMap();
-    const tokens = String(text || '').toUpperCase()
-      .replace(/,/g, ' ').replace(/\+/g, ' ').replace(/X/g, ' X ')
-      .replace(/  +/g, ' ').trim().split(/\s+/).filter(Boolean);
-    const items = [];
-    for (let i = 0; i < tokens.length; i++) {
-      let code = tokens[i];
-      let qty = 1;
-      const inline = code.match(/^([A-Z]+)(\d+)$/);
-      if (inline && productMap[inline[1]]) {
-        code = inline[1];
-        qty = Number(inline[2]) || 1;
-      } else if (!productMap[code]) {
-        continue;
-      } else if (tokens[i + 1] === 'X' && /^\d+$/.test(tokens[i + 2] || '')) {
-        qty = Number(tokens[i + 2]);
-        i += 2;
-      } else if (/^\d+$/.test(tokens[i + 1] || '')) {
-        qty = Number(tokens[i + 1]);
-        i += 1;
-      }
-      const p = productMap[code];
-      items.push({code: code, qty: qty, unit_price: p.price || 0, total: qty * (p.price || 0)});
-    }
-    return items;
+    return parseProductsInputStrict(text).items.map(function(item) {
+      return {
+        code: item.code,
+        qty: item.qty,
+        unit_price: item.unit_price,
+        total: item.qty * item.unit_price
+      };
+    });
   },
 
   normalizePayment(value) {
@@ -1462,6 +1517,49 @@ const API = {
     return orders;
   },
 
+
+  getFirebaseOrdersRange(date, days) {
+    const start = duplicateShiftDate(date, -(days || 7));
+    const end = duplicateShiftDate(date, days || 7);
+    const path = this.firebaseOrdersPath +
+      '?orderBy=' + encodeURIComponent(JSON.stringify('delivery_date')) +
+      '&startAt=' + encodeURIComponent(JSON.stringify(start)) +
+      '&endAt=' + encodeURIComponent(JSON.stringify(end));
+    return this.fb('GET', path).then((data) => {
+      const orders = [];
+      Object.keys(data || {}).forEach((id) => {
+        if (String(id).startsWith('__')) return;
+        if (data[id]) orders.push(this.normalizeOrder(id, data[id]));
+      });
+      return orders;
+    });
+  },
+
+  checkDuplicates(data, excludeIid) {
+    const payload = Object.assign({}, data || {});
+    if (excludeIid) payload.exclude_iid = excludeIid;
+    if (!this.isStaticMode()) {
+      return this.request('POST', '/api/orders/check-duplicates', payload);
+    }
+
+    const candidate = this.makeOrder(payload);
+    return this.getFirebaseOrdersRange(candidate.delivery_date, DUPLICATE_LOOKBACK_DAYS)
+      .catch(() => this.getFirebaseOrders())
+      .then((orders) => {
+        const duplicates = findDuplicateOrderMatches(candidate, orders, excludeIid);
+        return {
+          duplicates: duplicates,
+          count: duplicates.length,
+          policy: {
+            lookback_days: DUPLICATE_LOOKBACK_DAYS,
+            minimum_score: DUPLICATE_MIN_SCORE,
+            primary_key: 'normalized_phone',
+            automatic_block: false
+          }
+        };
+      });
+  },
+
   getOrders(date, status, agent) {
     if (this.isStaticMode()) {
       return this.getFirebaseOrders(date).then(function(orders) {
@@ -1487,6 +1585,19 @@ const API = {
       const order = this.makeOrder(data);
       order.source = 'web_ui';
       order.updated_at = this.nowStamp();
+      const review = data && data.duplicate_review;
+      const deleteIds = review && Array.isArray(review.delete_iids)
+        ? review.delete_iids.map(String).filter(Boolean) : [];
+      if (deleteIds.length) {
+        const iid = 'web_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+        const changes = {};
+        changes[iid] = order;
+        deleteIds.forEach(function(oldIid) { if (oldIid !== iid) changes[oldIid] = null; });
+        return this.fb('PATCH', this.firebaseOrdersPath, changes).then(function() {
+          order.iid = iid;
+          return {success: true, iid: iid, order: order, deleted_duplicate_iids: deleteIds};
+        });
+      }
       return this.fb('POST', this.firebaseOrdersPath, order).then((result) => {
         order.iid = result.name;
         return {success: true, iid: result.name, order: order};
@@ -1500,6 +1611,18 @@ const API = {
         const order = this.makeOrder(data, raw || {});
         order.source = 'web_ui';
         order.updated_at = this.nowStamp();
+        const review = data && data.duplicate_review;
+        const deleteIds = review && Array.isArray(review.delete_iids)
+          ? review.delete_iids.map(String).filter(function(id) { return id && id !== String(iid); }) : [];
+        if (deleteIds.length) {
+          const changes = {};
+          changes[iid] = order;
+          deleteIds.forEach(function(oldIid) { changes[oldIid] = null; });
+          return this.fb('PATCH', this.firebaseOrdersPath, changes).then(function() {
+            order.iid = iid;
+            return {success: true, order: order, deleted_duplicate_iids: deleteIds};
+          });
+        }
         return this.fb('PATCH', this.firebaseOrdersPath + '/' + encodeURIComponent(iid), order).then(() => {
           order.iid = iid;
           return {success: true, order: order};
@@ -1568,6 +1691,53 @@ const API = {
     }
     return this.request('GET', '/api/stats?date=' + encodeURIComponent(date));
   },
+  getDailyClose(date) {
+    if (this.isStaticMode()) {
+      return this.fb('GET', this.firebaseDailyClosePath + '/' + encodeURIComponent(date))
+        .then((record) => ({record: record || null}));
+    }
+    return this.request('GET', '/api/daily-close?date=' + encodeURIComponent(date));
+  },
+  saveDailyClose(date, changes) {
+    if (!this.isStaticMode()) return this.request('POST', '/api/daily-close', Object.assign({date: date}, changes || {}));
+    return this.getDailyClose(date).then((data) => {
+      const record = normalizeDailyCloseRecord(data.record, date);
+      mergeDailyCloseChanges(record, changes || {});
+      record.state = 'open';
+      record.closed_at = '';
+      record.closed_snapshot_hash = '';
+      record.updated_at = new Date().toISOString();
+      record.updated_ms = Date.now();
+      return this.fb('PUT', this.firebaseDailyClosePath + '/' + encodeURIComponent(date), record)
+        .then(() => ({record: record}));
+    });
+  },
+  closeDailyClose(date, record, dayNote, snapshotHash) {
+    if (!this.isStaticMode()) return this.request('POST', '/api/daily-close/close', {date: date, day_note: dayNote || ''});
+    const next = normalizeDailyCloseRecord(record, date);
+    next.day_note = String(dayNote || next.day_note || '').trim().slice(0, 2000);
+    next.state = 'closed';
+    next.closed_at = new Date().toISOString();
+    next.closed_snapshot_hash = String(snapshotHash || '');
+    next.updated_at = new Date().toISOString();
+    next.updated_ms = Date.now();
+    return this.fb('PUT', this.firebaseDailyClosePath + '/' + encodeURIComponent(date), next)
+      .then(() => ({success: true, record: next}));
+  },
+  reopenDailyClose(date, reason) {
+    if (!this.isStaticMode()) return this.request('POST', '/api/daily-close/reopen', {date: date, reason: reason || ''});
+    return this.getDailyClose(date).then((data) => {
+      const record = normalizeDailyCloseRecord(data.record, date);
+      record.state = 'open';
+      record.closed_at = '';
+      record.closed_snapshot_hash = '';
+      if (reason) record.day_note = (record.day_note ? record.day_note + '\n' : '') + 'Reopened: ' + String(reason).slice(0, 900);
+      record.updated_at = new Date().toISOString();
+      record.updated_ms = Date.now();
+      return this.fb('PUT', this.firebaseDailyClosePath + '/' + encodeURIComponent(date), record)
+        .then(() => ({record: record}));
+    });
+  },
   getDates() {
     if (this.isStaticMode()) {
       return Promise.resolve({dates: [this.today()], today: this.today()});
@@ -1628,6 +1798,145 @@ const API = {
 /* ═════════════════════════════════════════════════════════════════════
    UTILITIES
    ═════════════════════════════════════════════════════════════════════ */
+const DUPLICATE_LOOKBACK_DAYS = 7;
+const DUPLICATE_MIN_SCORE = 70;
+
+function duplicateNormalizedText(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .match(/[a-z0-9]+/g)?.join(' ') || '';
+}
+
+function duplicatePhoneKeys(value) {
+  const keys = new Set();
+  String(value || '').split(/[\/,;\n]+/).forEach(function(part) {
+    let digits = part.replace(/\D/g, '');
+    if (digits.indexOf('00') === 0) digits = digits.slice(2);
+    if (digits.length >= 9) keys.add(digits.slice(-9));
+  });
+  return keys;
+}
+
+function duplicateLevenshteinRatio(left, right) {
+  if (left === right) return 1;
+  if (!left || !right) return 0;
+  let previous = Array.from({length: right.length + 1}, function(_, index) { return index; });
+  for (let row = 1; row <= left.length; row += 1) {
+    const current = [row];
+    for (let column = 1; column <= right.length; column += 1) {
+      current[column] = Math.min(
+        current[column - 1] + 1,
+        previous[column] + 1,
+        previous[column - 1] + (left[row - 1] === right[column - 1] ? 0 : 1)
+      );
+    }
+    previous = current;
+  }
+  return 1 - previous[right.length] / Math.max(left.length, right.length);
+}
+
+function duplicateStringSimilarity(value1, value2) {
+  const left = duplicateNormalizedText(value1);
+  const right = duplicateNormalizedText(value2);
+  if (!left || !right) return 0;
+  const direct = duplicateLevenshteinRatio(left, right);
+  const sortedLeft = left.split(' ').sort().join(' ');
+  const sortedRight = right.split(' ').sort().join(' ');
+  return Math.max(direct, duplicateLevenshteinRatio(sortedLeft, sortedRight));
+}
+
+function duplicateDayNumber(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return null;
+  return Math.floor(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) / 86400000);
+}
+
+function duplicateDaysApart(order1, order2) {
+  const first = duplicateDayNumber(order1 && order1.delivery_date);
+  const second = duplicateDayNumber(order2 && order2.delivery_date);
+  if (first === null || second === null) {
+    return String(order1 && order1.delivery_date || '') === String(order2 && order2.delivery_date || '') ? 0 : null;
+  }
+  return Math.abs(first - second);
+}
+
+function duplicateShiftDate(value, amount) {
+  const day = duplicateDayNumber(value);
+  if (day === null) return String(value || '');
+  return new Date((day + amount) * 86400000).toISOString().slice(0, 10);
+}
+
+function duplicateOrderScore(first, second) {
+  const phones1 = duplicatePhoneKeys(first.phone);
+  const phones2 = duplicatePhoneKeys(second.phone);
+  let phoneMatch = false;
+  phones1.forEach(function(phone) { if (phones2.has(phone)) phoneMatch = true; });
+  if (!phoneMatch) return {score: 0, evidence: []};
+
+  let score = 72;
+  const evidence = ['Same phone number'];
+  const nameSimilarity = duplicateStringSimilarity(first.client_name || first.name, second.client_name || second.name);
+  if (nameSimilarity === 1) {
+    score += 18;
+    evidence.push('Same name');
+  } else if (nameSimilarity >= 0.78) {
+    score += 14;
+    evidence.push('Very similar name');
+  } else if (nameSimilarity >= 0.62) {
+    score += 7;
+    evidence.push('Similar name');
+  }
+
+  const daysApart = duplicateDaysApart(first, second);
+  if (daysApart === 0) {
+    score += 6;
+    evidence.push('Same delivery date');
+  }
+  const products1 = duplicateNormalizedText(first.products);
+  const products2 = duplicateNormalizedText(second.products);
+  if (products1 && products1 === products2) {
+    score += 4;
+    evidence.push('Same products');
+  }
+  if (duplicateStringSimilarity(first.address, second.address) >= 0.90) {
+    score += 4;
+    evidence.push('Same or very similar address');
+  }
+  return {score: Math.min(score, 100), evidence: evidence};
+}
+
+function duplicateConfidence(score) {
+  if (score >= 92) return 'high';
+  if (score >= 82) return 'medium';
+  return 'review';
+}
+
+function findDuplicateOrderMatches(candidate, orders, excludeIid) {
+  const matches = [];
+  (orders || []).forEach(function(order) {
+    if (!order || (excludeIid && String(order.iid) === String(excludeIid))) return;
+    const daysApart = duplicateDaysApart(candidate, order);
+    if (daysApart === null || daysApart > DUPLICATE_LOOKBACK_DAYS) return;
+    const result = duplicateOrderScore(candidate, order);
+    if (result.score < DUPLICATE_MIN_SCORE) return;
+    matches.push({
+      iid: order.iid,
+      score: result.score,
+      confidence: duplicateConfidence(result.score),
+      evidence: result.evidence,
+      same_date: daysApart === 0,
+      days_apart: daysApart,
+      order: order
+    });
+  });
+  matches.sort(function(left, right) {
+    return right.score - left.score || Number(right.same_date) - Number(left.same_date);
+  });
+  return matches;
+}
+
 function formatCurrency(val) {
   if (val === null || val === undefined || val === '') return '0 Ar';
   const n = Number(val);
@@ -1828,45 +2137,111 @@ function pageStyle(page) {
   };
 }
 
-function parseProductsInput(productsStr) {
-  const text = String(productsStr || '').trim().toUpperCase();
-  if (!text) return [];
-  const normalized = text.replace(/,/g,' ').replace(/\+/g,' ').replace(/X/g,' X ').replace(/  +/g,' ');
-  const tokens = normalized.trim().split(/\s+/);
-  const items = [];
+const MAX_PRODUCT_QUANTITY = 999;
+
+function parseProductsInputStrict(productsStr) {
+  const text = String(productsStr || '').trim();
+  if (!text) return {items: [], errors: [duplicateUiText('Les produits sont obligatoires.', 'Products are required.')]};
+  const productsByCode = {};
+  (state.products || []).forEach(function(product) {
+    const code = String(product.code || '').trim().toUpperCase();
+    if (code) productsByCode[code] = product;
+  });
+  const codes = Object.keys(productsByCode).sort(function(a, b) { return b.length - a.length; });
+  if (!codes.length) {
+    return {items: [], errors: [duplicateUiText('Aucun produit n\'est configuré.', 'No products are configured.')]};
+  }
+
+  const tokens = text.toUpperCase().replace(/×/g, 'X').replace(/[,;+\r\n]+/g, ' ').trim().split(/\s+/);
+  const totals = {};
+  const order = [];
+  const errors = [];
   let i = 0;
+
+  function addItem(code, qty, source) {
+    if (qty < 1 || qty > MAX_PRODUCT_QUANTITY) {
+      errors.push(duplicateUiText(
+        'La quantité de ' + code + ' doit être comprise entre 1 et ' + MAX_PRODUCT_QUANTITY + ' (reçu: ' + source + ').',
+        'Quantity for ' + code + ' must be between 1 and ' + MAX_PRODUCT_QUANTITY + ' (found: ' + source + ').'
+      ));
+      return;
+    }
+    if (!Object.prototype.hasOwnProperty.call(totals, code)) {
+      totals[code] = 0;
+      order.push(code);
+    }
+    totals[code] += qty;
+    if (totals[code] > MAX_PRODUCT_QUANTITY) {
+      errors.push(duplicateUiText(
+        'La quantité totale de ' + code + ' ne peut pas dépasser ' + MAX_PRODUCT_QUANTITY + '.',
+        'Combined quantity for ' + code + ' cannot exceed ' + MAX_PRODUCT_QUANTITY + '.'
+      ));
+    }
+  }
+
   while (i < tokens.length) {
     const token = tokens[i];
-    const prod = state.products.find(function(p) { return p.code === token; });
-    if (prod) {
-      let qty = 1;
-      if (i + 1 < tokens.length && tokens[i + 1] === 'X' && i + 2 < tokens.length && /^\d+$/.test(tokens[i + 2])) {
-        qty = parseInt(tokens[i + 2], 10);
-        i += 2;
-      } else if (i + 1 < tokens.length && /^\d+$/.test(tokens[i + 1])) {
-        qty = parseInt(tokens[i + 1], 10);
-        i += 1;
-      }
-      items.push({ code: prod.code, qty: qty, unit_price: prod.price || 0 });
-    } else {
-      const m = token.match(/^([A-Z]+)(\d+)$/);
-      if (m) {
-        const prodInline = state.products.find(function(p) { return p.code === m[1]; });
-        if (prodInline) {
-          items.push({ code: prodInline.code, qty: parseInt(m[2], 10), unit_price: prodInline.price || 0 });
+    let code = productsByCode[token] ? token : '';
+    let qty = 1;
+    let consumed = 1;
+    if (code && i + 1 < tokens.length) {
+      const next = tokens[i + 1];
+      if (/^[X:]\d+$/.test(next)) {
+        qty = parseInt(next.match(/\d+/)[0], 10);
+        consumed = 2;
+      } else if (next === 'X' || next === ':') {
+        if (i + 2 < tokens.length && /^\d+$/.test(tokens[i + 2])) {
+          qty = parseInt(tokens[i + 2], 10);
+          consumed = 3;
+        } else {
+          errors.push(duplicateUiText(
+            'Saisissez un nombre entier après ' + code + ' ' + next + '.',
+            'Enter a whole quantity after ' + code + ' ' + next + '.'
+          ));
+          consumed = 2;
         }
+      } else if (/^\d+$/.test(next)) {
+        qty = parseInt(next, 10);
+        consumed = 2;
       }
     }
-    i++;
+    if (!code) {
+      codes.some(function(possibleCode) {
+        if (token.indexOf(possibleCode) !== 0) return false;
+        const suffix = token.slice(possibleCode.length);
+        const match = suffix.match(/^(?:X|:)?(\d+)$/);
+        if (!match) return false;
+        code = possibleCode;
+        qty = parseInt(match[1], 10);
+        return true;
+      });
+    }
+    if (code) addItem(code, qty, token);
+    else errors.push(duplicateUiText(
+      'Produit inconnu ou mal écrit : “' + token + '”.',
+      'Unknown or malformed product entry: “' + token + '”.'
+    ));
+    i += consumed;
   }
-  return items;
+
+  return {
+    items: order.map(function(code) {
+      return {code: code, qty: totals[code], unit_price: Number(productsByCode[code].price) || 0};
+    }),
+    errors: errors
+  };
+}
+
+function parseProductsInput(productsStr) {
+  return parseProductsInputStrict(productsStr).items;
 }
 
 function formatProductsInput(productsStr) {
   const original = String(productsStr || '').trim();
   if (!original) return '';
-  const items = parseProductsInput(original);
-  if (!items.length) return original.toUpperCase();
+  const parsed = parseProductsInputStrict(original);
+  const items = parsed.items;
+  if (!items.length || parsed.errors.length) return original.toUpperCase();
   return items.map(function(item) {
     return item.code + ' x' + item.qty;
   }).join(', ');
@@ -2254,15 +2629,17 @@ function switchTab(tab) {
     b.classList.toggle('active', b.dataset.tab === tab);
   });
   document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  // Show FAB on orders/dashboard, hide on form
-  document.getElementById('fabNewOrder').style.display = (tab === 'form') ? 'none' : 'flex';
+  // Show FAB on orders/dashboard, hide it while working in a focused workflow.
+  document.getElementById('fabNewOrder').style.display = (tab === 'form' || tab === 'dailyClose') ? 'none' : 'flex';
   if (tab === 'orders') {
     document.getElementById('tabOrders').classList.add('active');
     updateDateBanner(state.currentDate);
+    stopDailyCloseRefresh();
     startAutoRefresh();
   } else if (tab === 'form') {
     document.getElementById('tabForm').classList.add('active');
     stopAutoRefresh();
+    stopDailyCloseRefresh();
     loadReferenceData({force: true});
     if (!state.editingOrder) {
       const dateInput = document.getElementById('fDeliveryDate');
@@ -2279,7 +2656,14 @@ function switchTab(tab) {
     document.getElementById('tabDashboard').classList.add('active');
     updateDateBanner(state.dashDate);
     stopAutoRefresh();
+    stopDailyCloseRefresh();
     loadStats();
+  } else if (tab === 'dailyClose') {
+    document.getElementById('tabDailyClose').classList.add('active');
+    updateDateBanner(state.closeDate);
+    stopAutoRefresh();
+    startDailyCloseRefresh();
+    loadDailyClose();
   }
 }
 
@@ -2345,6 +2729,368 @@ function prevDateDash() { setDashDate(shiftDate(state.dashDate, -1)); }
 function nextDateDash() { setDashDate(shiftDate(state.dashDate, 1)); }
 function goTodayDash() { setDashDate(todayISO()); }
 function pickDateDash(v) { if (v) setDashDate(v); }
+
+/* Daily Close: shared delivery validation and cash reconciliation. */
+function closeNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) && Math.abs(n) <= 1000000000 ? n : 0;
+}
+function closeAgentKey(agent) { return encodeURIComponent(String(agent || 'Unassigned')); }
+function closeOrderDomId(iid) { return 'close_' + String(iid || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
+function dailyCloseSnapshotHash(orders) {
+  const source = (orders || []).slice().sort((a, b) => {
+    const left = String(a.iid || ''), right = String(b.iid || '');
+    return left < right ? -1 : (left > right ? 1 : 0);
+  })
+    .map((order) => [
+      String(order.iid || ''), String(order.status || ''),
+      closeNumber(order.amount_collected).toFixed(2),
+      closeNumber(order.agent_owes).toFixed(2),
+      closeNumber(order.agent_payment).toFixed(2),
+      closeNumber(order.company_revenue).toFixed(2)
+    ].join('\x1e')).join('\x1f');
+  let value = 2166136261;
+  for (let index = 0; index < source.length; index += 1) {
+    value ^= source.charCodeAt(index);
+    value = Math.imul(value, 16777619) >>> 0;
+  }
+  return 'fnv1a:' + value.toString(16).padStart(8, '0');
+}
+
+function normalizeDailyCloseRecord(value, date) {
+  const source = value && typeof value === 'object' ? value : {};
+  const record = {
+    schema_version: 1, date: date, state: source.state === 'closed' ? 'closed' : 'open',
+    order_checks: {}, agent_settlements: {}, day_note: String(source.day_note || '').trim().slice(0, 2000),
+    closed_at: String(source.closed_at || '').slice(0, 80),
+    closed_snapshot_hash: String(source.closed_snapshot_hash || '').slice(0, 128),
+    updated_at: String(source.updated_at || '').slice(0, 80),
+    updated_ms: Math.max(0, Math.floor(closeNumber(source.updated_ms)))
+  };
+  const checks = source.order_checks && typeof source.order_checks === 'object' ? source.order_checks : {};
+  Object.keys(checks).forEach((iid) => {
+    const check = checks[iid] || {};
+    record.order_checks[String(iid)] = {
+      verified: !!check.verified,
+      proof_note: String(check.proof_note || '').trim().slice(0, 1000),
+      return_note: String(check.return_note || '').trim().slice(0, 1000),
+      updated_at: String(check.updated_at || '').slice(0, 80)
+    };
+  });
+  const settlements = source.agent_settlements && typeof source.agent_settlements === 'object' ? source.agent_settlements : {};
+  Object.keys(settlements).forEach((key) => {
+    const settlement = settlements[key] || {};
+    record.agent_settlements[String(key)] = {
+      agent: String(settlement.agent || '').trim().slice(0, 160),
+      actual_remittance: closeNumber(settlement.actual_remittance),
+      confirmed: !!settlement.confirmed,
+      note: String(settlement.note || '').trim().slice(0, 1000),
+      updated_at: String(settlement.updated_at || '').slice(0, 80)
+    };
+  });
+  return record;
+}
+
+function mergeDailyCloseChanges(record, changes) {
+  const source = changes || {};
+  if (source.order_checks && typeof source.order_checks === 'object') {
+    Object.keys(source.order_checks).forEach((iid) => {
+      const check = source.order_checks[iid] || {};
+      record.order_checks[iid] = {
+        verified: !!check.verified,
+        proof_note: String(check.proof_note || '').trim().slice(0, 1000),
+        return_note: String(check.return_note || '').trim().slice(0, 1000),
+        updated_at: new Date().toISOString()
+      };
+    });
+  }
+  if (source.agent_settlements && typeof source.agent_settlements === 'object') {
+    Object.keys(source.agent_settlements).forEach((key) => {
+      const settlement = source.agent_settlements[key] || {};
+      record.agent_settlements[key] = {
+        agent: String(settlement.agent || '').trim().slice(0, 160),
+        actual_remittance: closeNumber(settlement.actual_remittance),
+        confirmed: !!settlement.confirmed,
+        note: String(settlement.note || '').trim().slice(0, 1000),
+        updated_at: new Date().toISOString()
+      };
+    });
+  }
+  if (Object.prototype.hasOwnProperty.call(source, 'day_note')) record.day_note = String(source.day_note || '').trim().slice(0, 2000);
+}
+
+function buildStaticDailyCloseModel(orders, rawRecord, date) {
+  const record = normalizeDailyCloseRecord(rawRecord, date);
+  const finalStatuses = {Ok: true, 'Ok with retour': true, Cancelled: true, Rescheduled: true};
+  const agents = {};
+  const blockers = [];
+  const modelOrders = (orders || []).map((source) => {
+    const order = Object.assign({}, source || {});
+    order.iid = String(order.iid || '');
+    order.status = order.status || 'Pending';
+    order.agent = String(order.agent || '').trim() || 'Unassigned';
+    order.agent_key = closeAgentKey(order.agent);
+    order.amount_collected = closeNumber(order.amount_collected);
+    order.agent_payment = closeNumber(order.agent_payment);
+    order.agent_owes = closeNumber(order.agent_owes);
+    order.company_revenue = closeNumber(order.company_revenue);
+    order.is_final = !!finalStatuses[order.status];
+    // Older hosted records can predate the agent_owes field. For ordinary
+    // collection methods, derive the remittance from the same financial rule
+    // used by the desktop app so Daily Close remains useful for those records.
+    const paymentMethod = String(order.payment_method || '').toLowerCase();
+    order.expected_agent_owes = order.agent_owes;
+    if ((paymentMethod === 'cash' || paymentMethod === 'colis' || paymentMethod === 'mobile_delivery') &&
+        (order.status === 'Ok' || order.status === 'Ok with retour')) {
+      order.expected_agent_owes = order.amount_collected - order.agent_payment;
+    }
+    order.check = record.order_checks[order.iid] || {};
+    order.verified = !!order.check.verified;
+    order.return_documented = !!(order.returned_products || order.check.return_note);
+    const display = order.client_name || order.iid;
+    if (order.status === 'Pending') blockers.push({type: 'pending', iid: order.iid, message: display + ' is still pending.'});
+    else if (order.is_final) {
+      if (!order.verified) blockers.push({type: 'unverified', iid: order.iid, message: display + ' has not been checked.'});
+      if (order.status === 'Ok with retour' && !order.return_documented) blockers.push({type: 'return_note', iid: order.iid, message: 'Add a return note for ' + display + '.'});
+    }
+    const agent = agents[order.agent_key] || (agents[order.agent_key] = {
+      agent: order.agent, agent_key: order.agent_key, delivery_count: 0, final_count: 0,
+      expected_remittance: 0, cash_collected: 0, agent_payment: 0
+    });
+    agent.delivery_count += 1;
+    if (order.is_final) agent.final_count += 1;
+    if (order.status === 'Ok' || order.status === 'Ok with retour') {
+      agent.expected_remittance += order.expected_agent_owes;
+      agent.cash_collected += order.amount_collected;
+      agent.agent_payment += order.agent_payment;
+    }
+    return order;
+  }).sort((a, b) => (a.agent + a.client_name).localeCompare(b.agent + b.client_name));
+
+  const agentModels = Object.keys(agents).map((key) => {
+    const agent = agents[key];
+    const settlement = record.agent_settlements[key] || {};
+    const expected = Math.round(agent.expected_remittance * 100) / 100;
+    const actual = closeNumber(settlement.actual_remittance);
+    const difference = Math.round((actual - expected) * 100) / 100;
+    const confirmed = !!settlement.confirmed;
+    const needsSettlement = agent.final_count > 0;
+    if (needsSettlement && !confirmed) blockers.push({type: 'settlement_missing', agent_key: key, message: 'Confirm the cash settlement for ' + agent.agent + '.'});
+    else if (needsSettlement && Math.abs(difference) >= 1 && !settlement.note) blockers.push({type: 'settlement_variance', agent_key: key, message: 'Add a reason for ' + agent.agent + "'s " + Math.round(Math.abs(difference)) + ' Ar difference.'});
+    return Object.assign(agent, {expected_remittance: expected, actual_remittance: actual, difference: difference,
+      confirmed: confirmed, note: String(settlement.note || ''), needs_settlement: needsSettlement});
+  }).sort((a, b) => a.agent.localeCompare(b.agent));
+  const financialOrders = modelOrders.filter((order) => order.status === 'Ok' || order.status === 'Ok with retour');
+  const snapshotHash = dailyCloseSnapshotHash(modelOrders);
+  const totals = {
+    orders: modelOrders.length,
+    final_orders: modelOrders.filter((order) => order.is_final).length,
+    verified_orders: modelOrders.filter((order) => order.verified).length,
+    pending_orders: modelOrders.filter((order) => order.status === 'Pending').length,
+    cash_collected: financialOrders.reduce((sum, order) => sum + order.amount_collected, 0),
+    expected_remittance: agentModels.reduce((sum, agent) => sum + agent.expected_remittance, 0),
+    actual_remittance: agentModels.filter((agent) => agent.confirmed).reduce((sum, agent) => sum + agent.actual_remittance, 0),
+    agent_payments: financialOrders.reduce((sum, order) => sum + order.agent_payment, 0),
+    company_revenue: financialOrders.reduce((sum, order) => sum + order.company_revenue, 0)
+  };
+  totals.remittance_difference = totals.actual_remittance - totals.expected_remittance;
+  const closedOutdated = record.state === 'closed' && !!record.closed_snapshot_hash &&
+    record.closed_snapshot_hash !== snapshotHash;
+  return {date: date, record: record, orders: modelOrders, agents: agentModels, totals: totals,
+    blockers: blockers, ready_to_close: modelOrders.length > 0 && blockers.length === 0 && !closedOutdated,
+    closed_outdated: closedOutdated, snapshot_hash: snapshotHash};
+}
+
+function setCloseDate(iso) {
+  state.closeDate = iso;
+  document.getElementById('closeDatePicker').value = iso;
+  updateDateBanner(iso);
+  loadDailyClose();
+}
+function prevDateClose() { setCloseDate(shiftDate(state.closeDate, -1)); }
+function nextDateClose() { setCloseDate(shiftDate(state.closeDate, 1)); }
+function goTodayClose() { setCloseDate(todayISO()); }
+function pickDateClose(value) { if (value) setCloseDate(value); }
+
+async function loadDailyClose() {
+  if (state.dailyCloseLoading || !state.closeDate) return;
+  state.dailyCloseLoading = true;
+  try {
+    let model;
+    if (API.isStaticMode()) {
+      const results = await Promise.all([API.getOrders(state.closeDate, '', ''), API.getDailyClose(state.closeDate)]);
+      model = buildStaticDailyCloseModel(results[0].orders || [], results[1].record, state.closeDate);
+    } else {
+      model = await API.getDailyClose(state.closeDate);
+    }
+    state.dailyClose = model;
+    renderDailyClose();
+  } catch (error) {
+    const host = document.getElementById('dailyCloseContent');
+    if (host) host.innerHTML = '<div class="close-status warning">Unable to load Daily Close: ' + escHtml(error.message || String(error)) + '</div>';
+  } finally {
+    state.dailyCloseLoading = false;
+  }
+}
+
+function closeMoney(value) { return formatCurrency(Math.round(closeNumber(value))); }
+function closeSummaryCard(label, value) {
+  return '<div class="close-summary-card"><div class="close-summary-value">' + escHtml(String(value)) +
+    '</div><div class="close-summary-label">' + escHtml(label) + '</div></div>';
+}
+
+function renderDailyClose() {
+  const host = document.getElementById('dailyCloseContent');
+  const model = state.dailyClose;
+  if (!host || !model) return;
+  const record = model.record || {};
+  const locked = record.state === 'closed' && !model.closed_outdated;
+  const stateClass = model.closed_outdated ? 'warning' : (locked ? 'closed' : 'open');
+  const stateText = model.closed_outdated ? '⚠ This day was closed, but its orders changed. Reopen and review it.' :
+    (locked ? '✅ Day closed — recorded checks are locked until reopened.' : '🟡 Open — complete the checks below before closing the day.');
+  let html = '<div class="close-status ' + stateClass + '">' + escHtml(stateText) + '</div>';
+  html += '<div class="close-summary">' +
+    closeSummaryCard('Orders', model.totals.orders) +
+    closeSummaryCard('Checked', model.totals.verified_orders + ' / ' + model.totals.final_orders) +
+    closeSummaryCard('Expected agent cash', closeMoney(model.totals.expected_remittance)) +
+    closeSummaryCard('Recorded cash', closeMoney(model.totals.actual_remittance)) +
+    closeSummaryCard('Company revenue', closeMoney(model.totals.company_revenue)) + '</div>';
+  if (model.blockers && model.blockers.length) {
+    html += '<div class="close-blockers"><strong>Still needed before closing:</strong><ul>' +
+      model.blockers.slice(0, 8).map((item) => '<li>' + escHtml(item.message) + '</li>').join('') +
+      (model.blockers.length > 8 ? '<li>…and ' + (model.blockers.length - 8) + ' more.</li>' : '') +
+      '</ul></div>';
+  }
+
+  html += '<div class="close-section"><h3>1. Check every final delivery</h3><div class="close-table-wrap"><table class="close-table"><thead><tr>' +
+    '<th>Checked</th><th>Agent</th><th>Client</th><th>Status</th><th>Collected</th><th>Proof / return note</th></tr></thead><tbody>';
+  model.orders.forEach((order) => {
+    const domId = closeOrderDomId(order.iid);
+    const check = order.check || {};
+    const note = check.return_note || check.proof_note || order.returned_products || '';
+    const placeholder = order.status === 'Ok with retour' ? 'Return note required for partial delivery' : 'Optional proof or delivery note';
+    const disabled = locked || order.status === 'Pending' ? ' disabled' : '';
+    const statusText = order.status === 'Pending' ? 'Resolve delivery outcome first' : order.status;
+    html += '<tr><td><input class="close-check" type="checkbox" id="' + domId + '_verified"' +
+      (order.verified ? ' checked' : '') + disabled + ' onchange="saveDailyCloseOrderCheck(\'' + order.iid + '\')"></td>' +
+      '<td>' + escHtml(order.agent) + '</td><td>' + escHtml(order.client_name || '—') + '</td>' +
+      '<td>' + escHtml(statusText) + '</td><td>' + escHtml(closeMoney(order.amount_collected)) + '</td>' +
+      '<td><textarea id="' + domId + '_note" placeholder="' + escHtml(placeholder) + '"' + disabled + '>' + escHtml(note) + '</textarea>' +
+      (order.status !== 'Pending' && !locked ? '<button class="secondary" style="margin-top:4px" onclick="saveDailyCloseOrderNote(\'' + order.iid + '\')">Save note</button>' : '') +
+      '</td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  html += '<div class="close-section"><h3>2. Confirm cash with each agent</h3><div class="close-table-wrap"><table class="close-table"><thead><tr>' +
+    '<th>Agent</th><th>Expected cash</th><th>Actual cash</th><th>Difference</th><th>Reason if different</th><th></th></tr></thead><tbody>';
+  const settlementAgents = model.agents.filter((agent) => agent.needs_settlement);
+  if (!settlementAgents.length) html += '<tr><td colspan="6">No agent settlements are needed for this date.</td></tr>';
+  settlementAgents.forEach((agent) => {
+    const domId = 'settle_' + agent.agent_key.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const direction = agent.expected_remittance < 0 ? 'Paid to agent' : 'Received from agent';
+    const inputAmount = agent.confirmed ? agent.actual_remittance : agent.expected_remittance;
+    html += '<tr><td><strong>' + escHtml(agent.agent) + '</strong><br><small>' + escHtml(direction) + '</small></td>' +
+      '<td>' + escHtml(closeMoney(Math.abs(agent.expected_remittance))) + '</td>' +
+      '<td><input id="' + domId + '_amount" type="number" min="0" step="100" value="' +
+        escHtml(String(Math.abs(inputAmount))) + '"' + (locked ? ' disabled' : '') + '></td>' +
+      '<td>' + escHtml(closeMoney(agent.difference)) + '</td>' +
+      '<td><textarea id="' + domId + '_note" placeholder="Required when different"' + (locked ? ' disabled' : '') + '>' +
+        escHtml(agent.note || '') + '</textarea></td>' +
+      '<td><button' + (locked ? ' disabled' : '') + ' onclick="saveDailyCloseSettlement(\'' + agent.agent_key + '\')">' +
+        (agent.confirmed ? 'Update' : 'Confirm') + '</button></td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  html += '<div class="close-section"><h3>3. Close the day</h3><div class="close-actions">' +
+    '<input id="dailyCloseDayNote" type="text" style="flex:1;min-width:220px;padding:10px;border:1px solid #cdd6e1;border-radius:8px" ' +
+      'placeholder="Optional day note" value="' + escHtml(record.day_note || '') + '"' + (locked ? ' disabled' : '') + '>' +
+    '<button class="secondary" onclick="saveDailyCloseDayNote()"' + (locked ? ' disabled' : '') + '>Save progress</button>' +
+    '<button class="close-day" onclick="closeDailyCloseDay()"' + ((!model.ready_to_close || locked) ? ' disabled' : '') + '>🔒 Close day</button>' +
+    (locked || model.closed_outdated ? '<button class="secondary" onclick="reopenDailyCloseDay()">↪ Reopen</button>' : '') +
+    '</div></div>';
+  host.innerHTML = html;
+}
+
+function currentDailyCloseOrder(iid) {
+  return state.dailyClose && state.dailyClose.orders.find((order) => order.iid === iid);
+}
+
+async function saveDailyCloseOrderCheck(iid) {
+  const order = currentDailyCloseOrder(iid);
+  if (!order) return;
+  const domId = closeOrderDomId(iid);
+  const prior = order.check || {};
+  try {
+    await API.saveDailyClose(state.closeDate, {order_checks: {[iid]: {
+      verified: !!document.getElementById(domId + '_verified').checked,
+      proof_note: prior.proof_note || '', return_note: prior.return_note || ''
+    }}});
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
+
+async function saveDailyCloseOrderNote(iid) {
+  const order = currentDailyCloseOrder(iid);
+  if (!order) return;
+  const domId = closeOrderDomId(iid);
+  const prior = order.check || {};
+  const note = document.getElementById(domId + '_note').value.trim();
+  const changes = {verified: !!prior.verified, proof_note: prior.proof_note || '', return_note: prior.return_note || ''};
+  if (order.status === 'Ok with retour') changes.return_note = note;
+  else changes.proof_note = note;
+  try {
+    await API.saveDailyClose(state.closeDate, {order_checks: {[iid]: changes}});
+    showToast('Note saved', 'success');
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
+
+async function saveDailyCloseSettlement(agentKey) {
+  const agent = state.dailyClose && state.dailyClose.agents.find((item) => item.agent_key === agentKey);
+  if (!agent) return;
+  const domId = 'settle_' + agentKey.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const entered = closeNumber(document.getElementById(domId + '_amount').value);
+  const actual = agent.expected_remittance < 0 ? -Math.abs(entered) : Math.abs(entered);
+  const note = document.getElementById(domId + '_note').value.trim();
+  try {
+    await API.saveDailyClose(state.closeDate, {agent_settlements: {[agentKey]: {
+      agent: agent.agent, actual_remittance: actual, confirmed: true, note: note
+    }}});
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
+
+async function saveDailyCloseDayNote() {
+  const input = document.getElementById('dailyCloseDayNote');
+  if (!input) return;
+  try {
+    await API.saveDailyClose(state.closeDate, {day_note: input.value.trim()});
+    showToast('Daily close saved', 'success');
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
+
+async function closeDailyCloseDay() {
+  const model = state.dailyClose;
+  if (!model || !model.ready_to_close) return;
+  const note = (document.getElementById('dailyCloseDayNote') || {}).value || '';
+  try {
+    const result = await API.closeDailyClose(state.closeDate, model.record, note, model.snapshot_hash);
+    if (result.success === false) throw new Error(result.error || 'Resolve the remaining checks first.');
+    showToast('Day closed successfully', 'success');
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
+
+async function reopenDailyCloseDay() {
+  const reason = window.prompt('Why is this day being reopened?', 'Correction needed');
+  if (reason === null) return;
+  try {
+    await API.reopenDailyClose(state.closeDate, reason);
+    showToast('Day reopened', 'success');
+    await loadDailyClose();
+  } catch (error) { showToast(error.message || String(error), 'error'); }
+}
 
 /* ═════════════════════════════════════════════════════════════════════
    FILTER
@@ -2911,8 +3657,17 @@ function updatePricePreview() {
   const totalInput = document.getElementById('fTotalPrice');
   if (!productsStr) { container.innerHTML = ''; if (!totalInput.dataset.manual) totalInput.value = ''; checkPageSelection([]); updateSubtypeSelection([]); return; }
 
-  const items = parseProductsInput(productsStr);
+  const productResult = parseProductsInputStrict(productsStr);
+  const items = productResult.items;
 
+  if (productResult.errors.length > 0) {
+    container.innerHTML = '<div class="subtype-preview err">' +
+      productResult.errors.map(escHtml).join('<br>') + '</div>';
+    if (!totalInput.dataset.manual) totalInput.value = '';
+    checkPageSelection([]);
+    updateSubtypeSelection([]);
+    return;
+  }
   if (items.length === 0) { container.innerHTML = ''; if (!totalInput.dataset.manual) totalInput.value = ''; checkPageSelection([]); updateSubtypeSelection([]); return; }
 
   const fee = Number(getActiveToggle('feeToggles')) || 3000;
@@ -3041,6 +3796,68 @@ function parseSubtypeText(text) {
   return results;
 }
 
+function normalizedChoice(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function parseSubtypeTextStrict(text, allowedSubtypes) {
+  const raw = String(text || '').trim();
+  if (!raw) return {items: [], errors: []};
+  const allowed = {};
+  (allowedSubtypes || []).forEach(function(name) {
+    const clean = String(name || '').trim();
+    if (clean) allowed[normalizedChoice(clean)] = clean;
+  });
+  const items = [];
+  const errors = [];
+  const seen = new Set();
+  raw.split(/[,;\r\n]+/).map(function(part) { return part.trim(); }).filter(Boolean).forEach(function(part) {
+    let name = '';
+    let qty = 1;
+    let match = part.match(/^(.+?)\s*[xX×:]\s*(\d+)$/);
+    if (match) {
+      name = match[1].trim();
+      qty = parseInt(match[2], 10);
+    } else {
+      match = part.match(/^(.+?)\s+(\d+)$/);
+      if (match) {
+        name = match[1].trim();
+        qty = parseInt(match[2], 10);
+      } else if (/^[\p{L}\p{N}][\p{L}\p{N}\s'’._-]*$/u.test(part)) {
+        name = part;
+      } else {
+        errors.push(duplicateUiText('Sous-type mal écrit : “' + part + '”.', 'Malformed subtype entry: “' + part + '”.'));
+        return;
+      }
+    }
+    const key = normalizedChoice(name);
+    if (qty < 1 || qty > MAX_PRODUCT_QUANTITY) {
+      errors.push(duplicateUiText(
+        'La quantité du sous-type “' + name + '” doit être comprise entre 1 et ' + MAX_PRODUCT_QUANTITY + '.',
+        'Subtype “' + name + '” quantity must be between 1 and ' + MAX_PRODUCT_QUANTITY + '.'
+      ));
+      return;
+    }
+    if (Object.keys(allowed).length && !allowed[key]) {
+      errors.push(duplicateUiText(
+        'Sous-type inconnu “' + name + '”. Choisissez : ' + Object.values(allowed).join(', ') + '.',
+        'Unknown subtype “' + name + '”. Choose: ' + Object.values(allowed).join(', ') + '.'
+      ));
+      return;
+    }
+    if (seen.has(key)) {
+      errors.push(duplicateUiText(
+        'Le sous-type “' + name + '” est répété ; regroupez sa quantité.',
+        'Subtype “' + name + '” is repeated; combine its quantity.'
+      ));
+      return;
+    }
+    seen.add(key);
+    items.push({name: allowed[key] || name, qty: qty});
+  });
+  return {items: items, errors: errors};
+}
+
 function syncSubtypeDraft(code, value) {
   const key = String(code || '').trim().toUpperCase();
   if (!key) return;
@@ -3084,7 +3901,14 @@ function updateSubtypePreview(code) {
   const totalQty = parseInt(prodEl.dataset.qty) || 0;
   const text = inp.value.trim();
   if (!text) { preview.textContent = ''; preview.className = 'subtype-preview'; return; }
-  const parsed = parseSubtypeText(text);
+  const product = state.products.find(function(p) { return p.code === code; });
+  const parsedResult = parseSubtypeTextStrict(text, product && product.subtypes ? product.subtypes : []);
+  const parsed = parsedResult.items;
+  if (parsedResult.errors.length) {
+    preview.textContent = parsedResult.errors[0];
+    preview.className = 'subtype-preview err';
+    return;
+  }
   let sum = 0;
   const parts = [];
   parsed.forEach(p => { sum += p.qty; parts.push(p.name + ' x' + p.qty); });
@@ -3171,23 +3995,50 @@ function collectSubtypes() {
   return map;
 }
 
-function validateSubtypes() {
-  let valid = true;
-  document.querySelectorAll('.subtype-product').forEach(prodEl => {
-    const code = prodEl.dataset.code;
-    const totalQty = parseInt(prodEl.dataset.qty) || 0;
-    const inp = document.getElementById('stInput_' + code);
-    if (!inp) return;
-    const text = inp.value.trim();
-    if (!text) return;  // Empty is ok - subtypes are optional
-    const parsed = parseSubtypeText(text);
-    let sum = 0;
-    parsed.forEach(p => { sum += p.qty; });
-    if (sum > 0 && sum !== totalQty) {
-      valid = false;
+function validateSubtypesDetailed(items) {
+  captureSubtypeDraftsFromDom();
+  const errors = [];
+  const normalized = {};
+  (items || []).forEach(function(item) {
+    const product = state.products.find(function(p) { return p.code === item.code; });
+    const allowed = product && Array.isArray(product.subtypes) ? product.subtypes.filter(Boolean) : [];
+    if (!allowed.length) return;
+    const input = document.getElementById('stInput_' + item.code);
+    const text = String(input ? input.value : (state.subtypeDrafts[item.code] || '')).trim();
+    if (!text) {
+      errors.push({
+        field: 'stInput_' + item.code,
+        message: duplicateUiText(
+          'Choisissez les sous-types pour ' + item.code + ' ; leur total doit être ' + item.qty + '.',
+          'Choose subtypes for ' + item.code + '; their quantities must total ' + item.qty + '.'
+        )
+      });
+      return;
+    }
+    const result = parseSubtypeTextStrict(text, allowed);
+    result.errors.forEach(function(message) {
+      errors.push({field: 'stInput_' + item.code, message: item.code + ': ' + message});
+    });
+    const sum = result.items.reduce(function(total, subtype) { return total + subtype.qty; }, 0);
+    if (!result.errors.length && sum !== item.qty) {
+      errors.push({
+        field: 'stInput_' + item.code,
+        message: duplicateUiText(
+          item.code + ' : les sous-types totalisent ' + sum + ', mais la quantité du produit est ' + item.qty + '.',
+          item.code + ': subtype quantities total ' + sum + ', but product quantity is ' + item.qty + '.'
+        )
+      });
+    }
+    if (!result.errors.length && sum === item.qty) {
+      normalized[item.code] = result.items.map(function(part) { return part.name + ' x' + part.qty; }).join(', ');
     }
   });
-  return valid;
+  return {valid: errors.length === 0, errors: errors, subtypes: normalized};
+}
+
+function validateSubtypes() {
+  const products = parseProductsInputStrict(document.getElementById('fProducts').value);
+  return products.errors.length === 0 && validateSubtypesDetailed(products.items).valid;
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -3303,7 +4154,7 @@ function renderOrders() {
       : '';
     const webMemo = normalizeOrderMemo(o.web_memo) || memoForOrder(o);
     const memoClass = webMemo ? ' has-web-memo memo-' + webMemo.category_id : '';
-    html += '<div class="order-card has-checkbox' + pageThemeClass + (isSelected ? ' selected' : '') + '" data-iid="' + escHtml(o.iid) + '"' + pageThemeStyle + '>' +
+    html += '<div class="order-card has-checkbox' + pageThemeClass + memoClass + (isSelected ? ' selected' : '') + '" data-iid="' + escHtml(o.iid) + '"' + pageThemeStyle + '>' +
       '<input type="checkbox" class="card-checkbox"' + (isSelected ? ' checked' : '') +
       ' onchange="toggleOrderSelection(\'' + escHtml(o.iid) + '\',this.checked)">' +
       '<div class="card-header">' +
@@ -3988,6 +4839,7 @@ async function editOrder(iid) {
     await loadReferenceData();
   }
   state.editingOrder = order;
+  clearOrderValidation();
   loadSubtypeDraftsFromOrder(order);
 
   document.getElementById('editIid').value = order.iid;
@@ -4049,6 +4901,7 @@ async function editOrder(iid) {
 }
 
 function cancelEdit() {
+  clearOrderValidation();
   state.editingOrder = null;
   state.subtypeDrafts = {};
   document.getElementById('editIid').value = '';
@@ -4082,8 +4935,311 @@ function cancelEdit() {
 /* ═════════════════════════════════════════════════════════════════════
    SUBMIT ORDER
    ═════════════════════════════════════════════════════════════════════ */
+function duplicateUiText(fr, en) {
+  return LANG.current === 'fr' ? fr : en;
+}
+
+function duplicateEvidenceText(value) {
+  const map = {
+    'Same phone number': ['Meme numero de telephone', 'Same phone number'],
+    'Same name': ['Meme nom', 'Same name'],
+    'Very similar name': ['Nom tres similaire', 'Very similar name'],
+    'Similar name': ['Nom similaire', 'Similar name'],
+    'Same delivery date': ['Meme date de livraison', 'Same delivery date'],
+    'Same products': ['Memes produits', 'Same products'],
+    'Same or very similar address': ['Adresse identique ou tres similaire', 'Same or very similar address']
+  };
+  const item = map[value];
+  return item ? duplicateUiText(item[0], item[1]) : value;
+}
+
+function duplicateSameField(key, first, second) {
+  if (key === 'phone') {
+    const left = duplicatePhoneKeys(first);
+    const right = duplicatePhoneKeys(second);
+    let same = false;
+    left.forEach(function(value) { if (right.has(value)) same = true; });
+    return same;
+  }
+  return !!duplicateNormalizedText(first) &&
+    duplicateNormalizedText(first) === duplicateNormalizedText(second);
+}
+
+function duplicateOrderRows(candidate, existing, side) {
+  const fields = [
+    ['delivery_date', duplicateUiText('Date', 'Date')],
+    ['client_name', duplicateUiText('Client', 'Customer')],
+    ['phone', duplicateUiText('Telephone', 'Phone')],
+    ['address', duplicateUiText('Adresse', 'Address')],
+    ['products', duplicateUiText('Produits', 'Products')],
+    ['status', duplicateUiText('Statut', 'Status')],
+    ['agent', duplicateUiText('Agent', 'Agent')]
+  ];
+  const source = side === 'new' ? candidate : existing;
+  return fields.map(function(field) {
+    const key = field[0];
+    const leftValue = candidate[key] || (key === 'status' ? 'Pending' : '');
+    const rightValue = existing[key] || (key === 'status' ? 'Pending' : '');
+    const value = source[key] || (key === 'status' ? 'Pending' : '-');
+    const sameClass = duplicateSameField(key, leftValue, rightValue) ? ' match' : '';
+    return '<div class="duplicate-field' + sameClass + '"><span>' +
+      escHtml(field[1]) + '</span><strong>' + escHtml(String(value)) + '</strong></div>';
+  }).join('');
+}
+
+function reviewDuplicateMatches(candidate, matches, isEdit) {
+  return new Promise(function(resolve) {
+    const list = Array.isArray(matches) ? matches.filter(function(item) {
+      return item && item.iid && item.order;
+    }) : [];
+    if (!list.length) {
+      resolve({proceed: true, reviewed_iids: [], delete_iids: []});
+      return;
+    }
+
+    let index = 0;
+    const reviewed = [];
+    const remove = [];
+    const container = document.getElementById('modalContainer');
+
+    function finish(result) {
+      container.innerHTML = '';
+      resolve(result);
+    }
+
+    function next(action) {
+      const iid = String(list[index].iid);
+      reviewed.push(iid);
+      if (action === 'new') remove.push(iid);
+      index += 1;
+      if (index >= list.length) {
+        finish({proceed: true, reviewed_iids: reviewed, delete_iids: remove});
+      } else {
+        render();
+      }
+    }
+
+    function render() {
+      const match = list[index];
+      const existing = match.order;
+      const days = Number(match.days_apart || 0);
+      const sameDate = match.same_date || days === 0;
+      const title = match.confidence === 'high'
+        ? duplicateUiText('Doublon tres probable', 'Very likely duplicate')
+        : duplicateUiText('Commande similaire trouvee', 'Similar order found');
+      const guidance = sameDate
+        ? duplicateUiText(
+            'Le numero et la date de livraison sont identiques. Il peut s agir d une copie accidentelle.',
+            'The phone number and delivery date match. This may be an accidental copy.'
+          )
+        : duplicateUiText(
+            'Les dates sont espacees de ' + days + ' jour(s). Cela peut etre une vraie nouvelle commande.',
+            'The dates are ' + days + ' day(s) apart. This may be a legitimate repeat order.'
+          );
+      const chips = (match.evidence || []).map(function(item) {
+        return '<span class="duplicate-chip">' + escHtml(duplicateEvidenceText(item)) + '</span>';
+      }).join('');
+
+      container.innerHTML = '<div class="modal-backdrop"><div class="modal duplicate-modal">' +
+        '<div class="duplicate-head"><h3>' + escHtml(title) + '</h3>' +
+        '<p>' + escHtml(duplicateUiText(
+          'Rien ne sera bloque ou supprime automatiquement. Comparez puis choisissez.',
+          'Nothing is blocked or removed automatically. Compare, then choose.'
+        )) + '</p></div>' +
+        '<div class="duplicate-progress"><span>' +
+        escHtml(duplicateUiText('Correspondance', 'Match')) + ' ' + (index + 1) + ' / ' + list.length +
+        '</span><span>' + Number(match.score || 0) + '% ' +
+        escHtml(duplicateUiText('de concordance', 'evidence')) + '</span></div>' +
+        '<div class="duplicate-alert">' + escHtml(guidance) + '</div>' +
+        '<div class="duplicate-evidence">' + chips + '</div>' +
+        '<div class="duplicate-compare">' +
+        '<section class="duplicate-card"><h4>' + escHtml(isEdit
+          ? duplicateUiText('VOS MODIFICATIONS', 'YOUR CHANGES')
+          : duplicateUiText('NOUVELLE COMMANDE', 'NEW ORDER')) + '</h4>' +
+        duplicateOrderRows(candidate, existing, 'new') + '</section>' +
+        '<section class="duplicate-card"><h4>' +
+        escHtml(duplicateUiText('COMMANDE DEJA ENREGISTREE', 'EXISTING SAVED ORDER')) + '</h4>' +
+        duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
+        '<div class="duplicate-help">' + escHtml(duplicateUiText(
+          'Gardez les deux si le client a vraiment commande une nouvelle fois. Les options "seulement" retirent l autre version.',
+          'Keep both when the customer truly ordered again. An "only" option removes the other version.'
+        )) + '</div>' +
+        '<button class="duplicate-cancel" id="duplicateCancel">' +
+        escHtml(duplicateUiText('Retour au formulaire sans enregistrer', 'Return to the form without saving')) +
+        '</button><div class="duplicate-actions">' +
+        '<button class="duplicate-keep-old" id="duplicateKeepOld">' +
+        escHtml(duplicateUiText('Garder EXISTANTE seulement\nNe pas enregistrer la nouvelle', 'Keep EXISTING only\nDo not save the new one')) +
+        '</button><button class="duplicate-keep-both" id="duplicateKeepBoth">' +
+        escHtml(duplicateUiText('Garder LES DEUX\nVraie nouvelle commande', 'Keep BOTH\nThis is a real repeat order')) +
+        '</button><button class="duplicate-keep-new" id="duplicateKeepNew">' +
+        escHtml(duplicateUiText('Garder NOUVELLE seulement\nSupprimer l existante', 'Keep NEW only\nRemove the existing one')) +
+        '</button></div></div></div>';
+
+      document.getElementById('duplicateCancel').onclick = function() {
+        finish({proceed: false, cancelled: true, reviewed_iids: [], delete_iids: []});
+      };
+      document.getElementById('duplicateKeepOld').onclick = function() {
+        finish({proceed: false, keep_existing: true, reviewed_iids: [], delete_iids: []});
+      };
+      document.getElementById('duplicateKeepBoth').onclick = function() { next('both'); };
+      document.getElementById('duplicateKeepNew').onclick = function() { next('new'); };
+    }
+
+    render();
+  });
+}
+
+async function saveOrderWithDuplicateReview(body, editingOrder) {
+  const iid = editingOrder ? editingOrder.iid : '';
+  const candidate = editingOrder
+    ? Object.assign({}, editingOrder, body, {client_name: body.client_name, name: body.client_name})
+    : Object.assign({status: 'Pending'}, body);
+  let preview = await API.checkDuplicates(body, iid);
+
+  while (true) {
+    const matches = preview && Array.isArray(preview.duplicates) ? preview.duplicates : [];
+    if (matches.length) {
+      const decision = await reviewDuplicateMatches(candidate, matches, !!editingOrder);
+      if (!decision.proceed) return {cancelled: true};
+      body.duplicate_review = {
+        reviewed_iids: decision.reviewed_iids,
+        delete_iids: decision.delete_iids,
+        lookback_days: DUPLICATE_LOOKBACK_DAYS
+      };
+    } else {
+      delete body.duplicate_review;
+    }
+
+    try {
+      return editingOrder
+        ? await API.updateOrder(iid, body)
+        : await API.createOrder(body);
+    } catch (error) {
+      if (error.status === 409 && error.data &&
+          error.data.code === 'duplicate_review_required' &&
+          Array.isArray(error.data.duplicates)) {
+        preview = error.data;
+        delete body.duplicate_review;
+        continue;
+      }
+      throw error;
+    }
+  }
+}
+
+function clearOrderValidation() {
+  const summary = document.getElementById('orderValidationSummary');
+  if (summary) {
+    summary.classList.remove('visible');
+    summary.innerHTML = '';
+  }
+  document.querySelectorAll('#orderForm .field-invalid').forEach(function(element) {
+    element.classList.remove('field-invalid');
+    element.removeAttribute('aria-invalid');
+  });
+}
+
+function showOrderValidation(errors) {
+  clearOrderValidation();
+  const unique = [];
+  const seen = new Set();
+  (errors || []).forEach(function(error) {
+    const message = String(error.message || error || '').trim();
+    if (!message || seen.has(message)) return;
+    seen.add(message);
+    unique.push({field: error.field || '', message: message});
+    const field = error.field ? document.getElementById(error.field) : null;
+    if (field) {
+      field.classList.add('field-invalid');
+      field.setAttribute('aria-invalid', 'true');
+    }
+  });
+  if (!unique.length) return;
+  const summary = document.getElementById('orderValidationSummary');
+  summary.innerHTML = '<strong>' + escHtml(duplicateUiText(
+    'Commande non enregistrée — corrigez les points suivants :',
+    'Order not saved — please correct the following:'
+  )) + '</strong><ul>' + unique.map(function(error) {
+    return '<li>' + escHtml(error.message) + '</li>';
+  }).join('') + '</ul><div style="margin-top:7px;color:#8b5555">' + escHtml(duplicateUiText(
+    'Les notes restent facultatives.',
+    'Notes remain optional.'
+  )) + '</div>';
+  summary.classList.add('visible');
+  summary.scrollIntoView({behavior: 'smooth', block: 'center'});
+  const firstField = unique.map(function(error) { return document.getElementById(error.field); }).find(Boolean);
+  if (firstField) setTimeout(function() { firstField.focus(); }, 200);
+}
+
+function validateWebPhone(value) {
+  const parts = String(value || '').split(/\s*(?:\/|\\|\||,|;|\r?\n)+\s*/).filter(Boolean);
+  if (!parts.length) return false;
+  return parts.every(function(part) {
+    const compact = part.replace(/[\s\-().]/g, '');
+    const digits = compact.charAt(0) === '+' ? compact.slice(1) : compact;
+    return /^\d+$/.test(digits) && (digits.length === 10 || (digits.length >= 8 && digits.length <= 15));
+  });
+}
+
+function validateOrderForm(productResult) {
+  const errors = [];
+  const name = document.getElementById('fClientName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const address = document.getElementById('fAddress').value.trim();
+  const paymentMethod = state.formPaymentMethod || getActiveToggle('paymentToggles') || state.paymentDefault;
+  const totalText = document.getElementById('fTotalPrice').value.trim();
+  const fee = Number(getActiveToggle('feeToggles'));
+  const validPayments = ['cash', 'prepaid', 'colis', 'mobile_delivery', 'exchange'];
+
+  if (!name) errors.push({field: 'fClientName', message: duplicateUiText('Le nom du client est obligatoire.', 'Client name is required.')});
+  if (!phone) errors.push({field: 'fPhone', message: duplicateUiText('Le numéro de téléphone est obligatoire.', 'Phone number is required.')});
+  else if (!validateWebPhone(phone)) errors.push({field: 'fPhone', message: duplicateUiText('Saisissez un numéro valide (10 chiffres localement, ou 8 à 15 chiffres à l’international).', 'Enter a valid phone number (10 local digits, or 8–15 international digits).')});
+  if (!address) errors.push({field: 'fAddress', message: duplicateUiText('L’adresse de livraison est obligatoire.', 'Delivery address is required.')});
+
+  (productResult.errors || []).forEach(function(message) {
+    errors.push({field: 'fProducts', message: message});
+  });
+  if (!productResult.items.length && !productResult.errors.length) {
+    errors.push({field: 'fProducts', message: duplicateUiText('Ajoutez au moins un produit valide.', 'Add at least one valid product.')});
+  }
+  if (!Number.isFinite(fee) || fee < 0) {
+    errors.push({field: '', message: duplicateUiText('Choisissez des frais de livraison valides.', 'Choose a valid delivery fee.')});
+  }
+  if (validPayments.indexOf(paymentMethod) < 0) {
+    errors.push({field: '', message: duplicateUiText('Choisissez un mode de paiement valide.', 'Choose a valid payment method.')});
+  }
+  const total = Number(totalText);
+  if (totalText === '' || !Number.isFinite(total)) {
+    errors.push({field: 'fTotalPrice', message: duplicateUiText('Le total est obligatoire et doit être un nombre.', 'Total is required and must be a number.')});
+  } else if (paymentMethod !== 'exchange' && total <= 0) {
+    errors.push({field: 'fTotalPrice', message: duplicateUiText('Le total doit être supérieur à 0 (sauf pour un échange).', 'Total must be greater than 0 (except for an exchange).')});
+  }
+
+  const subtypeResult = productResult.errors.length
+    ? {valid: false, errors: [], subtypes: {}}
+    : validateSubtypesDetailed(productResult.items);
+  subtypeResult.errors.forEach(function(error) { errors.push(error); });
+  return {valid: errors.length === 0, errors: errors, subtypes: subtypeResult.subtypes};
+}
+
 async function submitOrder(e) {
   e.preventDefault();
+
+  clearOrderValidation();
+  const productsInput = document.getElementById('fProducts');
+  let productResult = parseProductsInputStrict(productsInput.value);
+  if (!productResult.errors.length && productResult.items.length) {
+    productsInput.value = productResult.items.map(function(item) {
+      return item.code + ' x' + item.qty;
+    }).join(', ');
+    updatePricePreview();
+    productResult = parseProductsInputStrict(productsInput.value);
+  }
+  const formValidation = validateOrderForm(productResult);
+  if (!formValidation.valid) {
+    showOrderValidation(formValidation.errors);
+    return;
+  }
 
   const btn = document.getElementById('btnSubmit');
   btn.disabled = true;
@@ -4099,7 +5255,9 @@ async function submitOrder(e) {
   const clientName = capitalizeName(document.getElementById('fClientName').value);
   const phone = formatPhone(document.getElementById('fPhone').value);
   const address = capitalizeName(document.getElementById('fAddress').value);
-  const products = formatProductsInput(document.getElementById('fProducts').value);
+  const products = productResult.items.map(function(item) {
+    return item.code + ' x' + item.qty;
+  }).join(', ');
   document.getElementById('fClientName').value = clientName;
   document.getElementById('fPhone').value = phone;
   document.getElementById('fAddress').value = address;
@@ -4110,7 +5268,7 @@ async function submitOrder(e) {
     phone: phone.trim(),
     address: address.trim(),
     products: products.trim(),
-    delivery_fee: Number(getActiveToggle('feeToggles')) || 3000,
+    delivery_fee: Number(getActiveToggle('feeToggles')),
     agent: document.getElementById('fAgent').value,
     payment_method: state.formPaymentMethod || getActiveToggle('paymentToggles') || state.paymentDefault,
     notes: document.getElementById('fNotes').value.trim()
@@ -4127,27 +5285,17 @@ async function submitOrder(e) {
     body.exchange_products = document.getElementById('fExchangeProducts').value.trim();
   }
 
-  // Validate and include subtypes
-  if (!validateSubtypes()) {
-    showToast(T('subtypes_mismatch'), 'error');
-    btn.disabled = false;
-    btn.textContent = state.editingOrder ? T('update_order') : T('create_order');
-    return;
-  }
-  const subtypesMap = collectSubtypes();
+  // Include the already validated and normalized subtype breakdown.
+  const subtypesMap = formValidation.subtypes;
   if (Object.keys(subtypesMap).length > 0) {
     body.subtypes = subtypesMap;
   }
 
   try {
-    let result;
-    if (state.editingOrder) {
-      result = await API.updateOrder(state.editingOrder.iid, body);
-      showToast(T('order_updated'));
-    } else {
-      result = await API.createOrder(body);
-      showToast(T('order_created'));
-    }
+    const editingOrder = state.editingOrder;
+    const result = await saveOrderWithDuplicateReview(body, editingOrder);
+    if (result && result.cancelled) return;
+    showToast(editingOrder ? T('order_updated') : T('order_created'));
     const savedDate = (result && result.order && result.order.delivery_date) || body.delivery_date || state.currentDate;
     cancelEdit(); // clears form
     switchTab('orders');
@@ -4155,7 +5303,11 @@ async function submitOrder(e) {
     else await loadOrders({force: true});
     refreshHistoryState();
   } catch(e) {
-    showToast(T('error_prefix') + ' ' + e.message, 'error');
+    if (e && e.data && Array.isArray(e.data.errors)) {
+      showOrderValidation(e.data.errors.map(function(message) { return {message: message}; }));
+    } else {
+      showToast(T('error_prefix') + ' ' + e.message, 'error');
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = state.editingOrder ? T('update_order') : T('create_order');
@@ -4181,6 +5333,20 @@ function stopAutoRefresh() {
   }
 }
 
+function startDailyCloseRefresh() {
+  stopDailyCloseRefresh();
+  state.dailyCloseRefreshTimer = setInterval(() => {
+    if (state.activeTab === 'dailyClose') loadDailyClose();
+  }, API.isStaticMode() ? 10000 : 30000);
+}
+
+function stopDailyCloseRefresh() {
+  if (state.dailyCloseRefreshTimer) {
+    clearInterval(state.dailyCloseRefreshTimer);
+    state.dailyCloseRefreshTimer = null;
+  }
+}
+
 function startReferenceRefresh() {
   if (state.referenceRefreshTimer) return;
   state.referenceRefreshTimer = setInterval(function() {
@@ -4194,6 +5360,7 @@ async function refreshFromInstantSync(reason) {
     jobs.push(loadReferenceData({force: true}));
   }
   if (state.activeTab === 'dashboard') jobs.push(loadStats());
+  if (state.activeTab === 'dailyClose') jobs.push(loadDailyClose());
   await Promise.allSettled(jobs);
 }
 
@@ -4399,9 +5566,11 @@ function applyLanguage() {
   populatePageDropdown();
   renderOrders();
   if (state.activeTab === 'dashboard') loadStats();
+  if (state.activeTab === 'dailyClose') renderDailyClose();
   updatePricePreview();
   // Update banner for whichever tab is active
-  updateDateBanner(state.activeTab === 'dashboard' ? state.dashDate : state.currentDate);
+  updateDateBanner(state.activeTab === 'dashboard' ? state.dashDate :
+    (state.activeTab === 'dailyClose' ? state.closeDate : state.currentDate));
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -4411,10 +5580,12 @@ async function init() {
   const today = todayISO();
   state.currentDate = today;
   state.dashDate = today;
+  state.closeDate = today;
   setupOrderClipboardInteractions();
 
   document.getElementById('orderDatePicker').value = today;
   document.getElementById('dashDatePicker').value = today;
+  document.getElementById('closeDatePicker').value = today;
   updateDateBanner(today);
 
   // Show loading state
@@ -4434,8 +5605,10 @@ async function init() {
     if (datesData.today && datesData.today !== today) {
       state.currentDate = datesData.today;
       state.dashDate = datesData.today;
+      state.closeDate = datesData.today;
       setCurrentDate(datesData.today);
       setDashDate(datesData.today);
+      document.getElementById('closeDatePicker').value = datesData.today;
     }
   } catch(e) { /* use local date */ }
 
