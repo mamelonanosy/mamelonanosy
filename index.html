@@ -178,6 +178,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-call{background:#e8f5e9;color:#2e7d32;text-decoration:none;display:inline-block}
 .btn-sms{background:#e3f2fd;color:#1565c0;text-decoration:none;display:inline-block}
 .btn-sms:hover{background:#bbdefb}
+.btn-chat{background:#e8efff;color:#174ea6;text-decoration:none;display:inline-block}
+.btn-chat:hover{background:#d6e3ff}
 .btn-sm:disabled,.btn-sm.is-disabled{opacity:.55;cursor:not-allowed}
 
 /*───────────────────────────── INTERNAL WEB MEMOS ─────────────────────────────*/
@@ -550,6 +552,53 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .order-card.selected{border-color:#667eea;box-shadow:0 0 0 2px rgba(102,126,234,.25)}
 .order-card.has-checkbox{padding-left:38px}
 
+/* Route planner */
+.route-panel{background:#fff;border:1px solid #e6e7ef;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.route-panel h2{font-size:1.05rem;color:#3f4261;margin-bottom:6px}
+.route-panel h3{font-size:.92rem;color:#4b4f6d;margin-bottom:8px}
+.route-muted{font-size:.8rem;color:#777;line-height:1.45}
+.route-origin{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.route-origin a{color:#667eea;font-weight:700;text-decoration:none;white-space:nowrap}
+.route-key-warning{margin-top:10px;padding:9px 11px;border-radius:9px;background:#fff3e0;color:#9a5500;font-size:.79rem;line-height:1.4;overflow-wrap:anywhere}
+.route-agent-list{display:grid;gap:8px;margin-top:10px}
+.route-agent-row{display:grid;grid-template-columns:auto minmax(100px,1fr) 120px 100px;gap:8px;align-items:center;background:#f7f8fc;border:1px solid #e3e5ef;border-radius:10px;padding:8px 10px}
+.route-agent-row strong{font-size:.83rem;overflow:hidden;text-overflow:ellipsis}
+.route-agent-row select,.route-agent-row input{width:100%;border:1px solid #d8dae5;border-radius:8px;padding:6px;background:#fff}
+.route-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.route-controls label{font-size:.8rem;color:#555;display:flex;gap:6px;align-items:center}
+.route-primary,.route-confirm{border:none;border-radius:9px;padding:9px 14px;color:#fff;background:#667eea;font-weight:700;font-size:.82rem}
+.route-primary:disabled,.route-confirm:disabled{opacity:.5;cursor:not-allowed}
+.route-confirm{background:#2e7d32}
+.route-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.route-summary div{background:#f2f3fa;border-radius:10px;padding:10px;text-align:center}
+.route-summary strong{display:block;color:#4b4f6d;font-size:1.05rem}
+.route-summary span{font-size:.72rem;color:#777}
+.route-card{border:1px solid #dddfea;border-radius:13px;background:#fff;margin-bottom:12px;overflow:hidden}
+.route-card-head{padding:12px 14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.route-card-head h3{font-size:1rem;margin:0;color:#fff}
+.route-card-head small{opacity:.9;display:block;margin-top:3px}
+.route-card-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.route-card-actions a,.route-card-actions button{border:1px solid rgba(255,255,255,.6);border-radius:7px;padding:4px 8px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:.72rem;font-weight:700}
+.route-stop{display:grid;grid-template-columns:34px 1fr auto;gap:9px;padding:11px 13px;border-top:1px solid #ececf2;align-items:start}
+.route-stop-number{width:28px;height:28px;border-radius:50%;background:#667eea;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem}
+.route-stop-main strong{font-size:.86rem;color:#333}.route-stop-main div{font-size:.77rem;color:#666;margin-top:2px;line-height:1.35}
+.route-stop-eta{text-align:right;font-size:.75rem;color:#555;white-space:nowrap}.route-stop-eta strong{display:block;color:#2e7d32;font-size:.8rem}
+.route-confidence-medium{color:#b26a00!important;font-weight:700}
+.route-unresolved{border-left:4px solid #d32f2f;background:#fff5f5;padding:9px 11px;margin:7px 0;border-radius:7px;font-size:.79rem}
+.route-empty{text-align:center;color:#777;padding:24px 12px}
+@media(min-width:768px){.route-summary{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){
+  .tab-bar{overflow-x:auto;scrollbar-width:thin}.tab-btn{flex:0 0 76px;min-width:76px;font-size:.7rem;padding-left:1px;padding-right:1px}
+  .date-nav{justify-content:flex-start;gap:4px;padding:7px 5px;overflow-x:auto}.date-nav button{padding:7px 8px;font-size:.72rem}.date-nav input[type="date"]{width:126px;padding:6px 4px}
+  .route-origin{flex-direction:column}.route-origin a{align-self:flex-start}
+  .route-agent-row{grid-template-columns:24px minmax(0,1fr)}
+  .route-agent-row .route-agent-active{grid-column:1;grid-row:1}
+  .route-agent-row strong{grid-column:2;grid-row:1}
+  .route-agent-row .route-agent-mode{grid-column:1/3;grid-row:2}
+  .route-agent-row .route-agent-start{grid-column:1/3;grid-row:3}
+  .route-stop{grid-template-columns:32px minmax(0,1fr)}.route-stop-eta{grid-column:2;text-align:left}
+}
+
 /*───────────────────────────── DESKTOP ─────────────────────────────*/
 @media(min-width:768px){
   html{font-size:15px}
@@ -591,6 +640,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   <button class="tab-btn active" data-tab="orders" onclick="switchTab('orders')">Commandes</button>
   <button class="tab-btn" data-tab="form" onclick="switchTab('form')">Nouvelle</button>
   <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')">Tableau de bord</button>
+  <button class="tab-btn" data-tab="routes" onclick="switchTab('routes')">Itin&eacute;raires</button>
   <button class="tab-btn" data-tab="dailyClose" onclick="switchTab('dailyClose')">✅ Clôture</button>
 </div>
 
@@ -803,6 +853,36 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   <div id="productsTableWrap"></div>
 </div>
 
+<!-- ROUTE PLANNER: daily axes, assignment and approximate ETAs -->
+<div class="tab-content" id="tabRoutes">
+  <div class="date-nav" style="margin-bottom:16px">
+    <button onclick="prevDateRoutes()">&larr; Pr&eacute;c</button>
+    <input type="date" id="routeDatePicker" onchange="pickDateRoutes(this.value)">
+    <button onclick="nextDateRoutes()">Suiv &rarr;</button>
+    <button onclick="goTodayRoutes()" style="background:#43a047">Aujourd'hui</button>
+  </div>
+
+  <div class="route-panel" id="routePlannerSetup">
+    <div class="route-origin">
+      <div>
+        <h2 id="routePlannerTitle">Planificateur d'itin&eacute;raires</h2>
+        <div class="route-muted" id="routeOriginText">Chargement du point de d&eacute;part...</div>
+      </div>
+      <a id="routeOriginLink" href="#" target="_blank" rel="noopener">Carte</a>
+    </div>
+    <div id="routeApiStatus"></div>
+    <h3 style="margin-top:14px" id="routeAgentsTitle">Agents et moyens de transport</h3>
+    <div class="route-muted" id="routeAgentsHelp">S&eacute;lectionnez les agents disponibles et choisissez v&eacute;lo ou bus pour cette journ&eacute;e.</div>
+    <div class="route-agent-list" id="routeAgentList"></div>
+    <div class="route-controls">
+      <label><input type="checkbox" id="routeIncludeColis"> <span id="routeIncludeColisLabel">Inclure les commandes colis/d&eacute;p&ocirc;t</span></label>
+      <button class="route-primary" id="routePreviewButton" onclick="previewDailyRoutes()">G&eacute;n&eacute;rer l'aper&ccedil;u</button>
+      <button class="route-confirm" id="routeConfirmButton" onclick="confirmDailyRoutes()" style="display:none">Confirmer et attribuer</button>
+    </div>
+  </div>
+  <div id="routePlanOutput"><div class="route-empty">Aucun itin&eacute;raire confirm&eacute; pour cette date.</div></div>
+</div>
+
 <!-- DAILY CLOSE: delivery validation and agent cash reconciliation -->
 <div class="tab-content" id="tabDailyClose">
   <div class="date-nav" style="margin-bottom:16px">
@@ -835,6 +915,7 @@ const LANG = {
     tab_new_order: { fr: 'Nouvelle', en: 'New Order' },
     tab_edit_order: { fr: 'Modifier', en: 'Edit Order' },
     tab_dashboard: { fr: 'Tableau de bord', en: 'Dashboard' },
+    tab_routes: { fr: 'Itin\u00e9raires', en: 'Routes' },
 
     // Date nav
     prev: { fr: 'Pr\u00e9c', en: 'Prev' },
@@ -879,6 +960,7 @@ const LANG = {
     edit: { fr: 'Modifier', en: 'Edit' },
     call: { fr: 'Appeler', en: 'Call' },
     sms: { fr: 'Message', en: 'Message' },
+    messenger: { fr: 'Messenger', en: 'Messenger' },
     delete: { fr: 'Supprimer', en: 'Delete' },
     memo_action: { fr: 'Mémo', en: 'Memo' },
 
@@ -1067,6 +1149,11 @@ const state = {
   currentDate: '',
   dashDate: '',
   closeDate: '',
+  routeDate: '',
+  routeConfig: null,
+  routePlan: null,
+  routePreview: null,
+  routeLoading: false,
   dailyClose: null,
   dailyCloseLoading: false,
   dailyCloseRefreshTimer: null,
@@ -1112,6 +1199,7 @@ const API = {
   firebaseOrdersPath: '/orders',
   firebaseReferencePath: '/orders/__reference_data',
   firebaseDailyClosePath: '/orders/__daily_reconciliation',
+  firebaseRoutePlansPath: '/orders/__route_plans',
   firebaseOrderMemoPath: '/orders/__web_order_memos',
   firebaseMemoPresetPath: '/orders/__web_memo_presets',
   staticConfigVersion: '2026-07-15-1',
@@ -1735,8 +1823,47 @@ const API = {
       record.updated_at = new Date().toISOString();
       record.updated_ms = Date.now();
       return this.fb('PUT', this.firebaseDailyClosePath + '/' + encodeURIComponent(date), record)
-        .then(() => ({record: record}));
+      .then(() => ({record: record}));
     });
+  },
+  canGenerateRoutes() {
+    return !this.staticHost;
+  },
+  getRoutePlannerConfig() {
+    if (this.canGenerateRoutes()) {
+      return this.request('GET', '/api/route-planner/config');
+    }
+    return this.getFirebaseReferenceData().then((reference) => {
+      const planner = reference.route_planner || {};
+      return {
+        schema_version: 1,
+        origin: planner.origin || {},
+        settings: planner.settings || {},
+        modes: planner.modes || ['bicycle', 'bus'],
+        agents: Array.isArray(reference.agents) ? reference.agents.filter(Boolean) : this.staticAgents,
+        google_api_key_configured: false,
+        read_only: true
+      };
+    });
+  },
+  getRoutePlan(date) {
+    if (this.canGenerateRoutes()) {
+      return this.request('GET', '/api/route-plans?date=' + encodeURIComponent(date));
+    }
+    return this.fb('GET', this.firebaseRoutePlansPath + '/' + encodeURIComponent(date))
+      .then((plan) => ({plan: plan || null, date: date}));
+  },
+  previewRoutePlan(payload) {
+    if (!this.canGenerateRoutes()) {
+      return Promise.reject(new Error('Route generation requires the desktop delivery server.'));
+    }
+    return this.request('POST', '/api/route-plans/preview', payload);
+  },
+  confirmRoutePlan(previewId) {
+    if (!this.canGenerateRoutes()) {
+      return Promise.reject(new Error('Route confirmation requires the desktop delivery server.'));
+    }
+    return this.request('POST', '/api/route-plans/confirm', {preview_id: previewId});
   },
   getDates() {
     if (this.isStaticMode()) {
@@ -2623,6 +2750,268 @@ async function removeSelectedMemoPreset() {
 /* ═════════════════════════════════════════════════════════════════════
    TAB SWITCHING
    ═════════════════════════════════════════════════════════════════════ */
+function routeText(fr, en) {
+  return LANG.current === 'fr' ? fr : en;
+}
+
+function setRouteDate(iso) {
+  state.routeDate = iso || todayISO();
+  const picker = document.getElementById('routeDatePicker');
+  if (picker) picker.value = state.routeDate;
+  updateDateBanner(state.routeDate);
+  state.routePreview = null;
+  return loadRoutePlanner();
+}
+
+function prevDateRoutes() { setRouteDate(shiftDate(state.routeDate, -1)); }
+function nextDateRoutes() { setRouteDate(shiftDate(state.routeDate, 1)); }
+function goTodayRoutes() { setRouteDate(todayISO()); }
+function pickDateRoutes(value) { if (value) setRouteDate(value); }
+
+function routeModeLabel(mode) {
+  if (mode === 'bus') return routeText('Bus', 'Bus');
+  return routeText('Vélo', 'Bicycle');
+}
+
+function renderRoutePlannerSetup() {
+  const config = state.routeConfig || {};
+  const origin = config.origin || {};
+  const settings = config.settings || {};
+  const originText = document.getElementById('routeOriginText');
+  const originLink = document.getElementById('routeOriginLink');
+  const apiStatus = document.getElementById('routeApiStatus');
+  const agentList = document.getElementById('routeAgentList');
+  const previewButton = document.getElementById('routePreviewButton');
+  const sharedAgent = new URLSearchParams(window.location.search).get('routeAgent') || '';
+
+  document.getElementById('routePlannerSetup').style.display = sharedAgent ? 'none' : '';
+  originText.textContent = (origin.label || routeText('Point de départ', 'Departure point')) +
+    (origin.landmark ? ' — ' + origin.landmark : '') +
+    (origin.latitude !== undefined ? ' (' + Number(origin.latitude).toFixed(6) + ', ' + Number(origin.longitude).toFixed(6) + ')' : '');
+  originLink.href = origin.maps_url || ('https://www.google.com/maps/search/?api=1&query=' +
+    encodeURIComponent(String(origin.latitude || '') + ',' + String(origin.longitude || '')));
+
+  if (!API.canGenerateRoutes()) {
+    apiStatus.innerHTML = '<div class="route-key-warning">' + escHtml(routeText(
+      'Vue partagée en lecture seule. La création et la confirmation se font depuis le serveur de livraison.',
+      'Shared read-only view. Generate and confirm plans from the delivery server.'
+    )) + '</div>';
+    previewButton.disabled = true;
+  } else if (!config.google_api_key_configured) {
+    apiStatus.innerHTML = '<div class="route-key-warning">' + escHtml(routeText(
+      'Clé Google Maps requise pour localiser les nouvelles adresses. Définissez GOOGLE_MAPS_API_KEY ou placez la clé dans data/google_maps_api_key.txt.',
+      'A Google Maps key is required to locate new addresses. Set GOOGLE_MAPS_API_KEY or place the key in data/google_maps_api_key.txt.'
+    )) + '</div>';
+    previewButton.disabled = false;
+  } else {
+    apiStatus.innerHTML = '';
+    previewButton.disabled = false;
+  }
+
+  const agents = Array.isArray(config.agents) && config.agents.length ? config.agents : state.agents;
+  agentList.innerHTML = (agents || []).map(function(agent) {
+    const key = 'route_agent_' + String(agent).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    const storedMode = localStorage.getItem(key + '_mode') || 'bicycle';
+    const storedActive = localStorage.getItem(key + '_active') === '1';
+    const startTime = localStorage.getItem(key + '_start') || settings.default_start_time || '08:30';
+    return '<div class="route-agent-row" data-agent="' + escHtml(agent) + '" data-storage-key="' + escHtml(key) + '">' +
+      '<input class="route-agent-active" type="checkbox"' + (storedActive ? ' checked' : '') + ' onchange="saveRouteAgentChoice(this)">' +
+      '<strong>' + escHtml(agent) + '</strong>' +
+      '<select class="route-agent-mode" onchange="saveRouteAgentChoice(this)">' +
+        '<option value="bicycle"' + (storedMode === 'bicycle' ? ' selected' : '') + '>' + escHtml(routeText('Vélo', 'Bicycle')) + '</option>' +
+        '<option value="bus"' + (storedMode === 'bus' ? ' selected' : '') + '>Bus</option>' +
+      '</select>' +
+      '<input class="route-agent-start" type="time" value="' + escHtml(startTime) + '" onchange="saveRouteAgentChoice(this)" title="Start time">' +
+    '</div>';
+  }).join('') || '<div class="route-empty">' + escHtml(routeText('Aucun agent disponible.', 'No agents available.')) + '</div>';
+}
+
+function saveRouteAgentChoice(source) {
+  const row = source.closest('.route-agent-row');
+  if (!row) return;
+  const key = row.dataset.storageKey;
+  localStorage.setItem(key + '_active', row.querySelector('.route-agent-active').checked ? '1' : '0');
+  localStorage.setItem(key + '_mode', row.querySelector('.route-agent-mode').value);
+  localStorage.setItem(key + '_start', row.querySelector('.route-agent-start').value || '08:30');
+}
+
+function selectedRouteAgents() {
+  return Array.from(document.querySelectorAll('.route-agent-row')).map(function(row) {
+    return {
+      name: row.dataset.agent || '',
+      active: row.querySelector('.route-agent-active').checked,
+      mode: row.querySelector('.route-agent-mode').value,
+      start_time: row.querySelector('.route-agent-start').value || '08:30'
+    };
+  }).filter(function(agent) { return agent.active && agent.name; });
+}
+
+function setRoutePlannerBusy(busy) {
+  state.routeLoading = !!busy;
+  const preview = document.getElementById('routePreviewButton');
+  const confirmButton = document.getElementById('routeConfirmButton');
+  if (preview) {
+    preview.disabled = busy || !API.canGenerateRoutes();
+    preview.textContent = busy ? routeText('Calcul en cours...', 'Planning...') : routeText("Générer l'aperçu", 'Generate preview');
+  }
+  if (confirmButton) confirmButton.disabled = busy;
+}
+
+async function loadRoutePlanner() {
+  if (state.routeLoading) return;
+  setRoutePlannerBusy(true);
+  const output = document.getElementById('routePlanOutput');
+  output.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> ' +
+    escHtml(routeText('Chargement des itinéraires...', 'Loading routes...')) + '</div>';
+  try {
+    const results = await Promise.all([API.getRoutePlannerConfig(), API.getRoutePlan(state.routeDate)]);
+    state.routeConfig = results[0] || {};
+    state.routePlan = results[1] && results[1].plan ? results[1].plan : null;
+    renderRoutePlannerSetup();
+    renderRoutePlan(state.routePreview || state.routePlan, !!state.routePreview);
+  } catch (error) {
+    output.innerHTML = '<div class="route-key-warning">' + escHtml(error.message) + '</div>';
+  } finally {
+    setRoutePlannerBusy(false);
+  }
+}
+
+async function previewDailyRoutes() {
+  const agents = selectedRouteAgents();
+  if (!agents.length) {
+    showToast(routeText('Sélectionnez au moins un agent.', 'Select at least one agent.'), 'error');
+    return;
+  }
+  setRoutePlannerBusy(true);
+  try {
+    const result = await API.previewRoutePlan({
+      date: state.routeDate,
+      agents: agents,
+      include_colis: !!document.getElementById('routeIncludeColis').checked
+    });
+    state.routePreview = result.plan;
+    renderRoutePlan(state.routePreview, true);
+    const assigned = Number(state.routePreview.summary && state.routePreview.summary.assigned_orders || 0);
+    document.getElementById('routeConfirmButton').style.display = assigned ? '' : 'none';
+  } catch (error) {
+    showToast(error.message, 'error');
+  } finally {
+    setRoutePlannerBusy(false);
+  }
+}
+
+async function confirmDailyRoutes() {
+  const plan = state.routePreview;
+  if (!plan || !plan.preview_id) return;
+  const message = routeText(
+    'Confirmer ce plan et remplacer les agents des commandes résolues ?',
+    'Confirm this plan and replace the agents on resolved orders?'
+  );
+  if (!window.confirm(message)) return;
+  setRoutePlannerBusy(true);
+  try {
+    const result = await API.confirmRoutePlan(plan.preview_id);
+    state.routePreview = null;
+    state.routePlan = result.plan;
+    document.getElementById('routeConfirmButton').style.display = 'none';
+    renderRoutePlan(state.routePlan, false);
+    showToast(routeText('Itinéraires confirmés et agents attribués.', 'Routes confirmed and agents assigned.'));
+    if (result.warning) showToast(result.warning, 'error');
+    loadOrders({force: true});
+  } catch (error) {
+    showToast(error.message, 'error');
+  } finally {
+    setRoutePlannerBusy(false);
+  }
+}
+
+function routeSummaryBox(value, label) {
+  return '<div><strong>' + escHtml(String(value)) + '</strong><span>' + escHtml(label) + '</span></div>';
+}
+
+function renderRoutePlan(plan, isPreview) {
+  const output = document.getElementById('routePlanOutput');
+  const confirmButton = document.getElementById('routeConfirmButton');
+  if (!plan) {
+    output.innerHTML = '<div class="route-empty">' + escHtml(routeText(
+      'Aucun itinéraire confirmé pour cette date.',
+      'No confirmed route plan for this date.'
+    )) + '</div>';
+    if (confirmButton) confirmButton.style.display = 'none';
+    return;
+  }
+  const summary = plan.summary || {};
+  const requestedAgent = new URLSearchParams(window.location.search).get('routeAgent') || '';
+  const routes = (plan.routes || []).filter(function(route) { return !requestedAgent || route.agent === requestedAgent; });
+  let html = '<div class="route-panel"><h2>' + escHtml(isPreview ? routeText('Aperçu — aucune attribution modifiée', 'Preview — no assignments changed') : routeText('Plan confirmé', 'Confirmed plan')) + '</h2>';
+  html += '<div class="route-muted">' + escHtml((plan.origin && plan.origin.label) || '') + ' • ' + escHtml(plan.date || state.routeDate) + '</div></div>';
+  html += '<div class="route-summary">' +
+    routeSummaryBox(summary.assigned_orders || 0, routeText('commandes attribuées', 'orders assigned')) +
+    routeSummaryBox(summary.unresolved_orders || 0, routeText('adresses à vérifier', 'addresses to review')) +
+    routeSummaryBox(summary.agent_count || routes.length, routeText('agents', 'agents')) +
+    routeSummaryBox((summary.total_distance_km || 0) + ' km', routeText('distance estimée', 'estimated distance')) + '</div>';
+
+  if (requestedAgent && !routes.length) {
+    html += '<div class="route-key-warning">' + escHtml(routeText('Aucun axe attribué à cet agent.', 'No route is assigned to this agent.')) + '</div>';
+  }
+  routes.forEach(function(route) {
+    html += '<section class="route-card"><div class="route-card-head"><div><h3>' +
+      escHtml(routeText('Axe ', 'Axis ') + route.axis + ' — ' + route.agent) + '</h3><small>' +
+      escHtml(routeModeLabel(route.mode) + ' • ' + route.stop_count + ' ' + routeText('arrêts', 'stops') +
+        ' • ' + route.distance_km + ' km • ' + routeText('fin ', 'finish ') + route.completion_from + '–' + route.completion_to) +
+      '</small></div><div class="route-card-actions">';
+    (route.maps_links || []).forEach(function(link, index) {
+      html += '<a href="' + escHtml(link) + '" target="_blank" rel="noopener">' +
+        escHtml(routeText('Carte', 'Map') + ((route.maps_links || []).length > 1 ? ' ' + (index + 1) : '')) + '</a>';
+    });
+    if (!requestedAgent) {
+      html += '<button type="button" data-agent="' + escHtml(route.agent) + '" onclick="copyAgentRouteLink(this.dataset.agent)">' +
+        escHtml(routeText('Partager', 'Share')) + '</button>';
+    }
+    html += '</div></div>';
+    (route.stops || []).forEach(function(stop) {
+      const confidenceClass = stop.geocode_confidence === 'medium' ? ' route-confidence-medium' : '';
+      html += '<div class="route-stop"><div class="route-stop-number">' + escHtml(stop.stop_number) + '</div>' +
+        '<div class="route-stop-main"><strong>' + escHtml(stop.client_name || routeText('Client', 'Customer')) + '</strong>' +
+        '<div class="' + confidenceClass.trim() + '">' + escHtml(stop.address || '') + '</div>' +
+        (stop.formatted_address && stop.formatted_address !== stop.address ? '<div>' + escHtml(routeText('Trouvé: ', 'Matched: ') + stop.formatted_address) + '</div>' : '') +
+        (stop.phone ? '<div><a href="tel:' + escHtml(String(stop.phone).replace(/[^+0-9]/g, '')) + '">' + escHtml(stop.phone) + '</a></div>' : '') +
+        (stop.notes ? '<div><em>' + escHtml(stop.notes) + '</em></div>' : '') + '</div>' +
+        '<div class="route-stop-eta"><strong>' + escHtml(stop.eta_from + '–' + stop.eta_to) + '</strong>' +
+        escHtml(stop.leg_distance_km + ' km • ~' + stop.leg_minutes + ' min') + '</div></div>';
+    });
+    html += '</section>';
+  });
+
+  if (!requestedAgent && (plan.unresolved || []).length) {
+    html += '<div class="route-panel"><h3>' + escHtml(routeText('Adresses à vérifier', 'Addresses to review')) + '</h3>';
+    (plan.unresolved || []).forEach(function(item) {
+      html += '<div class="route-unresolved"><strong>' + escHtml(item.client_name || '') + '</strong> — ' +
+        escHtml(item.address || '') + '<br><span>' + escHtml(item.reason || '') + '</span></div>';
+    });
+    html += '</div>';
+  }
+  if ((plan.warnings || []).length) {
+    html += '<div class="route-panel route-muted">' + (plan.warnings || []).map(function(warning) {
+      return '• ' + escHtml(warning);
+    }).join('<br>') + '</div>';
+  }
+  output.innerHTML = html;
+  if (confirmButton) confirmButton.style.display = isPreview && Number(summary.assigned_orders || 0) ? '' : 'none';
+}
+
+async function copyAgentRouteLink(agent) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('routeAgent', agent);
+  url.searchParams.set('routeDate', state.routeDate);
+  try {
+    await navigator.clipboard.writeText(url.toString());
+    showToast(routeText('Lien agent copié.', 'Agent link copied.'));
+  } catch (error) {
+    window.prompt(routeText('Copiez ce lien :', 'Copy this link:'), url.toString());
+  }
+}
+
 function switchTab(tab) {
   state.activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -2630,7 +3019,7 @@ function switchTab(tab) {
   });
   document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
   // Show FAB on orders/dashboard, hide it while working in a focused workflow.
-  document.getElementById('fabNewOrder').style.display = (tab === 'form' || tab === 'dailyClose') ? 'none' : 'flex';
+  document.getElementById('fabNewOrder').style.display = (tab === 'form' || tab === 'routes' || tab === 'dailyClose') ? 'none' : 'flex';
   if (tab === 'orders') {
     document.getElementById('tabOrders').classList.add('active');
     updateDateBanner(state.currentDate);
@@ -2658,6 +3047,12 @@ function switchTab(tab) {
     stopAutoRefresh();
     stopDailyCloseRefresh();
     loadStats();
+  } else if (tab === 'routes') {
+    document.getElementById('tabRoutes').classList.add('active');
+    updateDateBanner(state.routeDate);
+    stopAutoRefresh();
+    stopDailyCloseRefresh();
+    loadRoutePlanner();
   } else if (tab === 'dailyClose') {
     document.getElementById('tabDailyClose').classList.add('active');
     updateDateBanner(state.closeDate);
@@ -3254,6 +3649,14 @@ function memoKeyForOrder(order) {
   if (rowMatch) return 'local_row_' + rowMatch[1];
   if (/^(local_row_|desktop_)/.test(iid)) return iid;
   return 'desktop_' + iid.replace(/[^A-Za-z0-9_-]/g, '_');
+}
+
+const CUSTOMER_CHAT_PORTAL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/customer-chat';
+
+function customerConversationUrl(order) {
+  const key = memoKeyForOrder(order);
+  if (!/^[A-Za-z0-9_-]{1,180}$/.test(key)) return '';
+  return CUSTOMER_CHAT_PORTAL + '?order=' + encodeURIComponent(key);
 }
 
 function memoMatchesOrder(memo, order, key) {
@@ -4143,6 +4546,7 @@ function renderOrders() {
     const sc = statusClass(o.status);
     const pc = paymentClass(o.payment_method);
     const phoneClean = cleanPhone(o.phone);
+    const conversationUrl = customerConversationUrl(o);
     const isSelected = state.selectedOrders.has(o.iid);
     const pageInfo = resolvePageForOrder(o);
     const resolvedPage = pageInfo ? pageInfo.name : (o.resolved_page || o.page || '');
@@ -4234,6 +4638,7 @@ function renderOrders() {
     html += '</select>' +
       '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' +
       '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' +
+      (conversationUrl ? '<a class="btn-sm btn-chat" href="' + escHtml(conversationUrl) + '" target="_blank" rel="noopener noreferrer">&#128172; ' + escHtml(T('messenger')) + '</a>' : '') +
       '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
       '<a class="btn-sm btn-sms" href="sms:' + escHtml(phoneClean) + '">' + escHtml(T('sms')) + '</a>' +
       '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
@@ -5455,6 +5860,7 @@ function applyLanguage() {
   document.querySelector('.tab-btn[data-tab="orders"]').textContent = T('tab_orders');
   document.querySelector('.tab-btn[data-tab="form"]').textContent = state.editingOrder ? T('tab_edit_order') : T('tab_new_order');
   document.querySelector('.tab-btn[data-tab="dashboard"]').textContent = T('tab_dashboard');
+  document.querySelector('.tab-btn[data-tab="routes"]').textContent = T('tab_routes');
 
   // Date nav - Orders
   const dateNavBtns = document.querySelectorAll('#tabOrders .date-nav button');
@@ -5467,6 +5873,19 @@ function applyLanguage() {
   if (dashNavBtns[0]) dashNavBtns[0].innerHTML = '&larr; ' + T('prev');
   if (dashNavBtns[1]) dashNavBtns[1].innerHTML = T('next') + ' &rarr;';
   if (dashNavBtns[2]) dashNavBtns[2].textContent = T('today');
+
+  // Date nav - Routes
+  const routeNavBtns = document.querySelectorAll('#tabRoutes .date-nav button');
+  if (routeNavBtns[0]) routeNavBtns[0].innerHTML = '&larr; ' + T('prev');
+  if (routeNavBtns[1]) routeNavBtns[1].innerHTML = T('next') + ' &rarr;';
+  if (routeNavBtns[2]) routeNavBtns[2].textContent = T('today');
+  document.getElementById('routePlannerTitle').textContent = routeText("Planificateur d'itinéraires", 'Route planner');
+  document.getElementById('routeAgentsTitle').textContent = routeText('Agents et moyens de transport', 'Agents and transport');
+  document.getElementById('routeAgentsHelp').textContent = routeText(
+    'Sélectionnez les agents disponibles et choisissez vélo ou bus pour cette journée.',
+    'Select the available agents and choose bicycle or bus for this day.'
+  );
+  document.getElementById('routeIncludeColisLabel').textContent = routeText('Inclure les commandes colis/dépôt', 'Include parcel/depot orders');
 
   // Filter pills
   const pills = document.querySelectorAll('#filterRow .pill');
@@ -5566,10 +5985,15 @@ function applyLanguage() {
   renderOrders();
   if (state.activeTab === 'dashboard') loadStats();
   if (state.activeTab === 'dailyClose') renderDailyClose();
+  if (state.activeTab === 'routes') {
+    renderRoutePlannerSetup();
+    renderRoutePlan(state.routePreview || state.routePlan, !!state.routePreview);
+  }
   updatePricePreview();
   // Update banner for whichever tab is active
   updateDateBanner(state.activeTab === 'dashboard' ? state.dashDate :
-    (state.activeTab === 'dailyClose' ? state.closeDate : state.currentDate));
+    (state.activeTab === 'routes' ? state.routeDate :
+      (state.activeTab === 'dailyClose' ? state.closeDate : state.currentDate)));
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -5577,14 +6001,18 @@ function applyLanguage() {
    ═════════════════════════════════════════════════════════════════════ */
 async function init() {
   const today = todayISO();
+  const initialParams = new URLSearchParams(window.location.search);
+  const sharedRouteDate = initialParams.get('routeDate') || '';
   state.currentDate = today;
   state.dashDate = today;
   state.closeDate = today;
+  state.routeDate = /^\d{4}-\d{2}-\d{2}$/.test(sharedRouteDate) ? sharedRouteDate : today;
   setupOrderClipboardInteractions();
 
   document.getElementById('orderDatePicker').value = today;
   document.getElementById('dashDatePicker').value = today;
   document.getElementById('closeDatePicker').value = today;
+  document.getElementById('routeDatePicker').value = state.routeDate;
   updateDateBanner(today);
 
   // Show loading state
@@ -5605,9 +6033,11 @@ async function init() {
       state.currentDate = datesData.today;
       state.dashDate = datesData.today;
       state.closeDate = datesData.today;
+      if (!sharedRouteDate) state.routeDate = datesData.today;
       setCurrentDate(datesData.today);
       setDashDate(datesData.today);
       document.getElementById('closeDatePicker').value = datesData.today;
+      document.getElementById('routeDatePicker').value = state.routeDate;
     }
   } catch(e) { /* use local date */ }
 
@@ -5616,6 +6046,7 @@ async function init() {
   startReferenceFocusRefresh();
   startInstantSync();
   applyLanguage();
+  if (initialParams.get('routeAgent') || initialParams.get('tab') === 'routes') switchTab('routes');
 }
 
 // Kick it off
