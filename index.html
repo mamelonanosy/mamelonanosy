@@ -451,7 +451,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
 .duplicate-modal{max-width:980px;max-height:92vh;overflow:auto;padding:0}
 .duplicate-head{padding:22px 24px 16px;border-bottom:1px solid #e8ecf2}
-.duplicate-head h3{margin:0 0 6px;font-size:1.25rem;color:#9a4d00}
+.duplicate-head h3{margin:0 0 6px;font-size:1.25rem;color:#9a4d00;text-transform:uppercase;letter-spacing:.025em}
 .duplicate-head p{margin:0;color:#667085;font-size:.88rem;line-height:1.45}
 .duplicate-alert{margin:14px 24px 0;padding:11px 13px;border-radius:10px;background:#fff4df;color:#7a4700;font-size:.84rem;line-height:1.4}
 .duplicate-progress{display:flex;justify-content:space-between;gap:12px;margin:12px 24px 0;color:#52606d;font-size:.78rem;font-weight:700}
@@ -469,10 +469,11 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .duplicate-chat-link{display:inline-block;margin-top:7px;padding:8px 11px;border-radius:8px;background:#174ea6;color:#fff;text-decoration:none;font-weight:700}
 .duplicate-chat-link:hover{background:#103f89}
 .duplicate-block-alert{margin:14px 24px 0;padding:13px;border-radius:10px;background:#ffebee;color:#9b1c1c;font-size:.88rem;font-weight:700;line-height:1.45}
+.duplicate-copy-warning{margin:10px 24px 0;padding:12px 13px;border:2px solid #f5a623;border-radius:10px;background:#fff8dc;color:#713f12;font-size:.88rem;font-weight:800;line-height:1.5;text-transform:uppercase}
 .duplicate-block-actions{padding:14px 24px 22px;border-top:1px solid #e8ecf2;text-align:right}
 .duplicate-block-actions button{border:0;border-radius:10px;padding:11px 16px;background:#344054;color:#fff;font-weight:700;cursor:pointer}
 .duplicate-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:14px 24px 22px;border-top:1px solid #e8ecf2}
-.duplicate-actions button{border:0;border-radius:10px;padding:11px 8px;font-size:.78rem;font-weight:700;line-height:1.3;cursor:pointer}
+.duplicate-actions button{border:0;border-radius:10px;padding:11px 8px;font-size:.78rem;font-weight:800;line-height:1.3;cursor:pointer;text-transform:uppercase}
 .duplicate-keep-old{background:#eef1f5;color:#344054}
 .duplicate-keep-both{background:#2e7d32;color:#fff}
 .duplicate-keep-new{background:#c62828;color:#fff}
@@ -906,6 +907,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
+document.documentElement.dataset.lunaBuild = '20260920-mg-duplicate-prompts';
 /* ═════════════════════════════════════════════════════════════════════
    i18n – LANGUAGE SYSTEM
    ═════════════════════════════════════════════════════════════════════ */
@@ -5441,13 +5443,13 @@ function duplicateUiText(fr, en) {
 
 function duplicateEvidenceText(value) {
   const map = {
-    'Same phone number': ['Meme numero de telephone', 'Same phone number'],
-    'Same name': ['Meme nom', 'Same name'],
-    'Very similar name': ['Nom tres similaire', 'Very similar name'],
-    'Similar name': ['Nom similaire', 'Similar name'],
-    'Same delivery date': ['Meme date de livraison', 'Same delivery date'],
-    'Same products': ['Memes produits', 'Same products'],
-    'Same or very similar address': ['Adresse identique ou tres similaire', 'Same or very similar address']
+    'Same phone number': ['NUMÉRO MITOVY', 'Same phone number'],
+    'Same name': ['ANARANA MITOVY', 'Same name'],
+    'Very similar name': ['ANARANA TENA MITOVY', 'Very similar name'],
+    'Similar name': ['ANARANA MANAKAIKY', 'Similar name'],
+    'Same delivery date': ['DATY LIVRAISON MITOVY', 'Same delivery date'],
+    'Same products': ['ENTANA MITOVY', 'Same products'],
+    'Same or very similar address': ['ADIRESY MITOVY', 'Same or very similar address']
   };
   const item = map[value];
   return item ? duplicateUiText(item[0], item[1]) : value;
@@ -5467,13 +5469,13 @@ function duplicateSameField(key, first, second) {
 
 function duplicateOrderRows(candidate, existing, side) {
   const fields = [
-    ['delivery_date', duplicateUiText('Date', 'Date')],
+    ['delivery_date', duplicateUiText('Daty livraison', 'Date')],
     ['client_name', duplicateUiText('Client', 'Customer')],
-    ['phone', duplicateUiText('Telephone', 'Phone')],
-    ['address', duplicateUiText('Adresse', 'Address')],
-    ['products', duplicateUiText('Produits', 'Products')],
+    ['phone', duplicateUiText('Numéro', 'Phone')],
+    ['address', duplicateUiText('Adiresy', 'Address')],
+    ['products', duplicateUiText('Entana', 'Products')],
     ['status', duplicateUiText('Statut', 'Status')],
-    ['agent', duplicateUiText('Agent', 'Agent')]
+    ['agent', duplicateUiText('Livreur / agent', 'Agent')]
   ];
   const source = side === 'new' ? candidate : existing;
   return fields.map(function(field) {
@@ -5491,11 +5493,11 @@ function duplicateConversationMarkup(existing) {
   const conversationUrl = customerConversationUrl(existing || {});
   if (!conversationUrl) return '';
   return '<div class="duplicate-chat-note">' + escHtml(duplicateUiText(
-    'Le numero est identique : les deux commandes concernent probablement la meme personne et la meme conversation.',
+    'MITOVY NY NUMÉRO: mety client iray sy conversation iray ihany no misy amin\'ireo commande roa ireo.',
     'The phone number is identical, so both orders probably belong to the same person and Messenger conversation.'
   )) + '<br><a class="duplicate-chat-link" href="' + escHtml(conversationUrl) +
     '" target="duplicateCustomerChat" rel="noopener noreferrer" onclick="window.open(this.href,\'duplicateCustomerChat\',\'popup=yes,width=520,height=760,resizable=yes,scrollbars=yes\');return false;">' +
-    escHtml(duplicateUiText('Ouvrir la conversation commune a cote', 'Open the shared conversation beside this window')) +
+    escHtml(duplicateUiText('SOKAFY NY CONVERSATION — HAMARINO NY CLIENT SY NY NUMÉRO', 'Open the shared conversation beside this window')) +
     '</a></div>';
 }
 
@@ -5511,32 +5513,36 @@ function showSameDayDuplicateBlock(candidate, matches, isEdit) {
       resolve({proceed: false, blocked: true});
     };
     const countText = list.length > 1
-      ? duplicateUiText('Commandes deja enregistrees trouvees : ', 'Existing matching orders found: ') + list.length
-      : duplicateUiText('Une commande est deja enregistree.', 'One order is already saved.');
+      ? duplicateUiText('COMMANDE EFA VOATAHIRY HITA: ', 'Existing matching orders found: ') + list.length
+      : duplicateUiText('COMMANDE EFA VOATAHIRY HITA: 1', 'One order is already saved.');
 
     container.innerHTML = '<div class="modal-backdrop"><div class="modal duplicate-modal">' +
       '<div class="duplicate-head"><h3>' + escHtml(duplicateUiText(
-        'Commande bloquee — doublon du meme jour',
+        'VOASAKANA — EFA MISY COMMANDE AMIN\'IO NUMÉRO IO',
         'Order blocked — same-day duplicate'
       )) + '</h3><p>' + escHtml(duplicateUiText(
-        isEdit ? 'Vos modifications n ont pas ete enregistrees.' : 'La nouvelle commande n a pas ete enregistree.',
+        isEdit ? 'TSY VOATAHIRY NY FANOVANA NATAONAO.' : 'TSY VOATAHIRY ITY COMMANDE VAOVAO ITY.',
         isEdit ? 'Your changes were not saved.' : 'The new order was not saved.'
       )) + '</p></div>' +
       '<div class="duplicate-block-alert">' + escHtml(duplicateUiText(
-        'Le meme numero a deja une commande pour cette date de livraison. Pour eviter deux preparations ou deux livraisons, ouvrez et modifiez la commande deja enregistree.',
+        'EFA MISY COMMANDE VOATAHIRY MANANA NUMÉRO MITOVY SY DATY LIVRAISON MITOVY. Izany no misoroka préparation na livraison indroa ho an\'ny client iray.',
         'The same phone number already has an order for this delivery date. To prevent double preparation or delivery, open and update the saved order instead.'
       )) + '<br>' + escHtml(countText) + '</div>' +
+      '<div class="duplicate-copy-warning">' + escHtml(duplicateUiText(
+        'HAMARINO ALOHA NY NUMÉRO. Mety tena client vaovao ity, saingy mety NUMÉRO AN\'OLONA HAFA NO NATAO COPIÉ-COLLÉ PAR ERREUR. RAHA CLIENT HAFA: ahitsio eto ny numéro. RAHA CLIENT IRAY IHANY: ovay ilay commande efa voatahiry.',
+        'CHECK THE PHONE FIRST. This may be a genuine new customer, but another customer\'s saved phone may have been pasted by mistake. Correct the new phone if they are different customers; otherwise update the saved order.'
+      )) + '</div>' +
       '<div class="duplicate-compare">' +
       '<section class="duplicate-card"><h4>' + escHtml(isEdit
-        ? duplicateUiText('MODIFICATIONS BLOQUEES', 'BLOCKED CHANGES')
-        : duplicateUiText('NOUVELLE COMMANDE BLOQUEE', 'BLOCKED NEW ORDER')) + '</h4>' +
+        ? duplicateUiText('FANOVANA VOASAKANA', 'BLOCKED CHANGES')
+        : duplicateUiText('COMMANDE VAOVAO VOASAKANA', 'BLOCKED NEW ORDER')) + '</h4>' +
       duplicateOrderRows(candidate, existing, 'new') + '</section>' +
       '<section class="duplicate-card"><h4>' + escHtml(duplicateUiText(
-        'COMMANDE A MODIFIER', 'SAVED ORDER TO UPDATE'
+        'COMMANDE EFA VOATAHIRY', 'SAVED ORDER TO UPDATE'
       )) + '</h4>' + duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
       duplicateConversationMarkup(existing) +
       '<div class="duplicate-block-actions"><button id="duplicateBlockClose">' +
-      escHtml(duplicateUiText('Compris — retour sans enregistrer', 'Understood — return without saving')) +
+      escHtml(duplicateUiText('AZOKO — HIVERINA HANAMARINA NY NUMÉRO', 'Understood — return without saving')) +
       '</button></div></div></div>';
     document.getElementById('duplicateBlockClose').onclick = close;
   });
@@ -5579,11 +5585,11 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
       const existing = match.order;
       const days = Number(match.days_apart || 0);
       const title = duplicateUiText(
-        'Le meme numero existe sur une ancienne commande',
+        'FANAMARINANA — EFA NAMPIASAINA TAMIN\'NY COMMANDE HAFA ITY NUMÉRO ITY',
         'The same phone appears on an earlier order'
       );
       const guidance = duplicateUiText(
-        'Pourquoi cette fenetre apparait : meme numero, mais dates separees de ' + days + ' jour(s). Verifiez la conversation puis decidez si le client a vraiment recommande.',
+        'NUMÉRO MITOVY no hita, fa ' + days + ' andro ny elanelan\'ny daty livraison. Jereo ny conversation: tena nanao commande vaovao ve ilay client, sa NUMÉRO AN\'OLONA HAFA NO NATAO COPIÉ-COLLÉ?',
         'Why this window appeared: same phone, but the delivery dates are ' + days + ' day(s) apart. Check the conversation, then decide whether the customer really ordered again.'
       );
       const chips = (match.evidence || []).map(function(item) {
@@ -5593,37 +5599,41 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
       container.innerHTML = '<div class="modal-backdrop"><div class="modal duplicate-modal">' +
         '<div class="duplicate-head"><h3>' + escHtml(title) + '</h3>' +
         '<p>' + escHtml(duplicateUiText(
-          'Comparez la nouvelle commande a gauche avec la commande enregistree a droite. Aucune suppression ne se fera sans votre choix.',
+          'AMPITAHAO NY COMMANDE VAOVAO EO ANKAVIA SY NY COMMANDE EFA VOATAHIRY EO ANKAVANANA. Tsy misy hofafana raha tsy misafidy ianao.',
           'Compare the new order on the left with the saved order on the right. Nothing will be deleted unless you choose it.'
         )) + '</p></div>' +
         '<div class="duplicate-progress"><span>' +
-        escHtml(duplicateUiText('Correspondance', 'Match')) + ' ' + (index + 1) + ' / ' + list.length +
+        escHtml(duplicateUiText('COMMANDE MITOVY', 'Match')) + ' ' + (index + 1) + ' / ' + list.length +
         '</span><span>' + Number(match.score || 0) + '% ' +
-        escHtml(duplicateUiText('de concordance', 'evidence')) + '</span></div>' +
+        escHtml(duplicateUiText('POROFO', 'evidence')) + '</span></div>' +
         '<div class="duplicate-alert">' + escHtml(guidance) + '</div>' +
+        '<div class="duplicate-copy-warning">' + escHtml(duplicateUiText(
+          'HAMARINO NY CONVERSATION SY NY NUMÉRO ALOHAN\'NY HISAFIDIANA. METY COMMANDE VAOVAO MARINA, NA METY NUMÉRO DISO NO NATAO COPIÉ-COLLÉ.',
+          'CHECK THE CONVERSATION AND PHONE BEFORE CHOOSING. It may be a real reorder, or the wrong phone may have been pasted.'
+        )) + '</div>' +
         '<div class="duplicate-evidence">' + chips + '</div>' +
         '<div class="duplicate-compare">' +
         '<section class="duplicate-card"><h4>' + escHtml(isEdit
-          ? duplicateUiText('VOS MODIFICATIONS', 'YOUR CHANGES')
-          : duplicateUiText('NOUVELLE COMMANDE', 'NEW ORDER')) + '</h4>' +
+          ? duplicateUiText('FANOVANA NATAONAO', 'YOUR CHANGES')
+          : duplicateUiText('COMMANDE VAOVAO', 'NEW ORDER')) + '</h4>' +
         duplicateOrderRows(candidate, existing, 'new') + '</section>' +
         '<section class="duplicate-card"><h4>' +
-        escHtml(duplicateUiText('COMMANDE DEJA ENREGISTREE', 'EXISTING SAVED ORDER')) + '</h4>' +
+        escHtml(duplicateUiText('COMMANDE EFA VOATAHIRY', 'EXISTING SAVED ORDER')) + '</h4>' +
         duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
         duplicateConversationMarkup(existing) +
         '<div class="duplicate-help">' + escHtml(duplicateUiText(
-          'Regle simple : choisissez LES DEUX seulement si la conversation confirme une nouvelle commande. REMPLACER supprime definitivement l ancienne commande.',
+          'FITSIPIKA TSOTRA: fidio TEHIRIZO IZY ROA raha tena nanao commande vaovao ilay client. Ny SOLOINA ILAY TALOHA dia mamafa tanteraka ilay commande teo aloha.',
           'Simple rule: choose BOTH only if the conversation confirms a new order. REPLACE permanently deletes the earlier order.'
         )) + '</div>' +
         '<button class="duplicate-cancel" id="duplicateCancel">' +
-        escHtml(duplicateUiText('Retour sans enregistrer', 'Return without saving')) +
+        escHtml(duplicateUiText('HIVERINA TSY MISY TEHIRIZINA', 'Return without saving')) +
         '</button><div class="duplicate-actions">' +
         '<button class="duplicate-keep-old" id="duplicateKeepOld">' +
-        escHtml(duplicateUiText('1. ANNULER LA NOUVELLE\nGarder l ancienne', '1. CANCEL THE NEW ONE\nKeep the saved order')) +
+        escHtml(duplicateUiText('1. AZA TEHIRIZINA ITY VAOVAO ITY\nTAZOMY ILAY EFA VOATAHIRY', '1. CANCEL THE NEW ONE\nKeep the saved order')) +
         '</button><button class="duplicate-keep-both" id="duplicateKeepBoth">' +
-        escHtml(duplicateUiText('2. ENREGISTRER LES DEUX\nLe client a recommande', '2. SAVE BOTH ORDERS\nThe customer ordered again')) +
+        escHtml(duplicateUiText('2. TEHIRIZO IZY ROA\nNANAO COMMANDE VAOVAO ILAY CLIENT', '2. SAVE BOTH ORDERS\nThe customer ordered again')) +
         '</button><button class="duplicate-keep-new" id="duplicateKeepNew">' +
-        escHtml(duplicateUiText('3. REMPLACER L ANCIENNE\nEnregistrer nouvelle + supprimer ancienne', '3. REPLACE THE OLD ORDER\nSave new + delete old')) +
+        escHtml(duplicateUiText('3. SOLOINA ILAY TALOHA\nTEHIRIZO VAOVAO + FAFAO TALOHA', '3. REPLACE THE OLD ORDER\nSave new + delete old')) +
         '</button></div></div></div>';
 
       document.getElementById('duplicateCancel').onclick = function() {
