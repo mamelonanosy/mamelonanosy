@@ -182,6 +182,72 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-chat:hover{background:#d6e3ff}
 .btn-sm:disabled,.btn-sm.is-disabled{opacity:.55;cursor:not-allowed}
 
+/* Beginner delivery-contact controls: only channel + ordered steps are exposed. */
+.delivery-contact-hub{
+  margin-top:11px;padding:11px;border:1px solid #dfe6f4;border-radius:12px;
+  background:linear-gradient(135deg,#f8faff,#fff);
+}
+.delivery-contact-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.delivery-contact-title{font-size:.78rem;font-weight:900;color:#344054;letter-spacing:.025em}
+.delivery-chat-open{
+  border:none;border-radius:9px;background:#174ea6;color:#fff;padding:7px 10px;
+  font-size:.72rem;font-weight:850;text-transform:uppercase;
+}
+.delivery-chat-open:hover{background:#103f89}
+.delivery-chat-open:disabled{opacity:.55;cursor:wait}
+.delivery-contact-cue{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.delivery-cue{
+  display:inline-flex;align-items:center;gap:5px;border:none;border-radius:999px;
+  padding:5px 9px;font-size:.68rem;font-weight:850;text-transform:uppercase;
+}
+.delivery-cue.reply{background:#dff7e7;color:#116b36;box-shadow:0 0 0 2px rgba(46,125,50,.1)}
+.delivery-cue.waiting{background:#eef1f6;color:#667085}
+.delivery-cue.unread{background:#fff3cd;color:#8a5900}
+.delivery-cue.problem{background:#feeceb;color:#b42318}
+.delivery-channel-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.delivery-channel{
+  border:1.5px solid #d7deea;border-radius:10px;background:#fff;color:#344054;
+  padding:9px 8px;font-size:.72rem;font-weight:900;text-transform:uppercase;
+}
+.delivery-channel.messenger{border-color:#b8c8f0;color:#174ea6}
+.delivery-channel.sms{border-color:#b9d9f2;color:#1565c0}
+.delivery-channel.active{background:#eef2ff;border-color:#667eea;box-shadow:0 0 0 2px rgba(102,126,234,.1)}
+.delivery-steps{display:none;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.delivery-steps.open{display:grid}
+.delivery-step{
+  position:relative;min-height:68px;border:1.5px solid #dfe4ea;border-radius:10px;
+  background:#fff;color:#344054;padding:8px 6px;font-size:.7rem;font-weight:850;
+  line-height:1.25;text-align:center;
+}
+.delivery-step small{display:block;margin-top:4px;font-size:.6rem;font-weight:700;color:#7a8596}
+.delivery-step.ready{border-color:#667eea;color:#4a5fd0;background:#f7f8ff}
+.delivery-step.success{border-color:#63b77a;background:#eaf8ee;color:#176c35}
+.delivery-step.opened{border-color:#e2a83b;background:#fff8e7;color:#8a5900}
+.delivery-step.failed{border-color:#dc6b63;background:#fff0ef;color:#a3211a}
+.delivery-step.loading{color:#667eea;background:#f2f4ff;cursor:wait}
+.delivery-step.locked{background:#f2f3f5;color:#a0a5ad;border-color:#e1e4e8;cursor:not-allowed}
+.delivery-step-status{margin-top:8px;min-height:18px;font-size:.7rem;line-height:1.35;color:#667085;font-weight:700}
+.delivery-step-status.success{color:#176c35}.delivery-step-status.error{color:#b42318}
+.messenger-session{
+  border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(255,255,255,.16);
+  color:#fff;padding:6px 9px;font-size:.66rem;font-weight:850;text-transform:uppercase;
+}
+.messenger-session.ready{background:#228b4d;border-color:#8fe0aa}
+.header-actions{display:flex;gap:7px;align-items:center}
+.chat-busy-overlay{
+  position:fixed;inset:0;z-index:1400;background:rgba(18,25,38,.72);display:flex;
+  align-items:center;justify-content:center;padding:22px;
+}
+.chat-busy-card{width:min(420px,100%);background:#fff;border-radius:16px;padding:24px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.chat-busy-card strong{display:block;margin:9px 0 5px;color:#344054;font-size:1rem}
+.chat-busy-card p{color:#667085;font-size:.8rem;line-height:1.45}
+.chat-login-help{margin:-4px 0 12px;color:#667085;font-size:.75rem;line-height:1.4}
+@media(max-width:460px){
+  .delivery-contact-head{align-items:flex-start}.delivery-chat-open{max-width:52%}
+  .delivery-step{min-height:76px;padding:8px 4px}.delivery-step small{font-size:.57rem}
+  .messenger-session{max-width:120px;white-space:normal;line-height:1.15}
+}
+
 /*───────────────────────────── INTERNAL WEB MEMOS ─────────────────────────────*/
 .order-card.has-web-memo{
   border-left:5px solid var(--memo-accent,#64748b);
@@ -656,7 +722,10 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <h1>Gestionnaire de Livraison</h1>
       <div class="subtitle">Gestion des Commandes</div>
     </div>
-    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">🇬🇧</button>
+    <div class="header-actions">
+      <button type="button" class="messenger-session" id="messengerSessionButton" onclick="requestMessengerLogin()">MESSENGER: HIDITRA</button>
+      <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">🇬🇧</button>
+    </div>
   </div>
 </div>
 
@@ -925,7 +994,11 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-document.documentElement.dataset.lunaBuild = '20260920-sms-reminder-templates';
+document.documentElement.dataset.lunaBuild = '20260920-beginner-contact-hub';
+const INTEGRATED_DELIVERY_URL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/delivery';
+if (/(^|\.)github\.io$/i.test(window.location.hostname)) {
+  window.location.replace(INTEGRATED_DELIVERY_URL + window.location.search + window.location.hash);
+}
 /* ═════════════════════════════════════════════════════════════════════
    i18n – LANGUAGE SYSTEM
    ═════════════════════════════════════════════════════════════════════ */
@@ -1213,6 +1286,17 @@ const state = {
   subtypeDrafts: {},
   orderMemos: {},
   memoPresets: [],
+  smsReminderActivity: {},
+  reminderPanels: {},
+  chatAuthenticated: false,
+  chatCsrf: '',
+  chatCardStatuses: {},
+  chatStatusTimer: null,
+  chatRefreshTimer: null,
+  chatStatusLoading: false,
+  chatStatusLoadedAt: 0,
+  chatPendingAction: null,
+  chatActionMessages: {},
   sortField: '',
   sortAsc: true
 };
@@ -1229,6 +1313,7 @@ const API = {
   firebaseRoutePlansPath: '/orders/__route_plans',
   firebaseOrderMemoPath: '/orders/__web_order_memos',
   firebaseMemoPresetPath: '/orders/__web_memo_presets',
+  firebaseSmsReminderPath: '/orders/__sms_reminder_activity',
   staticConfigVersion: '2026-07-15-1',
   staticConfigCache: {},
   referenceCache: null,
@@ -1363,10 +1448,12 @@ const API = {
     this.memoRequestVersion = requestVersion;
     const request = Promise.all([
       this.fb('GET', this.firebaseOrderMemoPath),
-      this.fb('GET', this.firebaseMemoPresetPath)
+      this.fb('GET', this.firebaseMemoPresetPath),
+      this.fb('GET', this.firebaseSmsReminderPath)
     ]).then((results) => {
       const rawMemos = results[0] && typeof results[0] === 'object' ? results[0] : {};
       const rawPresets = results[1] && typeof results[1] === 'object' ? results[1] : {};
+      const rawSmsActivity = results[2] && typeof results[2] === 'object' ? results[2] : {};
       const memos = {};
       Object.keys(rawMemos).forEach((key) => {
         const memo = normalizeOrderMemo(rawMemos[key]);
@@ -1375,7 +1462,8 @@ const API = {
       const presets = Object.keys(rawPresets).map((key) => normalizeMemoPreset(key, rawPresets[key]))
         .filter(Boolean)
         .sort((a, b) => a.label.localeCompare(b.label));
-      const result = {memos: memos, presets: presets};
+      const smsActivity = normalizeSmsReminderActivity(rawSmsActivity);
+      const result = {memos: memos, presets: presets, smsActivity: smsActivity};
       if (requestVersion === this.memoRequestVersion) {
         this.memoCache = result;
         this.memoCacheAt = Date.now();
@@ -1435,6 +1523,27 @@ const API = {
     if (!id) return;
     await this.fb('DELETE', this.firebaseMemoPresetPath + '/' + encodeURIComponent(id));
     this.invalidateMemoCache();
+  },
+
+  async recordSmsReminderOpened(orderKey, reminderKey) {
+    const key = String(orderKey || '').trim();
+    const step = String(reminderKey || '').trim();
+    if (!/^[A-Za-z0-9_-]{1,180}$/.test(key) || !/^[a-z_]{3,80}$/.test(step)) {
+      throw new Error('SMS reminder identity is invalid');
+    }
+    const payload = {
+      schema_version: 1,
+      status: 'opened',
+      opened_at: new Date().toISOString(),
+      opened_ms: Date.now()
+    };
+    await this.fb(
+      'PUT',
+      this.firebaseSmsReminderPath + '/' + encodeURIComponent(key) + '/' + encodeURIComponent(step),
+      payload
+    );
+    this.invalidateMemoCache();
+    return payload;
   },
 
   invalidateReferenceCache() {
@@ -2682,6 +2791,441 @@ function launchSelectedSms() {
   window.location.href = url;
 }
 
+const DELIVERY_REMINDER_KEYS = ['driver_arrived','driver_waiting','delivery_confirmation'];
+const DELIVERY_REMINDER_SHORT = [
+  'LIVREUR TONGA',
+  'MBOLA MIANDRY',
+  'FANAMAFISANA FARANY'
+];
+const CHAT_API_BASE = '/control/api/customer-chat';
+
+function integratedMessengerAvailable() {
+  try {
+    const target = new URL(INTEGRATED_DELIVERY_URL);
+    return window.location.origin === target.origin &&
+      window.location.pathname.replace(/\/$/, '') === target.pathname.replace(/\/$/, '');
+  } catch(e) {
+    return false;
+  }
+}
+
+function newBrowserRequestId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID().toLowerCase();
+  }
+  const bytes = new Uint8Array(16);
+  window.crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  const hex = Array.from(bytes).map(function(value) { return value.toString(16).padStart(2, '0'); }).join('');
+  return hex.slice(0,8) + '-' + hex.slice(8,12) + '-' + hex.slice(12,16) + '-' +
+    hex.slice(16,20) + '-' + hex.slice(20);
+}
+
+async function chatApi(path, options) {
+  const settings = options || {};
+  const method = settings.method || 'GET';
+  const headers = {'Content-Type': 'application/json'};
+  if (!/^(GET|HEAD)$/i.test(method) && state.chatCsrf) headers['X-CSRF-Token'] = state.chatCsrf;
+  const response = await fetch(CHAT_API_BASE + path, {
+    method: method,
+    credentials: 'same-origin',
+    cache: 'no-store',
+    headers: headers,
+    body: settings.body === undefined ? undefined : JSON.stringify(settings.body)
+  });
+  let data = {};
+  try { data = await response.json(); } catch(e) {}
+  if (!response.ok || data.ok === false) {
+    const error = new Error(data.error || ('Messenger error (' + response.status + ')'));
+    error.status = response.status;
+    error.data = data;
+    if (response.status === 401 || response.status === 403) {
+      state.chatAuthenticated = false;
+      state.chatCsrf = '';
+      updateMessengerSessionButton();
+    }
+    throw error;
+  }
+  return data;
+}
+
+function updateMessengerSessionButton() {
+  const button = document.getElementById('messengerSessionButton');
+  if (!button) return;
+  if (!integratedMessengerAvailable()) {
+    button.textContent = 'MESSENGER: SOKAFY';
+    button.classList.remove('ready');
+    return;
+  }
+  button.textContent = state.chatAuthenticated ? 'MESSENGER: VONONA ✓' : 'MESSENGER: HIDITRA';
+  button.classList.toggle('ready', state.chatAuthenticated);
+}
+
+async function initializeMessengerSession() {
+  updateMessengerSessionButton();
+  if (!integratedMessengerAvailable()) return false;
+  try {
+    const data = await chatApi('/session');
+    state.chatAuthenticated = data.authenticated === true;
+    state.chatCsrf = state.chatAuthenticated ? String(data.csrf || '') : '';
+  } catch(e) {
+    state.chatAuthenticated = false;
+    state.chatCsrf = '';
+  }
+  updateMessengerSessionButton();
+  if (state.chatAuthenticated) scheduleMessengerCardStatusLoad(true);
+  return state.chatAuthenticated;
+}
+
+function requestMessengerLogin(pendingAction) {
+  if (!integratedMessengerAvailable()) {
+    window.location.href = INTEGRATED_DELIVERY_URL;
+    return;
+  }
+  if (typeof pendingAction === 'function') state.chatPendingAction = pendingAction;
+  if (state.chatAuthenticated) {
+    const action = state.chatPendingAction;
+    state.chatPendingAction = null;
+    if (action) action();
+    else scheduleMessengerCardStatusLoad(true);
+    return;
+  }
+  const container = document.getElementById('modalContainer');
+  container.innerHTML = '<div class="modal-backdrop"><div class="modal">' +
+    '<h3>HIDITRA MESSENGER — INDRAY MANDEHA</h3>' +
+    '<p class="chat-login-help">Ampidiro ny kaonty mpiasa Luna Shop. Tsy tehirizina eto ny mot de passe.</p>' +
+    '<label class="sms-message-label" for="chatLoginUsername">ANARAN’NY MPIASA</label>' +
+    '<input id="chatLoginUsername" autocomplete="username" autocapitalize="none">' +
+    '<label class="sms-message-label" for="chatLoginPassword">MOT DE PASSE</label>' +
+    '<input id="chatLoginPassword" type="password" autocomplete="current-password">' +
+    '<div id="chatLoginError" class="delivery-step-status error"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn-modal-cancel" onclick="closeModal();state.chatPendingAction=null">HANAKATONA</button>' +
+      '<button type="button" class="btn-confirm" id="chatLoginSubmit" onclick="submitMessengerLogin()">HIDITRA</button>' +
+    '</div></div></div>';
+  setTimeout(function() {
+    const username = document.getElementById('chatLoginUsername');
+    if (username) username.focus();
+  }, 0);
+}
+
+async function submitMessengerLogin() {
+  const username = document.getElementById('chatLoginUsername');
+  const password = document.getElementById('chatLoginPassword');
+  const submit = document.getElementById('chatLoginSubmit');
+  const errorBox = document.getElementById('chatLoginError');
+  if (!username || !password || !submit) return;
+  if (!username.value.trim() || !password.value) {
+    errorBox.textContent = 'Fenoy ny anarana sy mot de passe.';
+    return;
+  }
+  submit.disabled = true;
+  submit.textContent = 'MIDITRA…';
+  errorBox.textContent = '';
+  try {
+    const data = await chatApi('/login', {
+      method: 'POST',
+      body: {username: username.value.trim(), password: password.value}
+    });
+    state.chatAuthenticated = true;
+    state.chatCsrf = String(data.csrf || '');
+    updateMessengerSessionButton();
+    const action = state.chatPendingAction;
+    state.chatPendingAction = null;
+    closeModal();
+    scheduleMessengerCardStatusLoad(true);
+    if (action) action();
+  } catch(error) {
+    errorBox.textContent = 'TSY METY NY FIDIRANA — hamarino ny anarana sy mot de passe.';
+    submit.disabled = false;
+    submit.textContent = 'HIDITRA';
+  }
+}
+
+function showChatBusy(title, message) {
+  hideChatBusy();
+  const overlay = document.createElement('div');
+  overlay.className = 'chat-busy-overlay';
+  overlay.id = 'chatBusyOverlay';
+  overlay.innerHTML = '<div class="chat-busy-card"><span class="spinner"></span>' +
+    '<strong>' + escHtml(title) + '</strong><p>' + escHtml(message || 'Aza akatona ity pejy ity.') + '</p></div>';
+  document.body.appendChild(overlay);
+}
+
+function hideChatBusy() {
+  const overlay = document.getElementById('chatBusyOverlay');
+  if (overlay) overlay.remove();
+}
+
+function remindersArrayToMap(items) {
+  const result = {};
+  (Array.isArray(items) ? items : []).forEach(function(item) {
+    if (item && DELIVERY_REMINDER_KEYS.indexOf(item.key) >= 0) result[item.key] = item;
+  });
+  return result;
+}
+
+function scheduleMessengerCardStatusLoad(force) {
+  if (!state.chatAuthenticated || !integratedMessengerAvailable()) return;
+  if (!force && Date.now() - state.chatStatusLoadedAt < 45000) return;
+  if (state.chatStatusTimer) clearTimeout(state.chatStatusTimer);
+  state.chatStatusTimer = setTimeout(function() { loadMessengerCardStatuses(force); }, 120);
+}
+
+async function loadMessengerCardStatuses(force) {
+  if (!state.chatAuthenticated || state.chatStatusLoading) return;
+  if (!force && Date.now() - state.chatStatusLoadedAt < 45000) return;
+  const keys = state.orders.map(memoKeyForOrder).filter(function(value, index, list) {
+    return /^[A-Za-z0-9_-]{1,180}$/.test(value) && list.indexOf(value) === index;
+  }).slice(0, 80);
+  if (!keys.length) return;
+  state.chatStatusLoading = true;
+  try {
+    const data = await chatApi('/card-status?activity=1&order_keys=' + encodeURIComponent(keys.join(',')));
+    state.chatCardStatuses = Object.assign({}, state.chatCardStatuses, data.statuses || {});
+    state.chatStatusLoadedAt = Date.now();
+    renderOrders();
+  } catch(error) {
+    if (error.status === 401 || error.status === 403) updateMessengerSessionButton();
+  } finally {
+    state.chatStatusLoading = false;
+  }
+}
+
+function toggleReminderPanel(iid, channel) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  if (!order) return;
+  const key = memoKeyForOrder(order);
+  const current = state.reminderPanels[key] || '';
+  state.reminderPanels[key] = current === channel ? '' : channel;
+  renderOrders();
+}
+
+function localChatMessage(orderKey) {
+  return state.chatActionMessages[orderKey] || null;
+}
+
+function setLocalChatMessage(orderKey, text, type) {
+  state.chatActionMessages[orderKey] = {text: text, type: type || ''};
+}
+
+function messengerReminderState(orderKey, reminderKey) {
+  const status = state.chatCardStatuses[orderKey] || {};
+  const reminders = status.reminders || {};
+  return reminders[reminderKey] || {};
+}
+
+function smsReminderState(orderKey, reminderKey) {
+  return (((state.smsReminderActivity || {})[orderKey] || {})[reminderKey]) || {};
+}
+
+function reminderStepHtml(order, channel, index) {
+  const orderKey = memoKeyForOrder(order);
+  const reminderKey = DELIVERY_REMINDER_KEYS[index];
+  const stateValue = channel === 'messenger'
+    ? messengerReminderState(orderKey, reminderKey)
+    : smsReminderState(orderKey, reminderKey);
+  const status = String(stateValue.status || 'not_sent');
+  let previousComplete = true;
+  if (index > 0) {
+    const previousKey = DELIVERY_REMINDER_KEYS[index - 1];
+    const previous = channel === 'messenger'
+      ? messengerReminderState(orderKey, previousKey)
+      : smsReminderState(orderKey, previousKey);
+    previousComplete = channel === 'messenger'
+      ? previous.status === 'sent'
+      : previous.status === 'opened';
+  }
+  let className = previousComplete ? 'ready' : 'locked';
+  let statusText = previousComplete ? 'TSINDRIO HALEFA' : 'MIANDRY NY DINGANA ' + index;
+  let disabled = !previousComplete;
+  if (status === 'sent') {
+    className = 'success'; statusText = 'META NANEKENA ✓'; disabled = true;
+  } else if (status === 'sending') {
+    className = 'loading'; statusText = 'MANDEFA…'; disabled = true;
+  } else if (status === 'uncertain') {
+    className = 'failed'; statusText = 'HAMARINO MESSENGER'; disabled = true;
+  } else if (status === 'rejected') {
+    className = 'failed'; statusText = 'TSY LASA — AVERENO'; disabled = false;
+  } else if (status === 'opened') {
+    className = 'opened'; statusText = 'NOSOKAFANA — HAMARINO SEND'; disabled = true;
+  }
+  const click = channel === 'messenger'
+    ? 'sendMessengerReminder(this.getAttribute(\'data-order-iid\'),' + index + ')'
+    : 'launchSmsReminderStep(this.getAttribute(\'data-order-iid\'),' + index + ')';
+  return '<button type="button" class="delivery-step ' + className + '" data-order-iid="' +
+    escHtml(order.iid) + '" onclick="' + click + '"' + (disabled ? ' disabled' : '') + '>' +
+    'DINGANA ' + (index + 1) + '<small>' + escHtml(DELIVERY_REMINDER_SHORT[index]) + '</small>' +
+    '<small>' + escHtml(statusText) + '</small></button>';
+}
+
+function renderDeliveryContactHub(order) {
+  const orderKey = memoKeyForOrder(order);
+  const status = state.chatCardStatuses[orderKey] || {};
+  const selected = state.reminderPanels[orderKey] || '';
+  const localMessage = localChatMessage(orderKey);
+  let cue = '<span class="delivery-cue waiting">MESSENGER: TSY MBOLA VOAMARINA</span>';
+  if (status.client_replied_after_reminder) {
+    cue = '<button type="button" class="delivery-cue reply" data-order-iid="' + escHtml(order.iid) +
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">● CLIENT NAMALY — SOKAFY</button>';
+  } else if (Number(status.unread_count || 0) > 0) {
+    cue = '<button type="button" class="delivery-cue unread" data-order-iid="' + escHtml(order.iid) +
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">HAFATRA VAOVAO ' +
+      escHtml(status.unread_count) + ' — SOKAFY</button>';
+  } else if (status.linked && status.last_reminder_sent_at) {
+    cue = '<span class="delivery-cue waiting">MIANDRY VALINY</span>';
+  } else if (status.linked) {
+    cue = '<span class="delivery-cue waiting">CLIENT VOAMARINA ✓</span>';
+  }
+  let steps = '';
+  ['messenger','sms'].forEach(function(channel) {
+    steps += '<div class="delivery-steps' + (selected === channel ? ' open' : '') +
+      '" data-reminder-channel="' + channel + '">' +
+      [0,1,2].map(function(index) { return reminderStepHtml(order, channel, index); }).join('') +
+      '</div>';
+  });
+  return '<div class="delivery-contact-hub" data-contact-order-key="' + escHtml(orderKey) + '">' +
+    '<div class="delivery-contact-head"><span class="delivery-contact-title">RAPPELS LIVRAISON</span>' +
+      '<button type="button" class="delivery-chat-open" data-order-iid="' + escHtml(order.iid) +
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">💬 SOKAFY MESSENGER</button></div>' +
+    '<div class="delivery-contact-cue">' + cue + '</div>' +
+    '<div class="delivery-channel-row">' +
+      '<button type="button" class="delivery-channel messenger' + (selected === 'messenger' ? ' active' : '') +
+      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'messenger\')">MESSENGER — 3 DINGANA</button>' +
+      '<button type="button" class="delivery-channel sms' + (selected === 'sms' ? ' active' : '') +
+      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'sms\')">MESSAGE SMS — 3 DINGANA</button>' +
+    '</div>' + steps +
+    '<div class="delivery-step-status' + (localMessage ? ' ' + escHtml(localMessage.type) : '') + '">' +
+      escHtml(localMessage ? localMessage.text : '') + '</div></div>';
+}
+
+async function ensureMessengerConversation(order) {
+  const orderKey = memoKeyForOrder(order);
+  const current = state.chatCardStatuses[orderKey] || {};
+  if (current.linked && current.conversation_link) return current;
+  showChatBusy('MIKAROKA NY CLIENT AO AMIN’NY MESSENGER…', 'Ny numéro no porofo lehibe indrindra. Mety haharitra segondra vitsivitsy.');
+  try {
+    const data = await chatApi('/quick-link', {method: 'POST', body: {order_key: orderKey}});
+    const next = Object.assign({}, current, {
+      linked: true,
+      conversation_link: data.conversation_link || '',
+      participant_name: data.participant_name || '',
+      reminders: remindersArrayToMap(data.reminders)
+    });
+    state.chatCardStatuses[orderKey] = next;
+    setLocalChatMessage(orderKey, 'CLIENT MESSENGER VOAMARINA ✓', 'success');
+    renderOrders();
+    return next;
+  } finally {
+    hideChatBusy();
+  }
+}
+
+function openMessengerChat(iid) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  if (!order) return;
+  if (!state.chatAuthenticated) {
+    requestMessengerLogin(function() { openMessengerChat(iid); });
+    return;
+  }
+  const orderKey = memoKeyForOrder(order);
+  const current = state.chatCardStatuses[orderKey] || {};
+  if (current.linked && /^https:\/\//.test(current.conversation_link || '')) {
+    window.open(current.conversation_link, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const popup = window.open('about:blank', 'lunaMessengerChat');
+  if (popup) {
+    try { popup.document.body.innerHTML = '<p style="font-family:sans-serif;padding:24px">MIKAROKA NY CONVERSATION…</p>'; } catch(e) {}
+  }
+  ensureMessengerConversation(order).then(function(linked) {
+    if (!linked.conversation_link) throw new Error('Conversation link unavailable');
+    if (popup) popup.location.href = linked.conversation_link;
+    else window.location.href = linked.conversation_link;
+  }).catch(function(error) {
+    if (popup) popup.close();
+    const manualUrl = error.data && error.data.manual_url;
+    setLocalChatMessage(orderKey, 'TSY HITA HO AZY — SOKAFY NY FANAMARINANA MESSENGER', 'error');
+    renderOrders();
+    if (manualUrl && window.confirm('Tsy afaka nanamarina ho azy. Sokafana ve ny fanamarinana Messenger?')) {
+      window.open(manualUrl, '_blank', 'noopener,noreferrer');
+    }
+  });
+}
+
+async function sendMessengerReminder(iid, index) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  const reminderKey = DELIVERY_REMINDER_KEYS[Number(index)];
+  if (!order || !reminderKey) return;
+  if (!state.chatAuthenticated) {
+    requestMessengerLogin(function() { sendMessengerReminder(iid, index); });
+    return;
+  }
+  const orderKey = memoKeyForOrder(order);
+  const currentReminder = messengerReminderState(orderKey, reminderKey);
+  if (['sent','sending','uncertain'].indexOf(currentReminder.status) >= 0) return;
+  const status = state.chatCardStatuses[orderKey] || {reminders: {}};
+  status.reminders = Object.assign({}, status.reminders || {});
+  status.reminders[reminderKey] = {status: 'sending'};
+  state.chatCardStatuses[orderKey] = status;
+  setLocalChatMessage(orderKey, 'MANDEFA NY DINGANA ' + (Number(index) + 1) + '…', '');
+  renderOrders();
+  try {
+    await ensureMessengerConversation(order);
+    const data = await chatApi('/reminder/send', {
+      method: 'POST',
+      body: {order_key: orderKey, reminder_key: reminderKey, request_id: newBrowserRequestId()}
+    });
+    state.chatCardStatuses[orderKey].reminders = remindersArrayToMap(data.reminders);
+    setLocalChatMessage(orderKey, 'DINGANA ' + (Number(index) + 1) + ' — META NANEKENA NY HAFATRA ✓', 'success');
+    state.chatStatusLoadedAt = 0;
+    renderOrders();
+    scheduleMessengerCardStatusLoad(true);
+  } catch(error) {
+    const latest = state.chatCardStatuses[orderKey] || {reminders: {}};
+    latest.reminders = Object.assign({}, latest.reminders || {});
+    latest.reminders[reminderKey] = {status: 'rejected'};
+    state.chatCardStatuses[orderKey] = latest;
+    setLocalChatMessage(orderKey, 'TSY LASA NY DINGANA ' + (Number(index) + 1) + ' — ' + error.message, 'error');
+    hideChatBusy();
+    renderOrders();
+  }
+}
+
+function launchSmsReminderStep(iid, index) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  const template = SMS_REMINDER_TEMPLATES[Number(index)];
+  if (!order || !template) return;
+  const orderKey = memoKeyForOrder(order);
+  if (Number(index) > 0) {
+    const previous = smsReminderState(orderKey, DELIVERY_REMINDER_KEYS[Number(index) - 1]);
+    if (previous.status !== 'opened') {
+      setLocalChatMessage(orderKey, 'ALEFASO ALOHA NY DINGANA ' + Number(index) + '.', 'error');
+      renderOrders();
+      return;
+    }
+  }
+  const phone = cleanPhone(order.phone);
+  const appleMobile = isAppleMobileDevice(navigator.userAgent, navigator.platform, navigator.maxTouchPoints);
+  const url = buildSmsComposeUrl(phone, template.text, appleMobile);
+  if (!url) {
+    setLocalChatMessage(orderKey, 'TSY METY NY NUMÉRO — TSY AFAKA MANOKATRA MESSAGE.', 'error');
+    renderOrders();
+    return;
+  }
+  if (!state.smsReminderActivity[orderKey]) state.smsReminderActivity[orderKey] = {};
+  const localRecord = {status: 'opened', opened_at: new Date().toISOString(), opened_ms: Date.now()};
+  state.smsReminderActivity[orderKey][template.key] = localRecord;
+  setLocalChatMessage(orderKey, 'DINGANA ' + (Number(index) + 1) + ' NOSOKAFANA — HAMARINO DIA TSINDRIO SEND.', 'success');
+  API.recordSmsReminderOpened(orderKey, template.key).catch(function() {
+    setLocalChatMessage(orderKey, 'NOSOKAFANA NY MESSAGE FA TSY VOATAHIRY NY STATUS.', 'error');
+  });
+  if (appleMobile) copySmsFallbackNow(template.text);
+  renderOrders();
+  window.location.href = url;
+}
+
 function buildOrderClipboardText(order) {
   if (!order) return '';
   const parts = ['M'];
@@ -2972,6 +3516,7 @@ async function removeSelectedMemoPreset() {
     const memoData = await API.getWebMemoData({force: true});
     state.memoPresets = memoData.presets || [];
     state.orderMemos = memoData.memos || state.orderMemos;
+    state.smsReminderActivity = memoData.smsActivity || state.smsReminderActivity;
     openOrderMemo(iid);
     showToast(T('memo_preset_removed'));
   } catch (error) {
@@ -3884,6 +4429,30 @@ function memoKeyForOrder(order) {
   return 'desktop_' + iid.replace(/[^A-Za-z0-9_-]/g, '_');
 }
 
+function normalizeSmsReminderActivity(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  const allowed = new Set(['driver_arrived','driver_waiting','delivery_confirmation']);
+  const result = {};
+  Object.keys(source).forEach(function(orderKey) {
+    if (!/^[A-Za-z0-9_-]{1,180}$/.test(orderKey)) return;
+    const steps = source[orderKey];
+    if (!steps || typeof steps !== 'object') return;
+    const cleanSteps = {};
+    Object.keys(steps).forEach(function(stepKey) {
+      const value = steps[stepKey];
+      if (!allowed.has(stepKey) || !value || typeof value !== 'object') return;
+      if (value.status !== 'opened') return;
+      cleanSteps[stepKey] = {
+        status: 'opened',
+        opened_at: String(value.opened_at || '').slice(0, 120),
+        opened_ms: Math.max(0, Number(value.opened_ms) || 0)
+      };
+    });
+    if (Object.keys(cleanSteps).length) result[orderKey] = cleanSteps;
+  });
+  return result;
+}
+
 const CUSTOMER_CHAT_PORTAL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/customer-chat';
 
 function customerConversationUrl(order) {
@@ -3931,7 +4500,11 @@ async function loadOrders(options) {
       API.getOrders(state.currentDate, '', ''),
       API.getWebMemoData({force: force}).catch(function(error) {
         console.warn('load web memos error:', error);
-        return {memos: state.orderMemos || {}, presets: state.memoPresets || []};
+        return {
+          memos: state.orderMemos || {},
+          presets: state.memoPresets || [],
+          smsActivity: state.smsReminderActivity || {}
+        };
       })
     ]);
     if (reqId !== _ordersReqId) return; // Stale response, discard
@@ -3939,8 +4512,10 @@ async function loadOrders(options) {
     const memoData = results[1] || {};
     state.orderMemos = memoData.memos || {};
     state.memoPresets = memoData.presets || [];
+    state.smsReminderActivity = memoData.smsActivity || {};
     const nextOrders = applyOrderMemos(data.orders || [], state.orderMemos);
-    const signature = state.currentDate + '|' + JSON.stringify(nextOrders) + '|' + JSON.stringify(state.memoPresets);
+    const signature = state.currentDate + '|' + JSON.stringify(nextOrders) + '|' +
+      JSON.stringify(state.memoPresets) + '|' + JSON.stringify(state.smsReminderActivity);
     if (signature !== state.ordersSignature) {
       state.orders = nextOrders;
       state.ordersSignature = signature;
@@ -4779,7 +5354,6 @@ function renderOrders() {
     const sc = statusClass(o.status);
     const pc = paymentClass(o.payment_method);
     const phoneClean = cleanPhone(o.phone);
-    const conversationUrl = customerConversationUrl(o);
     const isSelected = state.selectedOrders.has(o.iid);
     const pageInfo = resolvePageForOrder(o);
     const resolvedPage = pageInfo ? pageInfo.name : (o.resolved_page || o.page || '');
@@ -4863,6 +5437,8 @@ function renderOrders() {
 
     html += '</div>'; // card-body
 
+    html += renderDeliveryContactHub(o);
+
     html += '<div class="card-footer">' +
       '<select onchange="changeStatus(\'' + escHtml(o.iid) + '\',this.value,this)" title="Change status">';
     statuses.forEach(s => {
@@ -4871,9 +5447,7 @@ function renderOrders() {
     html += '</select>' +
       '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' +
       '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' +
-      (conversationUrl ? '<a class="btn-sm btn-chat" href="' + escHtml(conversationUrl) + '" target="_blank" rel="noopener noreferrer">&#128172; ' + escHtml(T('messenger')) + '</a>' : '') +
       '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
-      '<button type="button" class="btn-sm btn-sms" data-sms-iid="' + escHtml(o.iid) + '" onclick="openSmsTemplates(this.getAttribute(\'data-sms-iid\'))">' + escHtml(T('sms')) + '</button>' +
       '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
     '</div>'; // card-footer
 
@@ -4883,6 +5457,7 @@ function renderOrders() {
   container.innerHTML = html;
   updateSelectionBar();
   updateSortButtons();
+  scheduleMessengerCardStatusLoad(false);
 }
 
 /* ═════════════════════════════════════════════════════════════════════
@@ -6335,7 +6910,8 @@ async function init() {
   await Promise.allSettled([
     loadReferenceData({force: true}),
     loadOrders(),
-    refreshHistoryState()
+    refreshHistoryState(),
+    initializeMessengerSession()
   ]);
 
   // Try to get today's date from server
@@ -6357,6 +6933,11 @@ async function init() {
   startReferenceRefresh();
   startReferenceFocusRefresh();
   startInstantSync();
+  if (!state.chatRefreshTimer) {
+    state.chatRefreshTimer = setInterval(function() {
+      if (state.activeTab === 'orders' && state.chatAuthenticated) loadMessengerCardStatuses(true);
+    }, 60000);
+  }
   applyLanguage();
   if (initialParams.get('routeAgent') || initialParams.get('tab') === 'routes') switchTab('routes');
 }
