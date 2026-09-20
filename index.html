@@ -449,6 +449,24 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .memo-check input{width:auto!important;margin:1px 0 0!important}
 .modal-actions .btn-memo-remove{margin-right:auto;background:#ffebee;color:#b42318}
 
+.sms-modal{max-width:590px;max-height:92vh;overflow:auto}
+.sms-order-summary{
+  margin:-3px 0 14px;padding:10px 12px;border-radius:10px;
+  background:#eef5ff;color:#174ea6;font-size:.82rem;line-height:1.45;
+}
+.sms-template-list{display:grid;gap:8px;margin-bottom:13px}
+.sms-template-option{
+  width:100%;border:1.5px solid #dfe4ea;border-radius:11px;background:#fff;
+  padding:10px 12px;text-align:left;color:#344054;transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.sms-template-option:hover{border-color:#8ea2ff;background:#f8f9ff}
+.sms-template-option.active{border-color:#667eea;background:#eef1ff;box-shadow:0 0 0 2px rgba(102,126,234,.12)}
+.sms-template-title{display:block;font-size:.78rem;font-weight:800;color:#4d5fc4;margin-bottom:5px}
+.sms-template-text{display:block;font-size:.78rem;line-height:1.4;white-space:pre-wrap}
+.sms-message-label{display:block;margin:0 0 5px;font-size:.78rem;font-weight:800;color:#475467}
+.sms-device-note{margin:-4px 0 13px;color:#667085;font-size:.72rem;line-height:1.4}
+.modal-actions .btn-sms-open{background:#1565c0;color:#fff;text-transform:uppercase;font-weight:800}
+
 .duplicate-modal{max-width:980px;max-height:92vh;overflow:auto;padding:0}
 .duplicate-head{padding:22px 24px 16px;border-bottom:1px solid #e8ecf2}
 .duplicate-head h3{margin:0 0 6px;font-size:1.25rem;color:#9a4d00;text-transform:uppercase;letter-spacing:.025em}
@@ -907,7 +925,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-document.documentElement.dataset.lunaBuild = '20260920-mg-duplicate-prompts';
+document.documentElement.dataset.lunaBuild = '20260920-sms-reminder-templates';
 /* ═════════════════════════════════════════════════════════════════════
    i18n – LANGUAGE SYSTEM
    ═════════════════════════════════════════════════════════════════════ */
@@ -2545,6 +2563,123 @@ async function copyTextToClipboard(text) {
   }
   ta.remove();
   return ok;
+}
+
+const SMS_REMINDER_TEMPLATES = [
+  {
+    key: 'driver_arrived',
+    label: '1 · Efa tonga ny livreur',
+    text: 'Salama tompoko, Luna Shop ihany, efa eny ilay livreur hanatitra ny ensemble anao fa mba raiso ny appelny azafady'
+  },
+  {
+    key: 'driver_waiting',
+    label: '2 · Mbola miandry ny livreur',
+    text: 'Mbola bedebe ny livraison ataony tmpoko fa efa elabe izy miandry anao eo, mba raiso ny appelny azafady'
+  },
+  {
+    key: 'delivery_confirmation',
+    label: '3 · Mila fanamafisana',
+    text: 'tsy mbola noraisinao foana ny appelny ilay livreur tompoko. Mba hamafiso azafady raha mbola horaisinao ilay entana. Raha tsy horaisinao intsony dia ampahafantaro anay eto mba handaminanay ny fiverenan’ilay entana sy ny frais de livraison. Miandry ny valinteninao izahay tompoko alohan ny handrasianay fepetra manokana.'
+  }
+];
+
+function isAppleMobileDevice(userAgent, platform, maxTouchPoints) {
+  const ua = String(userAgent || '');
+  const devicePlatform = String(platform || '');
+  return /iPad|iPhone|iPod/i.test(ua) ||
+    (devicePlatform === 'MacIntel' && Number(maxTouchPoints || 0) > 1);
+}
+
+function buildSmsComposeUrl(phone, message, appleMobile) {
+  const recipient = String(phone || '').replace(/[^0-9+]/g, '');
+  if (!recipient) return '';
+  const separator = appleMobile ? '&' : '?';
+  return 'sms:' + recipient + separator + 'body=' + encodeURIComponent(String(message || ''));
+}
+
+function selectSmsTemplate(index) {
+  const template = SMS_REMINDER_TEMPLATES[Number(index)];
+  const textarea = document.getElementById('smsMessageText');
+  if (!template || !textarea) return;
+  textarea.value = template.text;
+  document.querySelectorAll('.sms-template-option').forEach(function(button) {
+    button.classList.toggle('active', Number(button.getAttribute('data-template-index')) === Number(index));
+  });
+  textarea.focus();
+  textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+}
+
+function openSmsTemplates(iid) {
+  const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
+  if (!order) {
+    showToast(T('order_not_found'), 'error');
+    return;
+  }
+  const phone = cleanPhone(order.phone);
+  if (!phone) {
+    showToast(duplicateUiText('Tsy misy numéro azo ampiasaina.', 'No usable phone number.'), 'error');
+    return;
+  }
+
+  const templateHtml = SMS_REMINDER_TEMPLATES.map(function(template, index) {
+    return '<button type="button" class="sms-template-option' + (index === 0 ? ' active' : '') + '" ' +
+      'data-template-index="' + index + '" onclick="selectSmsTemplate(' + index + ')">' +
+      '<span class="sms-template-title">' + escHtml(template.label) + '</span>' +
+      '<span class="sms-template-text">' + escHtml(template.text) + '</span></button>';
+  }).join('');
+
+  const container = document.getElementById('modalContainer');
+  container.innerHTML = '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()">' +
+    '<div class="modal sms-modal" data-sms-phone="' + escHtml(phone) + '">' +
+      '<h3>HAFATRA SMS</h3>' +
+      '<div class="sms-order-summary"><strong>' + escHtml(order.client_name || '-') + '</strong><br>' +
+        escHtml(formatPhone(phone)) + '</div>' +
+      '<div class="sms-template-list">' + templateHtml + '</div>' +
+      '<label class="sms-message-label" for="smsMessageText">HAFATRA HALEFA — AZO OVANA RAHA ILAINA</label>' +
+      '<textarea id="smsMessageText" spellcheck="true">' + escHtml(SMS_REMINDER_TEMPLATES[0].text) + '</textarea>' +
+      '<div class="sms-device-note">Hisokatra ny application Message. Hamarino ilay hafatra, dia tsindrio SEND. Raha tsy miseho amin’ny iPhone ilay soratra dia efa nadika izy ka azo atao PASTE.</div>' +
+      '<div class="modal-actions">' +
+        '<button type="button" class="btn-modal-cancel" onclick="closeModal()">HANAKATONA</button>' +
+        '<button type="button" class="btn-sms-open" onclick="launchSelectedSms()">SOKAFY NY MESSAGE</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function copySmsFallbackNow(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = String(text || '');
+  textarea.setAttribute('readonly', 'readonly');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  textarea.remove();
+}
+
+function launchSelectedSms() {
+  const modal = document.querySelector('.sms-modal');
+  const textarea = document.getElementById('smsMessageText');
+  if (!modal || !textarea) return;
+  const message = String(textarea.value || '').trim();
+  if (!message) {
+    showToast(duplicateUiText('Soraty aloha ny hafatra.', 'Enter a message first.'), 'error');
+    textarea.focus();
+    return;
+  }
+  const appleMobile = isAppleMobileDevice(
+    navigator.userAgent,
+    navigator.platform,
+    navigator.maxTouchPoints
+  );
+  const url = buildSmsComposeUrl(modal.getAttribute('data-sms-phone'), message, appleMobile);
+  if (!url) {
+    showToast(duplicateUiText('Tsy mety ilay numéro.', 'Invalid phone number.'), 'error');
+    return;
+  }
+  if (appleMobile) copySmsFallbackNow(message);
+  window.location.href = url;
 }
 
 function buildOrderClipboardText(order) {
@@ -4738,7 +4873,7 @@ function renderOrders() {
       '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' +
       (conversationUrl ? '<a class="btn-sm btn-chat" href="' + escHtml(conversationUrl) + '" target="_blank" rel="noopener noreferrer">&#128172; ' + escHtml(T('messenger')) + '</a>' : '') +
       '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
-      '<a class="btn-sm btn-sms" href="sms:' + escHtml(phoneClean) + '">' + escHtml(T('sms')) + '</a>' +
+      '<button type="button" class="btn-sm btn-sms" data-sms-iid="' + escHtml(o.iid) + '" onclick="openSmsTemplates(this.getAttribute(\'data-sms-iid\'))">' + escHtml(T('sms')) + '</button>' +
       '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
     '</div>'; // card-footer
 
