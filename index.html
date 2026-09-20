@@ -465,6 +465,12 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .duplicate-field strong{color:#263238;overflow-wrap:anywhere}
 .duplicate-field.match{background:#f0fdf4}
 .duplicate-help{padding:0 24px 12px;color:#667085;font-size:.78rem;line-height:1.4}
+.duplicate-chat-note{margin:0 24px 12px;padding:10px 12px;border-radius:10px;background:#eef5ff;color:#174ea6;font-size:.8rem;line-height:1.4}
+.duplicate-chat-link{display:inline-block;margin-top:7px;padding:8px 11px;border-radius:8px;background:#174ea6;color:#fff;text-decoration:none;font-weight:700}
+.duplicate-chat-link:hover{background:#103f89}
+.duplicate-block-alert{margin:14px 24px 0;padding:13px;border-radius:10px;background:#ffebee;color:#9b1c1c;font-size:.88rem;font-weight:700;line-height:1.45}
+.duplicate-block-actions{padding:14px 24px 22px;border-top:1px solid #e8ecf2;text-align:right}
+.duplicate-block-actions button{border:0;border-radius:10px;padding:11px 16px;background:#344054;color:#fff;font-weight:700;cursor:pointer}
 .duplicate-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:14px 24px 22px;border-top:1px solid #e8ecf2}
 .duplicate-actions button{border:0;border-radius:10px;padding:11px 8px;font-size:.78rem;font-weight:700;line-height:1.3;cursor:pointer}
 .duplicate-keep-old{background:#eef1f5;color:#344054}
@@ -758,7 +764,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 
       <div class="form-group">
         <label>T&eacute;l&eacute;phone *</label>
-        <input type="tel" id="fPhone" required placeholder="034 12 345 67" onblur="this.value=formatPhone(this.value)">
+        <input type="tel" id="fPhone" required inputmode="tel" autocomplete="tel" placeholder="034 12 345 67" onblur="this.value=formatPhone(this.value)" aria-describedby="phoneHelp">
+        <div class="hint" id="phoneHelp">Points, espaces et tirets accept&eacute;s. Plusieurs num&eacute;ros&nbsp;: s&eacute;parez-les avec /.</div>
       </div>
 
       <div class="form-group">
@@ -1634,15 +1641,18 @@ const API = {
     return this.getFirebaseOrdersRange(candidate.delivery_date, DUPLICATE_LOOKBACK_DAYS)
       .catch(() => this.getFirebaseOrders())
       .then((orders) => {
-        const duplicates = findDuplicateOrderMatches(candidate, orders, excludeIid);
+        const matches = findDuplicateOrderMatches(candidate, orders, excludeIid);
+        const partitioned = partitionDuplicateMatches(matches);
         return {
-          duplicates: duplicates,
-          count: duplicates.length,
+          duplicates: partitioned.reviewable,
+          blocked_duplicates: partitioned.blocked,
+          count: matches.length,
           policy: {
             lookback_days: DUPLICATE_LOOKBACK_DAYS,
             minimum_score: DUPLICATE_MIN_SCORE,
             primary_key: 'normalized_phone',
-            automatic_block: false
+            automatic_block: true,
+            same_day_rule: 'same_delivery_date_and_phone'
           }
         };
       });
@@ -1938,10 +1948,16 @@ function duplicateNormalizedText(value) {
 
 function duplicatePhoneKeys(value) {
   const keys = new Set();
-  String(value || '').split(/[\/,;\n]+/).forEach(function(part) {
-    let digits = part.replace(/\D/g, '');
-    if (digits.indexOf('00') === 0) digits = digits.slice(2);
-    if (digits.length >= 9) keys.add(digits.slice(-9));
+  splitPhoneParts(value).forEach(function(part) {
+    const normalized = normalizeMalagasyPhone(part);
+    if (normalized) {
+      keys.add(normalized.slice(1));
+      return;
+    }
+    // Preserve advisory duplicate detection for old malformed records while
+    // strict form validation prevents new malformed numbers from being saved.
+    const legacyMatches = (String(part).replace(/\D/g, '').match(/0[23]\d{8}/g) || []);
+    legacyMatches.forEach(function(match) { keys.add(match.slice(1)); });
   });
   return keys;
 }
@@ -1975,9 +1991,22 @@ function duplicateStringSimilarity(value1, value2) {
 }
 
 function duplicateDayNumber(value) {
-  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return null;
-  return Math.floor(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) / 86400000);
+  const text = String(value || '').trim();
+  let match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let year;
+  let month;
+  let day;
+  if (match) {
+    year = Number(match[1]); month = Number(match[2]); day = Number(match[3]);
+  } else {
+    match = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    if (!match) return null;
+    day = Number(match[1]); month = Number(match[2]); year = Number(match[3]);
+  }
+  const stamp = Date.UTC(year, month - 1, day);
+  const check = new Date(stamp);
+  if (check.getUTCFullYear() !== year || check.getUTCMonth() !== month - 1 || check.getUTCDate() !== day) return null;
+  return Math.floor(stamp / 86400000);
 }
 
 function duplicateDaysApart(order1, order2) {
@@ -2062,6 +2091,35 @@ function findDuplicateOrderMatches(candidate, orders, excludeIid) {
     return right.score - left.score || Number(right.same_date) - Number(left.same_date);
   });
   return matches;
+}
+
+function partitionDuplicateMatches(matches) {
+  const blocked = [];
+  const reviewable = [];
+  (matches || []).forEach(function(match) {
+    (match && match.same_date ? blocked : reviewable).push(match);
+  });
+  return {blocked: blocked, reviewable: reviewable};
+}
+
+function classifyDuplicatePreview(preview) {
+  const returnedMatches = preview && Array.isArray(preview.duplicates)
+    ? preview.duplicates : [];
+  const clientPartition = partitionDuplicateMatches(returnedMatches);
+  const serverBlocked = preview && Array.isArray(preview.blocked_duplicates)
+    ? preview.blocked_duplicates : [];
+  return {
+    blocked: serverBlocked.concat(clientPartition.blocked),
+    reviewable: clientPartition.reviewable
+  };
+}
+
+function duplicateIdentityChanged(existing, candidate) {
+  if (!existing) return true;
+  const beforePhones = Array.from(duplicatePhoneKeys(existing.phone)).sort().join('|');
+  const afterPhones = Array.from(duplicatePhoneKeys(candidate.phone)).sort().join('|');
+  return beforePhones !== afterPhones ||
+    duplicateDayNumber(existing.delivery_date) !== duplicateDayNumber(candidate.delivery_date);
 }
 
 function formatCurrency(val) {
@@ -2192,23 +2250,60 @@ function capitalizeName(str) {
   }).join(' ');
 }
 
+const PHONE_MULTI_SEPARATOR_RE = /(?:\/|\\|\||,|;|\r?\n)+/;
+
+function splitPhoneParts(value) {
+  const text = String(value || '').trim();
+  if (!text) return [];
+  const explicitParts = text.split(PHONE_MULTI_SEPARATOR_RE).map(function(part) {
+    return part.trim();
+  }).filter(Boolean);
+  if (explicitParts.length > 1) return explicitParts;
+
+  const compact = text.replace(/[\s.\-()+]/g, '');
+  const contiguousPatterns = [
+    {full: /^(?:0[23]\d{8}){2,}$/, item: /0[23]\d{8}/g},
+    {full: /^(?:261[23]\d{8}){2,}$/, item: /261[23]\d{8}/g},
+    {full: /^(?:[23]\d{8}){2,}$/, item: /[23]\d{8}/g}
+  ];
+  for (let index = 0; index < contiguousPatterns.length; index += 1) {
+    const pattern = contiguousPatterns[index];
+    if (pattern.full.test(compact)) return compact.match(pattern.item) || [];
+  }
+  return explicitParts;
+}
+
+function normalizeMalagasyPhone(value) {
+  const part = String(value || '').trim();
+  if (!part || !/^[0-9+\s.\-()]+$/.test(part)) return null;
+  let compact = part.replace(/[\s.\-()]/g, '');
+  const plusCount = (compact.match(/\+/g) || []).length;
+  if (plusCount > 1 || (plusCount === 1 && compact.charAt(0) !== '+')) return null;
+
+  let national;
+  if (compact.indexOf('+261') === 0) {
+    national = compact.slice(4);
+    compact = national.charAt(0) === '0' ? national : '0' + national;
+  } else if (compact.indexOf('00261') === 0) {
+    national = compact.slice(5);
+    compact = national.charAt(0) === '0' ? national : '0' + national;
+  } else if (compact.indexOf('261') === 0) {
+    national = compact.slice(3);
+    compact = national.charAt(0) === '0' ? national : '0' + national;
+  } else if (/^[23]\d{8}$/.test(compact)) {
+    compact = '0' + compact;
+  }
+  return /^0[23]\d{8}$/.test(compact) ? compact : null;
+}
+
 function formatPhone(str) {
   if (!str) return '';
-  var parts = str.split('/');
-  var formatted = [];
-  parts.forEach(function(part) {
-    var clean = part.trim().replace(/[\s\-\(\)]/g, '');
-    // Handle +261 or 261 prefix
-    if (clean.indexOf('+261') === 0) clean = '0' + clean.slice(4);
-    else if (clean.indexOf('261') === 0 && clean.length === 12) clean = '0' + clean.slice(3);
-    // Format 10-digit Madagascar numbers: 034 12 345 67
-    if (clean.length === 10 && clean[0] === '0' && /^\d+$/.test(clean)) {
-      formatted.push(clean.slice(0,3) + ' ' + clean.slice(3,5) + ' ' + clean.slice(5,8) + ' ' + clean.slice(8,10));
-    } else {
-      formatted.push(part.trim());
-    }
-  });
-  return formatted.join(' / ');
+  return splitPhoneParts(str).map(function(part) {
+    const normalized = normalizeMalagasyPhone(part);
+    if (!normalized) return String(part).trim();
+    return normalized.slice(0,3) + ' ' + normalized.slice(3,5) + ' ' +
+      normalized.slice(5,8) + ' ' + normalized.slice(8,10);
+  }).join(' / ');
 }
 
 function statusClass(s) {
@@ -2246,7 +2341,8 @@ function paymentLabel(pm) {
 
 function cleanPhone(ph) {
   if (!ph) return '';
-  return ph.replace(/[^0-9+]/g, '');
+  const first = splitPhoneParts(ph)[0] || '';
+  return normalizeMalagasyPhone(first) || first.replace(/[^0-9+]/g, '');
 }
 
 function pageFontClass(page) {
@@ -5391,10 +5487,65 @@ function duplicateOrderRows(candidate, existing, side) {
   }).join('');
 }
 
-function reviewDuplicateMatches(candidate, matches, isEdit) {
+function duplicateConversationMarkup(existing) {
+  const conversationUrl = customerConversationUrl(existing || {});
+  if (!conversationUrl) return '';
+  return '<div class="duplicate-chat-note">' + escHtml(duplicateUiText(
+    'Le numero est identique : les deux commandes concernent probablement la meme personne et la meme conversation.',
+    'The phone number is identical, so both orders probably belong to the same person and Messenger conversation.'
+  )) + '<br><a class="duplicate-chat-link" href="' + escHtml(conversationUrl) +
+    '" target="duplicateCustomerChat" rel="noopener noreferrer" onclick="window.open(this.href,\'duplicateCustomerChat\',\'popup=yes,width=520,height=760,resizable=yes,scrollbars=yes\');return false;">' +
+    escHtml(duplicateUiText('Ouvrir la conversation commune a cote', 'Open the shared conversation beside this window')) +
+    '</a></div>';
+}
+
+function showSameDayDuplicateBlock(candidate, matches, isEdit) {
   return new Promise(function(resolve) {
     const list = Array.isArray(matches) ? matches.filter(function(item) {
       return item && item.iid && item.order;
+    }) : [];
+    const existing = list.length ? list[0].order : {};
+    const container = document.getElementById('modalContainer');
+    const close = function() {
+      container.innerHTML = '';
+      resolve({proceed: false, blocked: true});
+    };
+    const countText = list.length > 1
+      ? duplicateUiText('Commandes deja enregistrees trouvees : ', 'Existing matching orders found: ') + list.length
+      : duplicateUiText('Une commande est deja enregistree.', 'One order is already saved.');
+
+    container.innerHTML = '<div class="modal-backdrop"><div class="modal duplicate-modal">' +
+      '<div class="duplicate-head"><h3>' + escHtml(duplicateUiText(
+        'Commande bloquee — doublon du meme jour',
+        'Order blocked — same-day duplicate'
+      )) + '</h3><p>' + escHtml(duplicateUiText(
+        isEdit ? 'Vos modifications n ont pas ete enregistrees.' : 'La nouvelle commande n a pas ete enregistree.',
+        isEdit ? 'Your changes were not saved.' : 'The new order was not saved.'
+      )) + '</p></div>' +
+      '<div class="duplicate-block-alert">' + escHtml(duplicateUiText(
+        'Le meme numero a deja une commande pour cette date de livraison. Pour eviter deux preparations ou deux livraisons, ouvrez et modifiez la commande deja enregistree.',
+        'The same phone number already has an order for this delivery date. To prevent double preparation or delivery, open and update the saved order instead.'
+      )) + '<br>' + escHtml(countText) + '</div>' +
+      '<div class="duplicate-compare">' +
+      '<section class="duplicate-card"><h4>' + escHtml(isEdit
+        ? duplicateUiText('MODIFICATIONS BLOQUEES', 'BLOCKED CHANGES')
+        : duplicateUiText('NOUVELLE COMMANDE BLOQUEE', 'BLOCKED NEW ORDER')) + '</h4>' +
+      duplicateOrderRows(candidate, existing, 'new') + '</section>' +
+      '<section class="duplicate-card"><h4>' + escHtml(duplicateUiText(
+        'COMMANDE A MODIFIER', 'SAVED ORDER TO UPDATE'
+      )) + '</h4>' + duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
+      duplicateConversationMarkup(existing) +
+      '<div class="duplicate-block-actions"><button id="duplicateBlockClose">' +
+      escHtml(duplicateUiText('Compris — retour sans enregistrer', 'Understood — return without saving')) +
+      '</button></div></div></div>';
+    document.getElementById('duplicateBlockClose').onclick = close;
+  });
+}
+
+function reviewDuplicateMatches(candidate, matches, isEdit) {
+  return new Promise(function(resolve) {
+    const list = Array.isArray(matches) ? matches.filter(function(item) {
+      return item && item.iid && item.order && !item.same_date;
     }) : [];
     if (!list.length) {
       resolve({proceed: true, reviewed_iids: [], delete_iids: []});
@@ -5427,19 +5578,14 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
       const match = list[index];
       const existing = match.order;
       const days = Number(match.days_apart || 0);
-      const sameDate = match.same_date || days === 0;
-      const title = match.confidence === 'high'
-        ? duplicateUiText('Doublon tres probable', 'Very likely duplicate')
-        : duplicateUiText('Commande similaire trouvee', 'Similar order found');
-      const guidance = sameDate
-        ? duplicateUiText(
-            'Le numero et la date de livraison sont identiques. Il peut s agir d une copie accidentelle.',
-            'The phone number and delivery date match. This may be an accidental copy.'
-          )
-        : duplicateUiText(
-            'Les dates sont espacees de ' + days + ' jour(s). Cela peut etre une vraie nouvelle commande.',
-            'The dates are ' + days + ' day(s) apart. This may be a legitimate repeat order.'
-          );
+      const title = duplicateUiText(
+        'Le meme numero existe sur une ancienne commande',
+        'The same phone appears on an earlier order'
+      );
+      const guidance = duplicateUiText(
+        'Pourquoi cette fenetre apparait : meme numero, mais dates separees de ' + days + ' jour(s). Verifiez la conversation puis decidez si le client a vraiment recommande.',
+        'Why this window appeared: same phone, but the delivery dates are ' + days + ' day(s) apart. Check the conversation, then decide whether the customer really ordered again.'
+      );
       const chips = (match.evidence || []).map(function(item) {
         return '<span class="duplicate-chip">' + escHtml(duplicateEvidenceText(item)) + '</span>';
       }).join('');
@@ -5447,8 +5593,8 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
       container.innerHTML = '<div class="modal-backdrop"><div class="modal duplicate-modal">' +
         '<div class="duplicate-head"><h3>' + escHtml(title) + '</h3>' +
         '<p>' + escHtml(duplicateUiText(
-          'Rien ne sera bloque ou supprime automatiquement. Comparez puis choisissez.',
-          'Nothing is blocked or removed automatically. Compare, then choose.'
+          'Comparez la nouvelle commande a gauche avec la commande enregistree a droite. Aucune suppression ne se fera sans votre choix.',
+          'Compare the new order on the left with the saved order on the right. Nothing will be deleted unless you choose it.'
         )) + '</p></div>' +
         '<div class="duplicate-progress"><span>' +
         escHtml(duplicateUiText('Correspondance', 'Match')) + ' ' + (index + 1) + ' / ' + list.length +
@@ -5464,19 +5610,20 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
         '<section class="duplicate-card"><h4>' +
         escHtml(duplicateUiText('COMMANDE DEJA ENREGISTREE', 'EXISTING SAVED ORDER')) + '</h4>' +
         duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
+        duplicateConversationMarkup(existing) +
         '<div class="duplicate-help">' + escHtml(duplicateUiText(
-          'Gardez les deux si le client a vraiment commande une nouvelle fois. Les options "seulement" retirent l autre version.',
-          'Keep both when the customer truly ordered again. An "only" option removes the other version.'
+          'Regle simple : choisissez LES DEUX seulement si la conversation confirme une nouvelle commande. REMPLACER supprime definitivement l ancienne commande.',
+          'Simple rule: choose BOTH only if the conversation confirms a new order. REPLACE permanently deletes the earlier order.'
         )) + '</div>' +
         '<button class="duplicate-cancel" id="duplicateCancel">' +
-        escHtml(duplicateUiText('Retour au formulaire sans enregistrer', 'Return to the form without saving')) +
+        escHtml(duplicateUiText('Retour sans enregistrer', 'Return without saving')) +
         '</button><div class="duplicate-actions">' +
         '<button class="duplicate-keep-old" id="duplicateKeepOld">' +
-        escHtml(duplicateUiText('Garder EXISTANTE seulement\nNe pas enregistrer la nouvelle', 'Keep EXISTING only\nDo not save the new one')) +
+        escHtml(duplicateUiText('1. ANNULER LA NOUVELLE\nGarder l ancienne', '1. CANCEL THE NEW ONE\nKeep the saved order')) +
         '</button><button class="duplicate-keep-both" id="duplicateKeepBoth">' +
-        escHtml(duplicateUiText('Garder LES DEUX\nVraie nouvelle commande', 'Keep BOTH\nThis is a real repeat order')) +
+        escHtml(duplicateUiText('2. ENREGISTRER LES DEUX\nLe client a recommande', '2. SAVE BOTH ORDERS\nThe customer ordered again')) +
         '</button><button class="duplicate-keep-new" id="duplicateKeepNew">' +
-        escHtml(duplicateUiText('Garder NOUVELLE seulement\nSupprimer l existante', 'Keep NEW only\nRemove the existing one')) +
+        escHtml(duplicateUiText('3. REMPLACER L ANCIENNE\nEnregistrer nouvelle + supprimer ancienne', '3. REPLACE THE OLD ORDER\nSave new + delete old')) +
         '</button></div></div></div>';
 
       document.getElementById('duplicateCancel').onclick = function() {
@@ -5498,10 +5645,21 @@ async function saveOrderWithDuplicateReview(body, editingOrder) {
   const candidate = editingOrder
     ? Object.assign({}, editingOrder, body, {client_name: body.client_name, name: body.client_name})
     : Object.assign({status: 'Pending'}, body);
-  let preview = await API.checkDuplicates(body, iid);
+  let preview = editingOrder && !duplicateIdentityChanged(editingOrder, candidate)
+    ? {duplicates: [], blocked_duplicates: [], count: 0}
+    : await API.checkDuplicates(body, iid);
 
   while (true) {
-    const matches = preview && Array.isArray(preview.duplicates) ? preview.duplicates : [];
+    // Backward compatibility: an already-running older Python process puts
+    // every match in `duplicates`. Reclassify in the browser so same-day
+    // phone matches are still hard-blocked before that process is restarted.
+    const classified = classifyDuplicatePreview(preview);
+    const blocked = classified.blocked;
+    if (blocked.length) {
+      await showSameDayDuplicateBlock(candidate, blocked, !!editingOrder);
+      return {cancelled: true, blocked: true};
+    }
+    const matches = classified.reviewable;
     if (matches.length) {
       const decision = await reviewDuplicateMatches(candidate, matches, !!editingOrder);
       if (!decision.proceed) return {cancelled: true};
@@ -5519,6 +5677,12 @@ async function saveOrderWithDuplicateReview(body, editingOrder) {
         ? await API.updateOrder(iid, body)
         : await API.createOrder(body);
     } catch (error) {
+      if (error.status === 409 && error.data &&
+          error.data.code === 'same_day_duplicate_blocked' &&
+          Array.isArray(error.data.duplicates)) {
+        await showSameDayDuplicateBlock(candidate, error.data.duplicates, !!editingOrder);
+        return {cancelled: true, blocked: true};
+      }
       if (error.status === 409 && error.data &&
           error.data.code === 'duplicate_review_required' &&
           Array.isArray(error.data.duplicates)) {
@@ -5576,13 +5740,16 @@ function showOrderValidation(errors) {
 }
 
 function validateWebPhone(value) {
-  const parts = String(value || '').split(/\s*(?:\/|\\|\||,|;|\r?\n)+\s*/).filter(Boolean);
+  const text = String(value || '').trim();
+  if (!text || !/^[0-9+\s.\-()\/\\|,;]+$/.test(text)) return false;
+  const explicitlySeparated = text.split(PHONE_MULTI_SEPARATOR_RE);
+  if (explicitlySeparated.length > 1 && explicitlySeparated.some(function(part) { return !part.trim(); })) {
+    return false;
+  }
+  const parts = splitPhoneParts(text);
   if (!parts.length) return false;
-  return parts.every(function(part) {
-    const compact = part.replace(/[\s\-().]/g, '');
-    const digits = compact.charAt(0) === '+' ? compact.slice(1) : compact;
-    return /^\d+$/.test(digits) && (digits.length === 10 || (digits.length >= 8 && digits.length <= 15));
-  });
+  const normalized = parts.map(normalizeMalagasyPhone);
+  return normalized.every(Boolean) && new Set(normalized).size === normalized.length;
 }
 
 function validateOrderForm(productResult) {
@@ -5597,7 +5764,7 @@ function validateOrderForm(productResult) {
 
   if (!name) errors.push({field: 'fClientName', message: duplicateUiText('Le nom du client est obligatoire.', 'Client name is required.')});
   if (!phone) errors.push({field: 'fPhone', message: duplicateUiText('Le numéro de téléphone est obligatoire.', 'Phone number is required.')});
-  else if (!validateWebPhone(phone)) errors.push({field: 'fPhone', message: duplicateUiText('Saisissez un numéro valide (10 chiffres localement, ou 8 à 15 chiffres à l’international).', 'Enter a valid phone number (10 local digits, or 8–15 international digits).')});
+  else if (!validateWebPhone(phone)) errors.push({field: 'fPhone', message: duplicateUiText('Chaque numéro doit contenir exactement 10 chiffres et commencer par 02 ou 03. Les points sont acceptés; séparez plusieurs numéros avec /.', 'Each number must contain exactly 10 digits and start with 02 or 03. Dots are accepted; separate multiple numbers with /.')});
   if (!address) errors.push({field: 'fAddress', message: duplicateUiText('L’adresse de livraison est obligatoire.', 'Delivery address is required.')});
 
   (productResult.errors || []).forEach(function(message) {
