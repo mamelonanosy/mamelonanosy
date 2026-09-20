@@ -182,51 +182,42 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .btn-chat:hover{background:#d6e3ff}
 .btn-sm:disabled,.btn-sm.is-disabled{opacity:.55;cursor:not-allowed}
 
-/* Beginner delivery-contact controls: only channel + ordered steps are exposed. */
-.delivery-contact-hub{
-  margin-top:11px;padding:11px;border:1px solid #dfe6f4;border-radius:12px;
-  background:linear-gradient(135deg,#f8faff,#fff);
+/* Compact contact tools: reminders stay secondary until an employee opens them. */
+.delivery-contact-hub{margin-top:8px;padding-top:8px;border-top:1px dashed #e2e7ef}
+.delivery-contact-toolbar{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.delivery-chat-open,.delivery-channel{
+  border:1px solid #d9dee8;border-radius:8px;background:#fff;color:#475467;
+  padding:5px 8px;font-size:.65rem;font-weight:800;line-height:1.25;
 }
-.delivery-contact-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.delivery-contact-title{font-size:.78rem;font-weight:900;color:#344054;letter-spacing:.025em}
-.delivery-chat-open{
-  border:none;border-radius:9px;background:#174ea6;color:#fff;padding:7px 10px;
-  font-size:.72rem;font-weight:850;text-transform:uppercase;
-}
-.delivery-chat-open:hover{background:#103f89}
-.delivery-chat-open:disabled{opacity:.55;cursor:wait}
-.delivery-contact-cue{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.delivery-chat-open{color:#174ea6;border-color:#cdd9f4;background:#f8faff}
+.delivery-chat-open:hover{background:#eef3ff}.delivery-chat-open:disabled{opacity:.55;cursor:wait}
+.delivery-channel:hover{background:#f6f7f9}
+.delivery-channel.active{color:#3448b6;background:#eef2ff;border-color:#aebbf2}
+.delivery-contact-cue{display:flex;gap:5px;align-items:center;margin-left:auto}
 .delivery-cue{
   display:inline-flex;align-items:center;gap:5px;border:none;border-radius:999px;
-  padding:5px 9px;font-size:.68rem;font-weight:850;text-transform:uppercase;
+  padding:4px 7px;font-size:.62rem;font-weight:850;
 }
 .delivery-cue.reply{background:#dff7e7;color:#116b36;box-shadow:0 0 0 2px rgba(46,125,50,.1)}
 .delivery-cue.waiting{background:#eef1f6;color:#667085}
 .delivery-cue.unread{background:#fff3cd;color:#8a5900}
 .delivery-cue.problem{background:#feeceb;color:#b42318}
-.delivery-channel-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-.delivery-channel{
-  border:1.5px solid #d7deea;border-radius:10px;background:#fff;color:#344054;
-  padding:9px 8px;font-size:.72rem;font-weight:900;text-transform:uppercase;
-}
-.delivery-channel.messenger{border-color:#b8c8f0;color:#174ea6}
-.delivery-channel.sms{border-color:#b9d9f2;color:#1565c0}
-.delivery-channel.active{background:#eef2ff;border-color:#667eea;box-shadow:0 0 0 2px rgba(102,126,234,.1)}
-.delivery-steps{display:none;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.delivery-steps{display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px;padding:7px;background:#f8f9fb;border:1px solid #e8ebf0;border-radius:9px}
 .delivery-steps.open{display:grid}
 .delivery-step{
-  position:relative;min-height:68px;border:1.5px solid #dfe4ea;border-radius:10px;
-  background:#fff;color:#344054;padding:8px 6px;font-size:.7rem;font-weight:850;
+  position:relative;min-height:53px;border:1px solid #dfe4ea;border-radius:8px;
+  background:#fff;color:#344054;padding:6px 4px;font-size:.65rem;font-weight:850;
   line-height:1.25;text-align:center;
 }
-.delivery-step small{display:block;margin-top:4px;font-size:.6rem;font-weight:700;color:#7a8596}
+.delivery-step small{display:block;margin-top:3px;font-size:.56rem;font-weight:700;color:#7a8596}
 .delivery-step.ready{border-color:#667eea;color:#4a5fd0;background:#f7f8ff}
 .delivery-step.success{border-color:#63b77a;background:#eaf8ee;color:#176c35}
 .delivery-step.opened{border-color:#e2a83b;background:#fff8e7;color:#8a5900}
 .delivery-step.failed{border-color:#dc6b63;background:#fff0ef;color:#a3211a}
 .delivery-step.loading{color:#667eea;background:#f2f4ff;cursor:wait}
 .delivery-step.locked{background:#f2f3f5;color:#a0a5ad;border-color:#e1e4e8;cursor:not-allowed}
-.delivery-step-status{margin-top:8px;min-height:18px;font-size:.7rem;line-height:1.35;color:#667085;font-weight:700}
+.delivery-step-status{margin-top:6px;font-size:.66rem;line-height:1.35;color:#667085;font-weight:700}
+.delivery-step-status:empty{display:none}
 .delivery-step-status.success{color:#176c35}.delivery-step-status.error{color:#b42318}
 .messenger-session{
   border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(255,255,255,.16);
@@ -243,8 +234,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .chat-busy-card p{color:#667085;font-size:.8rem;line-height:1.45}
 .chat-login-help{margin:-4px 0 12px;color:#667085;font-size:.75rem;line-height:1.4}
 @media(max-width:460px){
-  .delivery-contact-head{align-items:flex-start}.delivery-chat-open{max-width:52%}
-  .delivery-step{min-height:76px;padding:8px 4px}.delivery-step small{font-size:.57rem}
+  .delivery-contact-toolbar{gap:4px}.delivery-contact-cue{width:100%;margin-left:0}
+  .delivery-step{min-height:58px;padding:6px 3px}.delivery-step small{font-size:.53rem}
   .messenger-session{max-width:120px;white-space:normal;line-height:1.15}
 }
 
@@ -723,7 +714,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <div class="subtitle">Gestion des Commandes</div>
     </div>
     <div class="header-actions">
-      <button type="button" class="messenger-session" id="messengerSessionButton" onclick="requestMessengerLogin()">MESSENGER: HIDITRA</button>
+      <button type="button" class="messenger-session" id="messengerSessionButton" onclick="requestMessengerLogin()">MESSENGER : CONNEXION</button>
       <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">🇬🇧</button>
     </div>
   </div>
@@ -994,7 +985,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-document.documentElement.dataset.lunaBuild = '20260920-beginner-contact-hub';
+document.documentElement.dataset.lunaBuild = '20260920-compact-contact-chat';
 const INTEGRATED_DELIVERY_URL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/delivery';
 if (/(^|\.)github\.io$/i.test(window.location.hostname)) {
   window.location.replace(INTEGRATED_DELIVERY_URL + window.location.search + window.location.hash);
@@ -2793,9 +2784,9 @@ function launchSelectedSms() {
 
 const DELIVERY_REMINDER_KEYS = ['driver_arrived','driver_waiting','delivery_confirmation'];
 const DELIVERY_REMINDER_SHORT = [
-  'LIVREUR TONGA',
-  'MBOLA MIANDRY',
-  'FANAMAFISANA FARANY'
+  'Livreur arrivé',
+  'Livreur en attente',
+  'Dernière confirmation'
 ];
 const CHAT_API_BASE = '/control/api/customer-chat';
 
@@ -2854,11 +2845,11 @@ function updateMessengerSessionButton() {
   const button = document.getElementById('messengerSessionButton');
   if (!button) return;
   if (!integratedMessengerAvailable()) {
-    button.textContent = 'MESSENGER: SOKAFY';
+    button.textContent = 'MESSENGER : OUVRIR';
     button.classList.remove('ready');
     return;
   }
-  button.textContent = state.chatAuthenticated ? 'MESSENGER: VONONA ✓' : 'MESSENGER: HIDITRA';
+  button.textContent = state.chatAuthenticated ? 'MESSENGER : PRÊT ✓' : 'MESSENGER : CONNEXION';
   button.classList.toggle('ready', state.chatAuthenticated);
 }
 
@@ -2893,16 +2884,16 @@ function requestMessengerLogin(pendingAction) {
   }
   const container = document.getElementById('modalContainer');
   container.innerHTML = '<div class="modal-backdrop"><div class="modal">' +
-    '<h3>HIDITRA MESSENGER — INDRAY MANDEHA</h3>' +
-    '<p class="chat-login-help">Ampidiro ny kaonty mpiasa Luna Shop. Tsy tehirizina eto ny mot de passe.</p>' +
-    '<label class="sms-message-label" for="chatLoginUsername">ANARAN’NY MPIASA</label>' +
+    '<h3>CONNEXION MESSENGER</h3>' +
+    '<p class="chat-login-help">Utilisez le compte employé Luna Shop. La session restera ouverte sur cet appareil.</p>' +
+    '<label class="sms-message-label" for="chatLoginUsername">IDENTIFIANT</label>' +
     '<input id="chatLoginUsername" autocomplete="username" autocapitalize="none">' +
     '<label class="sms-message-label" for="chatLoginPassword">MOT DE PASSE</label>' +
     '<input id="chatLoginPassword" type="password" autocomplete="current-password">' +
     '<div id="chatLoginError" class="delivery-step-status error"></div>' +
     '<div class="modal-actions">' +
-      '<button type="button" class="btn-modal-cancel" onclick="closeModal();state.chatPendingAction=null">HANAKATONA</button>' +
-      '<button type="button" class="btn-confirm" id="chatLoginSubmit" onclick="submitMessengerLogin()">HIDITRA</button>' +
+      '<button type="button" class="btn-modal-cancel" onclick="closeModal();state.chatPendingAction=null">ANNULER</button>' +
+      '<button type="button" class="btn-confirm" id="chatLoginSubmit" onclick="submitMessengerLogin()">SE CONNECTER</button>' +
     '</div></div></div>';
   setTimeout(function() {
     const username = document.getElementById('chatLoginUsername');
@@ -2917,11 +2908,11 @@ async function submitMessengerLogin() {
   const errorBox = document.getElementById('chatLoginError');
   if (!username || !password || !submit) return;
   if (!username.value.trim() || !password.value) {
-    errorBox.textContent = 'Fenoy ny anarana sy mot de passe.';
+    errorBox.textContent = 'Saisissez l’identifiant et le mot de passe.';
     return;
   }
   submit.disabled = true;
-  submit.textContent = 'MIDITRA…';
+  submit.textContent = 'CONNEXION…';
   errorBox.textContent = '';
   try {
     const data = await chatApi('/login', {
@@ -2937,9 +2928,9 @@ async function submitMessengerLogin() {
     scheduleMessengerCardStatusLoad(true);
     if (action) action();
   } catch(error) {
-    errorBox.textContent = 'TSY METY NY FIDIRANA — hamarino ny anarana sy mot de passe.';
+    errorBox.textContent = 'Connexion refusée. Vérifiez l’identifiant et le mot de passe.';
     submit.disabled = false;
-    submit.textContent = 'HIDITRA';
+    submit.textContent = 'SE CONNECTER';
   }
 }
 
@@ -2949,7 +2940,7 @@ function showChatBusy(title, message) {
   overlay.className = 'chat-busy-overlay';
   overlay.id = 'chatBusyOverlay';
   overlay.innerHTML = '<div class="chat-busy-card"><span class="spinner"></span>' +
-    '<strong>' + escHtml(title) + '</strong><p>' + escHtml(message || 'Aza akatona ity pejy ity.') + '</p></div>';
+    '<strong>' + escHtml(title) + '</strong><p>' + escHtml(message || 'Ne fermez pas cette page.') + '</p></div>';
   document.body.appendChild(overlay);
 }
 
@@ -3038,25 +3029,25 @@ function reminderStepHtml(order, channel, index) {
       : previous.status === 'opened';
   }
   let className = previousComplete ? 'ready' : 'locked';
-  let statusText = previousComplete ? 'TSINDRIO HALEFA' : 'MIANDRY NY DINGANA ' + index;
+  let statusText = previousComplete ? 'Envoyer' : 'Étape ' + index + ' requise';
   let disabled = !previousComplete;
   if (status === 'sent') {
-    className = 'success'; statusText = 'META NANEKENA ✓'; disabled = true;
+    className = 'success'; statusText = 'Accepté par Meta ✓'; disabled = true;
   } else if (status === 'sending') {
-    className = 'loading'; statusText = 'MANDEFA…'; disabled = true;
+    className = 'loading'; statusText = 'Envoi…'; disabled = true;
   } else if (status === 'uncertain') {
-    className = 'failed'; statusText = 'HAMARINO MESSENGER'; disabled = true;
+    className = 'failed'; statusText = 'À vérifier'; disabled = true;
   } else if (status === 'rejected') {
-    className = 'failed'; statusText = 'TSY LASA — AVERENO'; disabled = false;
+    className = 'failed'; statusText = 'Échec — réessayer'; disabled = false;
   } else if (status === 'opened') {
-    className = 'opened'; statusText = 'NOSOKAFANA — HAMARINO SEND'; disabled = true;
+    className = 'opened'; statusText = 'SMS ouvert — vérifier'; disabled = true;
   }
   const click = channel === 'messenger'
     ? 'sendMessengerReminder(this.getAttribute(\'data-order-iid\'),' + index + ')'
     : 'launchSmsReminderStep(this.getAttribute(\'data-order-iid\'),' + index + ')';
   return '<button type="button" class="delivery-step ' + className + '" data-order-iid="' +
     escHtml(order.iid) + '" onclick="' + click + '"' + (disabled ? ' disabled' : '') + '>' +
-    'DINGANA ' + (index + 1) + '<small>' + escHtml(DELIVERY_REMINDER_SHORT[index]) + '</small>' +
+    'Étape ' + (index + 1) + '<small>' + escHtml(DELIVERY_REMINDER_SHORT[index]) + '</small>' +
     '<small>' + escHtml(statusText) + '</small></button>';
 }
 
@@ -3065,18 +3056,16 @@ function renderDeliveryContactHub(order) {
   const status = state.chatCardStatuses[orderKey] || {};
   const selected = state.reminderPanels[orderKey] || '';
   const localMessage = localChatMessage(orderKey);
-  let cue = '<span class="delivery-cue waiting">MESSENGER: TSY MBOLA VOAMARINA</span>';
+  let cue = '';
   if (status.client_replied_after_reminder) {
     cue = '<button type="button" class="delivery-cue reply" data-order-iid="' + escHtml(order.iid) +
-      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">● CLIENT NAMALY — SOKAFY</button>';
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">● Le client a répondu — ouvrir</button>';
   } else if (Number(status.unread_count || 0) > 0) {
     cue = '<button type="button" class="delivery-cue unread" data-order-iid="' + escHtml(order.iid) +
-      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">HAFATRA VAOVAO ' +
-      escHtml(status.unread_count) + ' — SOKAFY</button>';
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">' +
+      escHtml(status.unread_count) + ' message(s) non lu(s) — ouvrir</button>';
   } else if (status.linked && status.last_reminder_sent_at) {
-    cue = '<span class="delivery-cue waiting">MIANDRY VALINY</span>';
-  } else if (status.linked) {
-    cue = '<span class="delivery-cue waiting">CLIENT VOAMARINA ✓</span>';
+    cue = '<span class="delivery-cue waiting">En attente de réponse</span>';
   }
   let steps = '';
   ['messenger','sms'].forEach(function(channel) {
@@ -3086,16 +3075,14 @@ function renderDeliveryContactHub(order) {
       '</div>';
   });
   return '<div class="delivery-contact-hub" data-contact-order-key="' + escHtml(orderKey) + '">' +
-    '<div class="delivery-contact-head"><span class="delivery-contact-title">RAPPELS LIVRAISON</span>' +
+    '<div class="delivery-contact-toolbar">' +
       '<button type="button" class="delivery-chat-open" data-order-iid="' + escHtml(order.iid) +
-      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">💬 SOKAFY MESSENGER</button></div>' +
-    '<div class="delivery-contact-cue">' + cue + '</div>' +
-    '<div class="delivery-channel-row">' +
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">💬 Conversation</button>' +
       '<button type="button" class="delivery-channel messenger' + (selected === 'messenger' ? ' active' : '') +
-      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'messenger\')">MESSENGER — 3 DINGANA</button>' +
+      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'messenger\')">Rappel Messenger</button>' +
       '<button type="button" class="delivery-channel sms' + (selected === 'sms' ? ' active' : '') +
-      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'sms\')">MESSAGE SMS — 3 DINGANA</button>' +
-    '</div>' + steps +
+      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'sms\')">Rappel SMS</button>' +
+      '<div class="delivery-contact-cue">' + cue + '</div></div>' + steps +
     '<div class="delivery-step-status' + (localMessage ? ' ' + escHtml(localMessage.type) : '') + '">' +
       escHtml(localMessage ? localMessage.text : '') + '</div></div>';
 }
@@ -3104,7 +3091,7 @@ async function ensureMessengerConversation(order) {
   const orderKey = memoKeyForOrder(order);
   const current = state.chatCardStatuses[orderKey] || {};
   if (current.linked && current.conversation_link) return current;
-  showChatBusy('MIKAROKA NY CLIENT AO AMIN’NY MESSENGER…', 'Ny numéro no porofo lehibe indrindra. Mety haharitra segondra vitsivitsy.');
+  showChatBusy('Recherche de la conversation…', 'Le numéro du client est utilisé en priorité. Cela peut prendre quelques secondes.');
   try {
     const data = await chatApi('/quick-link', {method: 'POST', body: {order_key: orderKey}});
     const next = Object.assign({}, current, {
@@ -3114,7 +3101,7 @@ async function ensureMessengerConversation(order) {
       reminders: remindersArrayToMap(data.reminders)
     });
     state.chatCardStatuses[orderKey] = next;
-    setLocalChatMessage(orderKey, 'CLIENT MESSENGER VOAMARINA ✓', 'success');
+    setLocalChatMessage(orderKey, 'Conversation client confirmée ✓', 'success');
     renderOrders();
     return next;
   } finally {
@@ -3130,28 +3117,9 @@ function openMessengerChat(iid) {
     return;
   }
   const orderKey = memoKeyForOrder(order);
-  const current = state.chatCardStatuses[orderKey] || {};
-  if (current.linked && /^https:\/\//.test(current.conversation_link || '')) {
-    window.open(current.conversation_link, '_blank', 'noopener,noreferrer');
-    return;
-  }
-  const popup = window.open('about:blank', 'lunaMessengerChat');
-  if (popup) {
-    try { popup.document.body.innerHTML = '<p style="font-family:sans-serif;padding:24px">MIKAROKA NY CONVERSATION…</p>'; } catch(e) {}
-  }
-  ensureMessengerConversation(order).then(function(linked) {
-    if (!linked.conversation_link) throw new Error('Conversation link unavailable');
-    if (popup) popup.location.href = linked.conversation_link;
-    else window.location.href = linked.conversation_link;
-  }).catch(function(error) {
-    if (popup) popup.close();
-    const manualUrl = error.data && error.data.manual_url;
-    setLocalChatMessage(orderKey, 'TSY HITA HO AZY — SOKAFY NY FANAMARINANA MESSENGER', 'error');
-    renderOrders();
-    if (manualUrl && window.confirm('Tsy afaka nanamarina ho azy. Sokafana ve ny fanamarinana Messenger?')) {
-      window.open(manualUrl, '_blank', 'noopener,noreferrer');
-    }
-  });
+  const chatUrl = '/control/customer-chat?order=' + encodeURIComponent(orderKey);
+  const popup = window.open(chatUrl, 'lunaCustomerChat');
+  if (!popup) window.location.href = chatUrl;
 }
 
 async function sendMessengerReminder(iid, index) {
@@ -3169,7 +3137,7 @@ async function sendMessengerReminder(iid, index) {
   status.reminders = Object.assign({}, status.reminders || {});
   status.reminders[reminderKey] = {status: 'sending'};
   state.chatCardStatuses[orderKey] = status;
-  setLocalChatMessage(orderKey, 'MANDEFA NY DINGANA ' + (Number(index) + 1) + '…', '');
+  setLocalChatMessage(orderKey, 'Envoi de l’étape ' + (Number(index) + 1) + '…', '');
   renderOrders();
   try {
     await ensureMessengerConversation(order);
@@ -3178,7 +3146,7 @@ async function sendMessengerReminder(iid, index) {
       body: {order_key: orderKey, reminder_key: reminderKey, request_id: newBrowserRequestId()}
     });
     state.chatCardStatuses[orderKey].reminders = remindersArrayToMap(data.reminders);
-    setLocalChatMessage(orderKey, 'DINGANA ' + (Number(index) + 1) + ' — META NANEKENA NY HAFATRA ✓', 'success');
+    setLocalChatMessage(orderKey, 'Étape ' + (Number(index) + 1) + ' acceptée par Meta ✓', 'success');
     state.chatStatusLoadedAt = 0;
     renderOrders();
     scheduleMessengerCardStatusLoad(true);
@@ -3187,7 +3155,7 @@ async function sendMessengerReminder(iid, index) {
     latest.reminders = Object.assign({}, latest.reminders || {});
     latest.reminders[reminderKey] = {status: 'rejected'};
     state.chatCardStatuses[orderKey] = latest;
-    setLocalChatMessage(orderKey, 'TSY LASA NY DINGANA ' + (Number(index) + 1) + ' — ' + error.message, 'error');
+    setLocalChatMessage(orderKey, 'Échec de l’étape ' + (Number(index) + 1) + ' — ' + error.message, 'error');
     hideChatBusy();
     renderOrders();
   }
@@ -3201,7 +3169,7 @@ function launchSmsReminderStep(iid, index) {
   if (Number(index) > 0) {
     const previous = smsReminderState(orderKey, DELIVERY_REMINDER_KEYS[Number(index) - 1]);
     if (previous.status !== 'opened') {
-      setLocalChatMessage(orderKey, 'ALEFASO ALOHA NY DINGANA ' + Number(index) + '.', 'error');
+      setLocalChatMessage(orderKey, 'Envoyez d’abord l’étape ' + Number(index) + '.', 'error');
       renderOrders();
       return;
     }
@@ -3210,16 +3178,16 @@ function launchSmsReminderStep(iid, index) {
   const appleMobile = isAppleMobileDevice(navigator.userAgent, navigator.platform, navigator.maxTouchPoints);
   const url = buildSmsComposeUrl(phone, template.text, appleMobile);
   if (!url) {
-    setLocalChatMessage(orderKey, 'TSY METY NY NUMÉRO — TSY AFAKA MANOKATRA MESSAGE.', 'error');
+    setLocalChatMessage(orderKey, 'Numéro invalide : impossible d’ouvrir l’application Messages.', 'error');
     renderOrders();
     return;
   }
   if (!state.smsReminderActivity[orderKey]) state.smsReminderActivity[orderKey] = {};
   const localRecord = {status: 'opened', opened_at: new Date().toISOString(), opened_ms: Date.now()};
   state.smsReminderActivity[orderKey][template.key] = localRecord;
-  setLocalChatMessage(orderKey, 'DINGANA ' + (Number(index) + 1) + ' NOSOKAFANA — HAMARINO DIA TSINDRIO SEND.', 'success');
+  setLocalChatMessage(orderKey, 'Étape ' + (Number(index) + 1) + ' ouverte dans Messages — vérifiez puis appuyez sur Envoyer.', 'success');
   API.recordSmsReminderOpened(orderKey, template.key).catch(function() {
-    setLocalChatMessage(orderKey, 'NOSOKAFANA NY MESSAGE FA TSY VOATAHIRY NY STATUS.', 'error');
+    setLocalChatMessage(orderKey, 'Messages a été ouvert, mais le statut n’a pas pu être enregistré.', 'error');
   });
   if (appleMobile) copySmsFallbackNow(template.text);
   renderOrders();
