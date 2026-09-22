@@ -1305,6 +1305,7 @@ const API = {
   firebaseOrderMemoPath: '/orders/__web_order_memos',
   firebaseMemoPresetPath: '/orders/__web_memo_presets',
   firebaseSmsReminderPath: '/orders/__sms_reminder_activity',
+  firebaseDeletedOrdersPath: '/orders/__deleted_orders',
   staticConfigVersion: '2026-07-15-1',
   staticConfigCache: {},
   referenceCache: null,
@@ -1732,6 +1733,21 @@ const API = {
     return orders;
   },
 
+  firebaseDeletePatch(orderIds, reason) {
+    const changes = {};
+    const deletedAt = new Date().toISOString();
+    (orderIds || []).map(String).filter(Boolean).forEach(function(id) {
+      changes[id] = null;
+      changes['__deleted_orders/' + id] = {
+        schema_version: 1,
+        deleted_at: deletedAt,
+        deleted_by: 'web_app',
+        reason: String(reason || 'manual_delete')
+      };
+    });
+    return changes;
+  },
+
 
   getFirebaseOrdersRange(date, days) {
     const start = duplicateShiftDate(date, -(days || 7));
@@ -1808,9 +1824,8 @@ const API = {
         ? review.delete_iids.map(String).filter(Boolean) : [];
       if (deleteIds.length) {
         const iid = 'web_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
-        const changes = {};
+        const changes = this.firebaseDeletePatch(deleteIds, 'duplicate_review');
         changes[iid] = order;
-        deleteIds.forEach(function(oldIid) { if (oldIid !== iid) changes[oldIid] = null; });
         return this.fb('PATCH', this.firebaseOrdersPath, changes).then(function() {
           order.iid = iid;
           return {success: true, iid: iid, order: order, deleted_duplicate_iids: deleteIds};
@@ -1833,9 +1848,8 @@ const API = {
         const deleteIds = review && Array.isArray(review.delete_iids)
           ? review.delete_iids.map(String).filter(function(id) { return id && id !== String(iid); }) : [];
         if (deleteIds.length) {
-          const changes = {};
+          const changes = this.firebaseDeletePatch(deleteIds, 'duplicate_review');
           changes[iid] = order;
-          deleteIds.forEach(function(oldIid) { changes[oldIid] = null; });
           return this.fb('PATCH', this.firebaseOrdersPath, changes).then(function() {
             order.iid = iid;
             return {success: true, order: order, deleted_duplicate_iids: deleteIds};
@@ -1851,7 +1865,8 @@ const API = {
   },
   deleteOrder(iid) {
     if (this.isStaticMode()) {
-      return this.fb('DELETE', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then(function() {
+      const changes = this.firebaseDeletePatch([iid], 'manual_delete');
+      return this.fb('PATCH', this.firebaseOrdersPath, changes).then(function() {
         return {success: true};
       });
     }
