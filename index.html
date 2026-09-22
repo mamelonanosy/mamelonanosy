@@ -158,6 +158,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .employee-card-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.employee-card-fields input,.employee-card-fields select,.admin-form input,.admin-form select{width:100%;border:1px solid #d9dde7;border-radius:8px;padding:8px}
 .employee-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.employee-card-actions .secondary{background:#eef1f8;color:#465064}.employee-card-actions .danger{background:#ffebee;color:#b42318}
 .admin-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}.admin-form .full{grid-column:1/-1}.admin-help{font-size:.72rem;color:#73798a;margin:8px 0}
+.admin-help.error{color:#b42318;background:#fff1f0;border:1px solid #ffc9c5;border-radius:8px;padding:8px;font-weight:700}
 .role-explanation{grid-column:1/-1;font-size:.7rem;line-height:1.35;color:#61697a;background:#f5f6fa;border-radius:8px;padding:7px 9px}
 .history-list{display:grid;gap:10px}.history-event{border-left:3px solid #667eea;padding:8px 10px;background:#f8f9fd;border-radius:0 9px 9px 0}.history-event-head{display:flex;justify-content:space-between;gap:8px;font-weight:750;font-size:.79rem}.history-event small{color:#777}.history-changes{margin-top:6px;font-size:.72rem;color:#555;line-height:1.45}.history-empty{text-align:center;color:#777;padding:24px}
 .dashboard-mode{display:none;gap:6px;margin-bottom:12px}.dashboard-mode.visible{display:flex}.dashboard-mode button{border:1px solid #dfe3ec;border-radius:999px;padding:7px 12px;background:#fff;color:#646b7b;font-weight:750}.dashboard-mode button.active{background:#667eea;color:#fff;border-color:#667eea}
@@ -1094,7 +1095,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-document.documentElement.dataset.lunaBuild = '20260922-employee-access';
+document.documentElement.dataset.lunaBuild = '20260922-employee-create-fix';
 const INTEGRATED_DELIVERY_URL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/delivery';
 const DELIVERY_GITHUB_ENTRY = /(^|\.)github\.io$/i.test(window.location.hostname);
 const DELIVERY_PRODUCTION_HOST = /^luna-shop-n8n\.167\.99\.4\.110\.sslip\.io$/i.test(window.location.hostname);
@@ -1796,36 +1797,80 @@ function renderEmployeeAdmin() {
 function openCreateEmployee() {
   const modal = document.querySelector('.employee-admin-modal');
   if (!modal) return;
-  modal.innerHTML = '<h3>Nouvel employ&eacute;</h3><div class="admin-form">' +
-    '<label>Nom affich&eacute;<input id="newEmployeeName" autocomplete="off"></label>' +
-    '<label>Identifiant<input id="newEmployeeUsername" autocomplete="off" autocapitalize="none"></label>' +
+  modal.innerHTML = '<h3>Nouvel employ&eacute;</h3><form id="newEmployeeForm" onsubmit="createEmployee(event)"><div class="admin-form">' +
+    '<label>Nom affich&eacute;<input id="newEmployeeName" autocomplete="off" maxlength="120" required></label>' +
+    '<label>Identifiant<input id="newEmployeeUsername" autocomplete="off" autocapitalize="none" minlength="3" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,63}" required></label>' +
     '<label>R&ocirc;le<select id="newEmployeeRole" onchange="updateRoleExplanation(this,\'newEmployeeRoleHelp\')">' + employeeRoleOptions('employee') + '</select></label>' +
-    '<label>Mot de passe permanent<input id="newEmployeePassword" type="password" autocomplete="new-password" minlength="10" required placeholder="10 caract&egrave;res minimum"></label>' +
-    '<label>Confirmer le mot de passe<input id="newEmployeePasswordConfirm" type="password" autocomplete="new-password" minlength="10" required></label>' +
+    '<label>Mot de passe permanent<input id="newEmployeePassword" type="password" autocomplete="new-password" minlength="10" maxlength="256" required placeholder="10 caract&egrave;res minimum"></label>' +
+    '<label>Confirmer le mot de passe<input id="newEmployeePasswordConfirm" type="password" autocomplete="new-password" minlength="10" maxlength="256" required></label>' +
     '<div class="role-explanation" id="newEmployeeRoleHelp">' + escHtml(roleExplanation('employee')) + '</div></div>' +
-    '<div class="admin-help" id="newEmployeeMessage">Choisissez le mot de passe utilis&eacute; par cet employ&eacute;. Il restera valide jusqu\'&agrave; ce que vous ou l\'employ&eacute; le modifiiez.</div>' +
-    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="renderEmployeeAdmin()">RETOUR</button><button class="btn-confirm" onclick="createEmployee()">CR&Eacute;ER</button></div>';
+    '<div class="admin-help" id="newEmployeeMessage" role="alert" aria-live="assertive">Choisissez le mot de passe utilis&eacute; par cet employ&eacute;. Il restera valide jusqu\'&agrave; ce que vous ou l\'employ&eacute; le modifiiez.</div>' +
+    '<div class="modal-actions"><button type="button" class="btn-modal-cancel" onclick="renderEmployeeAdmin()">RETOUR</button><button type="submit" class="btn-confirm" id="newEmployeeSubmitButton">CR&Eacute;ER</button></div></form>';
+  const firstField = document.getElementById('newEmployeeName');
+  if (firstField) firstField.focus();
 }
 
-async function createEmployee() {
-  const data = {
-    display_name: document.getElementById('newEmployeeName').value.trim(),
-    username: document.getElementById('newEmployeeUsername').value.trim().toLowerCase(),
-    role: document.getElementById('newEmployeeRole').value,
-    password: document.getElementById('newEmployeePassword').value
-  };
-  const passwordConfirm = document.getElementById('newEmployeePasswordConfirm').value;
+function showCreateEmployeeError(message, field) {
+  const target = document.getElementById('newEmployeeMessage');
+  if (target) {
+    target.textContent = message;
+    target.classList.add('error');
+    target.scrollIntoView({block:'nearest'});
+  }
+  if (field && typeof field.focus === 'function') field.focus();
+  showToast(message, 'error');
+}
+
+async function createEmployee(event) {
+  if (event && typeof event.preventDefault === 'function') event.preventDefault();
+  const form = document.getElementById('newEmployeeForm');
+  const nameField = document.getElementById('newEmployeeName');
+  const usernameField = document.getElementById('newEmployeeUsername');
+  const roleField = document.getElementById('newEmployeeRole');
+  const passwordField = document.getElementById('newEmployeePassword');
+  const confirmationField = document.getElementById('newEmployeePasswordConfirm');
+  const button = document.getElementById('newEmployeeSubmitButton');
+  if (!form || !nameField || !usernameField || !roleField || !passwordField || !confirmationField || !button) {
+    showToast('Le formulaire doit \u00eatre recharg\u00e9. Fermez puis rouvrez cette fen\u00eatre.', 'error');
+    return false;
+  }
   const message = document.getElementById('newEmployeeMessage');
-  if (!data.display_name || !data.username) { message.textContent = 'Le nom et l\u2019identifiant sont obligatoires.'; return; }
-  if (data.password.length < 10) { message.textContent = 'Le mot de passe est obligatoire et doit contenir au moins 10 caract\u00e8res.'; return; }
-  if (data.password !== passwordConfirm) { message.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
+  if (message) message.classList.remove('error');
+  const data = {
+    display_name: nameField.value.trim(),
+    username: usernameField.value.trim().toLowerCase(),
+    role: roleField.value,
+    password: passwordField.value
+  };
+  const passwordConfirm = confirmationField.value;
+  if (!data.display_name) { showCreateEmployeeError('Le nom est obligatoire.', nameField); return false; }
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$/.test(data.username)) {
+    showCreateEmployeeError('Identifiant invalide: utilisez 3 caract\u00e8res minimum, sans espace.', usernameField);
+    return false;
+  }
+  if (data.password.length < 10 || data.password.length > 256) {
+    showCreateEmployeeError('Le mot de passe doit contenir au moins 10 caract\u00e8res.', passwordField);
+    return false;
+  }
+  if (data.password !== passwordConfirm) {
+    showCreateEmployeeError('Les deux mots de passe ne correspondent pas.', confirmationField);
+    return false;
+  }
+  button.disabled = true;
+  button.textContent = 'CR\u00c9ATION...';
+  if (message) message.textContent = 'Cr\u00e9ation du compte en cours...';
   try {
     const result = await API.createEmployee(data);
     const created = result.employee || result;
     if (created && created.id) state.employees.push(created);
     showToast('Compte employ\u00e9 cr\u00e9\u00e9.');
     renderEmployeeAdmin();
-  } catch (error) { message.textContent = error.message || 'Cr\u00e9ation impossible.'; }
+  } catch (error) {
+    showCreateEmployeeError(error.message || 'Cr\u00e9ation impossible.', null);
+    button.disabled = false;
+    button.textContent = 'CR\u00c9ER';
+  }
+  return false;
 }
 
 async function saveEmployee(id) {
