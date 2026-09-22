@@ -105,6 +105,66 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   margin-left:auto;border:1px solid #ddd;border-radius:8px;
   padding:6px 10px;font-size:.8rem;background:#fff;color:#444;
 }
+.filter-creator{margin-left:0;max-width:190px}
+
+/* Employee access is intentionally part of the delivery UI rather than a
+   second administration application.  The gate is shown before any order
+   request is made on the secured VPS route. */
+.employee-auth-gate{
+  position:fixed;inset:0;z-index:5000;display:flex;align-items:center;
+  justify-content:center;padding:20px;background:linear-gradient(145deg,#f3f5ff,#f8f4fb);
+}
+.employee-auth-gate[hidden]{display:none}
+.employee-login-card{
+  width:min(100%,390px);background:#fff;border:1px solid #e3e6ef;border-radius:20px;
+  padding:26px;box-shadow:0 18px 55px rgba(65,70,120,.18)
+}
+.employee-login-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.employee-login-logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem}
+.employee-login-brand h2{font-size:1.18rem;color:#333}.employee-login-brand p{font-size:.78rem;color:#7a7f91;margin-top:3px}
+.employee-login-card label{display:block;font-size:.78rem;font-weight:700;color:#555;margin:12px 0 5px}
+.employee-login-card input{width:100%;border:1px solid #d8dce8;border-radius:10px;padding:11px 12px;background:#fff;color:#333}
+.employee-login-card input:focus{outline:2px solid rgba(102,126,234,.22);border-color:#667eea}
+.employee-login-submit{width:100%;margin-top:18px;border:0;border-radius:10px;padding:12px;background:#667eea;color:#fff;font-weight:800}
+.employee-login-submit:disabled{opacity:.55;cursor:wait}
+.employee-login-message{min-height:20px;margin-top:10px;font-size:.78rem;color:#b42318;text-align:center}
+.employee-login-message.neutral{color:#667085}
+.auth-pending .header,.auth-pending .tab-bar,.auth-pending .date-banner,
+.auth-pending .tab-content,.auth-pending .fab{visibility:hidden}
+.employee-account{
+  border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.16);color:#fff;
+  border-radius:10px;padding:6px 9px;display:none;align-items:center;gap:7px;font-size:.72rem;font-weight:800
+}
+.employee-account.visible{display:inline-flex}.employee-account .employee-avatar{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#667eea;font-size:.67rem}
+.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+
+.order-audit-line{margin-top:8px;padding-top:7px;border-top:1px dashed #eceef4;color:#858b9b;font-size:.67rem;line-height:1.45}
+.order-audit-button{border:0;background:none;padding:0;color:inherit;text-align:left;font:inherit}
+.order-audit-button.can-open{cursor:pointer}.order-audit-button.can-open:hover{color:#5b67b5;text-decoration:underline}
+
+.account-modal,.employee-admin-modal,.history-modal{max-width:760px;max-height:90vh;overflow:auto}
+.account-summary{display:flex;gap:12px;align-items:center;padding:12px;background:#f6f7fb;border-radius:12px;margin-bottom:14px}
+.account-summary-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#667eea;color:#fff;font-weight:900}
+.account-summary strong{display:block}.account-summary small{color:#767c8e}
+.account-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.account-menu-grid button{border:1px solid #dfe3ec;border-radius:10px;background:#fff;color:#3f4655;padding:11px;font-weight:750;text-align:left}
+.account-menu-grid button:hover{background:#f5f6ff;border-color:#bdc5ef}
+.account-menu-grid .danger{color:#b42318;background:#fff7f6}
+.admin-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.admin-toolbar button,.employee-card-actions button,.admin-primary{border:0;border-radius:8px;padding:8px 10px;background:#667eea;color:#fff;font-size:.75rem;font-weight:800}
+.employee-list{display:grid;gap:9px}.employee-admin-card{border:1px solid #e3e5ec;border-radius:12px;padding:12px;background:#fff}
+.employee-admin-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.employee-admin-head small{display:block;color:#777;margin-top:2px}
+.employee-status{border-radius:999px;padding:3px 8px;font-size:.65rem;font-weight:800;background:#e8f5e9;color:#26723a}.employee-status.off{background:#f1f2f4;color:#777}
+.employee-card-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.employee-card-fields input,.employee-card-fields select,.admin-form input,.admin-form select{width:100%;border:1px solid #d9dde7;border-radius:8px;padding:8px}
+.employee-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.employee-card-actions .secondary{background:#eef1f8;color:#465064}.employee-card-actions .danger{background:#ffebee;color:#b42318}
+.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}.admin-form .full{grid-column:1/-1}.admin-help{font-size:.72rem;color:#73798a;margin:8px 0}
+.role-explanation{grid-column:1/-1;font-size:.7rem;line-height:1.35;color:#61697a;background:#f5f6fa;border-radius:8px;padding:7px 9px}
+.one-time-password{padding:12px;background:#fff7db;border:1px solid #eed887;border-radius:10px;color:#654f00;word-break:break-all;margin-top:10px}.one-time-password strong{display:block;margin-bottom:5px}
+.history-list{display:grid;gap:10px}.history-event{border-left:3px solid #667eea;padding:8px 10px;background:#f8f9fd;border-radius:0 9px 9px 0}.history-event-head{display:flex;justify-content:space-between;gap:8px;font-weight:750;font-size:.79rem}.history-event small{color:#777}.history-changes{margin-top:6px;font-size:.72rem;color:#555;line-height:1.45}.history-empty{text-align:center;color:#777;padding:24px}
+.dashboard-mode{display:none;gap:6px;margin-bottom:12px}.dashboard-mode.visible{display:flex}.dashboard-mode button{border:1px solid #dfe3ec;border-radius:999px;padding:7px 12px;background:#fff;color:#646b7b;font-weight:750}.dashboard-mode button.active{background:#667eea;color:#fff;border-color:#667eea}
+.team-performance[hidden],.dashboard-orders-panel[hidden]{display:none}.team-performance-controls{display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap;background:#fff;border-radius:12px;padding:11px;margin-bottom:12px}.team-performance-controls label{font-size:.68rem;color:#666;font-weight:700}.team-performance-controls input{display:block;margin-top:4px;border:1px solid #d9dde7;border-radius:8px;padding:7px}.team-performance-controls button{border:0;border-radius:8px;padding:8px 12px;background:#667eea;color:#fff;font-weight:800}
+.performance-grid{display:grid;gap:10px}.performance-card{background:#fff;border:1px solid #e3e5ec;border-radius:12px;padding:12px}.performance-card h3{font-size:.9rem;margin-bottom:8px}.performance-numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.performance-number{background:#f6f7fb;border-radius:8px;padding:8px;text-align:center}.performance-number strong{display:block;color:#4d57a7}.performance-number span{font-size:.64rem;color:#777}
+.permission-note{font-size:.72rem;color:#777;background:#f5f6f8;border-radius:8px;padding:8px;margin-top:8px}
 
 /*───────────────────────────── STATUS BADGES ─────────────────────────────*/
 .badge{
@@ -679,6 +739,12 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
   .route-agent-row .route-agent-mode{grid-column:1/3;grid-row:2}
   .route-agent-row .route-agent-start{grid-column:1/3;grid-row:3}
   .route-stop{grid-template-columns:32px minmax(0,1fr)}.route-stop-eta{grid-column:2;text-align:left}
+  .employee-account .employee-account-name{display:none}
+  .employee-account{padding:5px 7px}.messenger-session{font-size:.61rem!important;padding:5px 7px!important}
+  .filter-agent,.filter-creator{margin-left:0;flex:1 1 calc(50% - 4px);max-width:none;min-width:130px}
+  .account-menu-grid,.employee-card-fields,.admin-form{grid-template-columns:1fr}
+  .admin-form .full{grid-column:auto}
+  .performance-numbers{grid-template-columns:repeat(2,1fr)}
 }
 
 /*───────────────────────────── DESKTOP ─────────────────────────────*/
@@ -704,7 +770,28 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 }
 </style>
 </head>
-<body>
+<body class="auth-pending">
+
+<!-- Employee login: shown before secured delivery data is requested. -->
+<div class="employee-auth-gate" id="employeeAuthGate" role="dialog" aria-modal="true" aria-labelledby="employeeLoginTitle">
+  <div class="employee-login-card">
+    <div class="employee-login-brand">
+      <div class="employee-login-logo">LS</div>
+      <div>
+        <h2 id="employeeLoginTitle">Luna Shop</h2>
+        <p>Acc&egrave;s employ&eacute; &agrave; la gestion des livraisons</p>
+      </div>
+    </div>
+    <form id="employeeLoginForm" onsubmit="submitEmployeeLogin(event)" autocomplete="on">
+      <label for="employeeUsername">Identifiant</label>
+      <input id="employeeUsername" name="username" autocomplete="username" required>
+      <label for="employeePassword">Mot de passe</label>
+      <input id="employeePassword" name="password" type="password" autocomplete="current-password" required>
+      <button class="employee-login-submit" id="employeeLoginButton" type="submit">SE CONNECTER</button>
+      <div class="employee-login-message neutral" id="employeeLoginMessage" aria-live="polite">V&eacute;rification de la session&hellip;</div>
+    </form>
+  </div>
+</div>
 
 <!-- HEADER -->
 <div class="header">
@@ -714,6 +801,10 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <div class="subtitle">Gestion des Commandes</div>
     </div>
     <div class="header-actions">
+      <button type="button" class="employee-account" id="employeeAccountButton" onclick="openEmployeeAccount()" aria-label="Compte employ&eacute;">
+        <span class="employee-avatar" id="employeeAvatar">?</span>
+        <span class="employee-account-name" id="employeeAccountName">Compte</span>
+      </button>
       <button type="button" class="messenger-session" id="messengerSessionButton" onclick="requestMessengerLogin()">MESSENGER : CONNEXION</button>
       <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">🇬🇧</button>
     </div>
@@ -770,6 +861,9 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
       <option value="mobile_delivery">Mobile Money</option>
       <option value="exchange">&Eacute;change</option>
     </select>
+    <select class="filter-agent filter-creator" id="filterCreator" onchange="filterByCreator()" title="Employ&eacute; ayant cr&eacute;&eacute; la commande">
+      <option value="">Tous les cr&eacute;ateurs</option>
+    </select>
   </div>
 
   <!-- Search -->
@@ -799,6 +893,7 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
     <button class="sort-btn" data-sort="client_name" onclick="toggleSort('client_name')" data-t="sort_name">Name</button>
     <button class="sort-btn" data-sort="status" onclick="toggleSort('status')" data-t="sort_status">Status</button>
     <button class="sort-btn" data-sort="agent" onclick="toggleSort('agent')" data-t="sort_agent">Agent</button>
+    <button class="sort-btn" data-sort="creator" onclick="toggleSort('creator')">Cr&eacute;ateur</button>
     <button class="sort-btn" data-sort="total_price" onclick="toggleSort('total_price')" data-t="sort_price">Price</button>
     <button class="sort-btn" data-sort="delivery_fee" onclick="toggleSort('delivery_fee')" data-t="sort_fee">Fee</button>
   </div>
@@ -929,14 +1024,29 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
     <button onclick="goTodayDash()" style="background:#43a047">Aujourd'hui</button>
   </div>
 
-  <div class="section-title">Statistiques des commandes</div>
-  <div class="stats-grid" id="statsGrid"></div>
+  <div class="dashboard-mode" id="dashboardMode">
+    <button type="button" id="dashboardOrdersButton" class="active" onclick="setDashboardMode('orders')">Commandes</button>
+    <button type="button" id="dashboardTeamButton" onclick="setDashboardMode('team')">&Eacute;quipe</button>
+  </div>
 
-  <div class="section-title">R&eacute;sum&eacute; financier</div>
-  <div class="financial-grid" id="financialGrid"></div>
+  <div class="dashboard-orders-panel" id="dashboardOrdersPanel">
+    <div class="section-title">Statistiques des commandes</div>
+    <div class="stats-grid" id="statsGrid"></div>
 
-  <div class="section-title">D&eacute;tail des produits</div>
-  <div id="productsTableWrap"></div>
+    <div class="section-title">R&eacute;sum&eacute; financier</div>
+    <div class="financial-grid" id="financialGrid"></div>
+
+    <div class="section-title">D&eacute;tail des produits</div>
+    <div id="productsTableWrap"></div>
+  </div>
+  <div class="team-performance" id="teamPerformance" hidden>
+    <div class="team-performance-controls">
+      <label>Du<input type="date" id="performanceFrom"></label>
+      <label>Au<input type="date" id="performanceTo"></label>
+      <button type="button" onclick="loadTeamPerformance()">ACTUALISER</button>
+    </div>
+    <div id="teamPerformanceContent"></div>
+  </div>
 </div>
 
 <!-- ROUTE PLANNER: daily axes, assignment and approximate ETAs -->
@@ -985,9 +1095,18 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 </div>
 
 <script>
-document.documentElement.dataset.lunaBuild = '20260920-compact-contact-chat';
+document.documentElement.dataset.lunaBuild = '20260922-employee-access';
 const INTEGRATED_DELIVERY_URL = 'https://luna-shop-n8n.167.99.4.110.sslip.io/control/delivery';
-if (/(^|\.)github\.io$/i.test(window.location.hostname)) {
+const DELIVERY_GITHUB_ENTRY = /(^|\.)github\.io$/i.test(window.location.hostname);
+const DELIVERY_PRODUCTION_HOST = /^luna-shop-n8n\.167\.99\.4\.110\.sslip\.io$/i.test(window.location.hostname);
+const DELIVERY_CANONICAL_ROUTE = /^\/control\/delivery\/?$/.test(window.location.pathname);
+const DELIVERY_LOCAL_DEV = window.location.protocol === 'file:' || /^(localhost|127(?:\.\d{1,3}){3}|\[?::1\]?|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})$/i.test(window.location.hostname);
+const DELIVERY_UNTRUSTED_PUBLIC = /^https?:$/.test(window.location.protocol) && !DELIVERY_LOCAL_DEV && !DELIVERY_PRODUCTION_HOST && !DELIVERY_GITHUB_ENTRY;
+const DELIVERY_SECURE_MODE = DELIVERY_PRODUCTION_HOST || DELIVERY_CANONICAL_ROUTE;
+const DELIVERY_REDIRECTING = DELIVERY_GITHUB_ENTRY || DELIVERY_UNTRUSTED_PUBLIC || (DELIVERY_PRODUCTION_HOST && !DELIVERY_CANONICAL_ROUTE);
+if (DELIVERY_REDIRECTING) {
+  const redirectGate = document.getElementById('employeeAuthGate');
+  if (redirectGate) redirectGate.innerHTML = '<div class="employee-login-card"><div class="employee-login-brand"><div class="employee-login-logo">LS</div><div><h2>Luna Shop s&eacute;curis&eacute;</h2><p>Redirection vers l\'acc&egrave;s employ&eacute;&hellip;</p></div></div><a class="employee-login-submit" style="display:block;text-align:center;text-decoration:none" href="' + INTEGRATED_DELIVERY_URL + '">OUVRIR LUNA SHOP S&Eacute;CURIS&Eacute;</a></div>';
   window.location.replace(INTEGRATED_DELIVERY_URL + window.location.search + window.location.hash);
 }
 /* ═════════════════════════════════════════════════════════════════════
@@ -1236,6 +1355,8 @@ function toggleLanguage() {
 /* ═════════════════════════════════════════════════════════════════════
    STATE
    ═════════════════════════════════════════════════════════════════════ */
+const EMPLOYEE_LOGIN_GATE_HTML = document.getElementById('employeeAuthGate').innerHTML;
+
 const state = {
   currentDate: '',
   dashDate: '',
@@ -1289,8 +1410,522 @@ const state = {
   chatPendingAction: null,
   chatActionMessages: {},
   sortField: '',
-  sortAsc: true
+  sortAsc: true,
+  filterCreator: '',
+  employeeAuthenticated: false,
+  employee: null,
+  employeeRole: '',
+  employeePermissions: [],
+  employeeCsrf: '',
+  employeeMustChangePassword: false,
+  employeeAppStarted: false,
+  dashboardMode: 'orders',
+  employees: [],
+  employeeRoles: []
 };
+
+const DELIVERY_ROLE_LABELS = {
+  owner: 'Propri\u00e9taire',
+  manager: 'Responsable',
+  employee: 'Employ\u00e9',
+  viewer: 'Lecture seule'
+};
+
+const DELIVERY_PERMISSION_ALIASES = {
+  view: ['orders.read','orders.view','view_orders','order_view'],
+  create: ['orders.create','create_order','order_create'],
+  edit: ['orders.update','orders.edit','edit_order','order_update'],
+  memo: ['orders.memo','orders.edit','edit_order','order_update'],
+  delete: ['orders.delete','delete_order','order_delete'],
+  status: ['orders.status','orders.update_status','orders.edit','change_status','order_status'],
+  chat: ['chat.use','messenger.use','customer_chat','chat'],
+  reminder: ['reminders.send','reminder.send','send_reminders','reminder'],
+  history: ['audit.view','orders.history','view_history','history'],
+  performance: ['performance.view','team.performance','view_performance','performance'],
+  employees: ['employees.manage','users.manage','manage_employees','admin'],
+  settings: ['settings.manage','manage_settings','settings'],
+  routes: ['operations.route','routes.manage','routes.view','manage_routes','routes'],
+  daily_close: ['finance.close','daily_close.manage','financial_close','manage_daily_close','daily_close']
+};
+
+function normalizedEmployeeRole() {
+  return String(state.employeeRole || (state.employee && state.employee.role) || '').toLowerCase();
+}
+
+function hasDeliveryPermission(action) {
+  if (!DELIVERY_SECURE_MODE) return true;
+  const role = normalizedEmployeeRole();
+  if (role === 'owner') return true;
+  const permissions = Array.isArray(state.employeePermissions) ? state.employeePermissions.map(String) : [];
+  if (permissions.length) {
+    if (permissions.indexOf('*') >= 0) return true;
+    return (DELIVERY_PERMISSION_ALIASES[action] || [action]).some(function(permission) {
+      return permissions.indexOf(permission) >= 0;
+    });
+  }
+  // Fixed presets remain a UI fallback only.  The server always makes the
+  // authoritative permission decision for every write.
+  if (role === 'manager') return action !== 'employees' && action !== 'settings';
+  if (role === 'employee') return ['view','create','edit','memo','status','chat','reminder'].indexOf(action) >= 0;
+  return action === 'view';
+}
+
+function employeeInitials(name) {
+  return String(name || '?').trim().split(/\s+/).slice(0, 2).map(function(part) {
+    return part.charAt(0).toUpperCase();
+  }).join('') || '?';
+}
+
+function normalizeEmployeeSession(data) {
+  const payload = data && data.session ? data.session : (data || {});
+  const user = payload.user || payload.employee || null;
+  return {
+    authenticated: !!((payload.authenticated === true || payload.ok === true) && user),
+    user: user,
+    role: String(payload.role || (user && user.role) || ''),
+    permissions: Array.isArray(payload.permissions) ? payload.permissions : [],
+    csrf: String(payload.csrf || payload.csrf_token || ''),
+    mustChangePassword: !!(payload.must_change_password || (user && user.must_change_password))
+  };
+}
+
+function setEmployeeSession(data) {
+  const session = normalizeEmployeeSession(data);
+  state.employeeAuthenticated = session.authenticated;
+  state.employee = session.user;
+  state.employeeRole = session.role;
+  state.employeePermissions = session.permissions;
+  state.employeeCsrf = session.csrf;
+  state.employeeMustChangePassword = session.mustChangePassword;
+  const accountButton = document.getElementById('employeeAccountButton');
+  if (accountButton && session.authenticated) {
+    const name = session.user.display_name || session.user.username || 'Compte';
+    document.getElementById('employeeAccountName').textContent = name;
+    document.getElementById('employeeAvatar').textContent = employeeInitials(name);
+    accountButton.classList.add('visible');
+  }
+}
+
+function showEmployeeLogin(message) {
+  state.employeeAuthenticated = false;
+  state.employee = null;
+  state.employeeCsrf = '';
+  pauseEmployeeDataRefresh();
+  document.body.classList.add('auth-pending');
+  const gate = document.getElementById('employeeAuthGate');
+  if (!gate.querySelector('#employeeLoginForm')) gate.innerHTML = EMPLOYEE_LOGIN_GATE_HTML;
+  gate.hidden = false;
+  const messageEl = document.getElementById('employeeLoginMessage');
+  if (messageEl) {
+    messageEl.classList.toggle('neutral', !message);
+    messageEl.textContent = message || 'Connectez-vous avec votre compte employ\u00e9.';
+  }
+  const password = document.getElementById('employeePassword');
+  if (password) password.value = '';
+}
+
+function pauseEmployeeDataRefresh() {
+  if (state.refreshTimer) { clearInterval(state.refreshTimer); state.refreshTimer = null; }
+  if (state.referenceRefreshTimer) { clearInterval(state.referenceRefreshTimer); state.referenceRefreshTimer = null; }
+  if (state.chatRefreshTimer) { clearInterval(state.chatRefreshTimer); state.chatRefreshTimer = null; }
+}
+
+function hideEmployeeLogin() {
+  document.getElementById('employeeAuthGate').hidden = true;
+  document.body.classList.remove('auth-pending');
+}
+
+async function submitEmployeeLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById('employeeUsername').value.trim();
+  const password = document.getElementById('employeePassword').value;
+  const button = document.getElementById('employeeLoginButton');
+  const message = document.getElementById('employeeLoginMessage');
+  if (!username || !password) return;
+  button.disabled = true;
+  button.textContent = 'CONNEXION...';
+  message.className = 'employee-login-message neutral';
+  message.textContent = 'V\u00e9rification...';
+  try {
+    const result = await API.employeeLogin(username, password);
+    setEmployeeSession(result);
+    if (!state.employeeAuthenticated) throw new Error('Connexion refus\u00e9e.');
+    if (state.employeeMustChangePassword) {
+      renderMandatoryPasswordGate(password);
+      return;
+    }
+    hideEmployeeLogin();
+    applyEmployeeAccess();
+    await startDeliveryAppOnce();
+  } catch (error) {
+    message.className = 'employee-login-message';
+    message.textContent = error.message || 'Identifiant ou mot de passe incorrect.';
+  } finally {
+    if (document.getElementById('employeeLoginButton')) {
+      button.disabled = false;
+      button.textContent = 'SE CONNECTER';
+    }
+  }
+}
+
+function renderMandatoryPasswordGate(currentPassword) {
+  pauseEmployeeDataRefresh();
+  const gate = document.getElementById('employeeAuthGate');
+  gate.hidden = false;
+  document.body.classList.add('auth-pending');
+  gate.innerHTML = '<div class="employee-login-card">' +
+    '<div class="employee-login-brand"><div class="employee-login-logo">LS</div><div><h2>Nouveau mot de passe</h2>' +
+    '<p>Vous devez remplacer le mot de passe temporaire.</p></div></div>' +
+    '<form id="mandatoryPasswordForm">' +
+    (currentPassword ? '' : '<label for="mandatoryCurrentPassword">Mot de passe actuel</label><input id="mandatoryCurrentPassword" type="password" autocomplete="current-password" required>') +
+    '<label for="mandatoryNewPassword">Nouveau mot de passe</label><input id="mandatoryNewPassword" type="password" autocomplete="new-password" minlength="10" required>' +
+    '<label for="mandatoryConfirmPassword">Confirmer</label><input id="mandatoryConfirmPassword" type="password" autocomplete="new-password" minlength="10" required>' +
+    '<button class="employee-login-submit" id="mandatoryPasswordButton" type="submit">ENREGISTRER</button>' +
+    '<div class="employee-login-message neutral" id="mandatoryPasswordMessage">Au moins 10 caract\u00e8res.</div></form></div>';
+  document.getElementById('mandatoryPasswordForm').onsubmit = async function(event) {
+    event.preventDefault();
+    const existing = currentPassword || document.getElementById('mandatoryCurrentPassword').value;
+    const next = document.getElementById('mandatoryNewPassword').value;
+    const confirm = document.getElementById('mandatoryConfirmPassword').value;
+    const msg = document.getElementById('mandatoryPasswordMessage');
+    if (next.length < 10) { msg.className = 'employee-login-message'; msg.textContent = 'Utilisez au moins 10 caract\u00e8res.'; return; }
+    if (next !== confirm) { msg.className = 'employee-login-message'; msg.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
+    const save = document.getElementById('mandatoryPasswordButton');
+    save.disabled = true;
+    try {
+      const result = await API.changeEmployeePassword(existing, next);
+      if (result && result.csrf) {
+        state.employeeCsrf = result.csrf;
+        // Delivery and customer-chat mutations share the same Flask session
+        // CSRF token. Keep an already-open chat usable after token rotation.
+        state.chatCsrf = result.csrf;
+      }
+      state.employeeMustChangePassword = false;
+      hideEmployeeLogin();
+      applyEmployeeAccess();
+      await startDeliveryAppOnce();
+    } catch (error) {
+      msg.className = 'employee-login-message';
+      msg.textContent = error.message || 'Impossible de modifier le mot de passe.';
+      save.disabled = false;
+    }
+  };
+}
+
+function applyEmployeeAccess() {
+  const canCreate = hasDeliveryPermission('create');
+  const canEdit = hasDeliveryPermission('edit');
+  const formTab = document.querySelector('.tab-btn[data-tab="form"]');
+  if (formTab) formTab.style.display = (canCreate || canEdit) ? '' : 'none';
+  const fab = document.getElementById('fabNewOrder');
+  if (fab && !canCreate) fab.style.display = 'none';
+  const routeTab = document.querySelector('.tab-btn[data-tab="routes"]');
+  if (routeTab) routeTab.style.display = hasDeliveryPermission('routes') ? '' : 'none';
+  const closeTab = document.querySelector('.tab-btn[data-tab="dailyClose"]');
+  if (closeTab) closeTab.style.display = hasDeliveryPermission('daily_close') ? '' : 'none';
+  const messenger = document.getElementById('messengerSessionButton');
+  if (messenger) messenger.style.display = hasDeliveryPermission('chat') ? '' : 'none';
+  const dashboardMode = document.getElementById('dashboardMode');
+  if (dashboardMode) dashboardMode.classList.toggle('visible', hasDeliveryPermission('performance'));
+  const undoBar = document.querySelector('.undo-redo-bar');
+  if (undoBar && DELIVERY_SECURE_MODE) undoBar.style.display = 'none';
+  if (state.activeTab === 'form' && !(canCreate || canEdit)) switchTab('orders');
+  if (state.activeTab === 'routes' && !hasDeliveryPermission('routes')) switchTab('orders');
+  if (state.activeTab === 'dailyClose' && !hasDeliveryPermission('daily_close')) switchTab('orders');
+  if (state.orders.length) renderOrders();
+}
+
+async function startDeliveryAppOnce() {
+  if (state.employeeAppStarted) {
+    await Promise.allSettled([loadReferenceData({force:true}), loadOrders({force:true})]);
+    startAutoRefresh();
+    startReferenceRefresh();
+    if (hasDeliveryPermission('chat')) initializeMessengerSession();
+    return;
+  }
+  state.employeeAppStarted = true;
+  await init();
+}
+
+async function bootstrapEmployeeAccess() {
+  if (DELIVERY_REDIRECTING) return;
+  if (!DELIVERY_SECURE_MODE) {
+    state.employeeAuthenticated = true;
+    state.employee = {id: 'local', username: 'local', display_name: 'Mode local', role: 'owner'};
+    state.employeeRole = 'owner';
+    hideEmployeeLogin();
+    applyEmployeeAccess();
+    await startDeliveryAppOnce();
+    return;
+  }
+  try {
+    const result = await API.getEmployeeSession();
+    setEmployeeSession(result);
+    if (!state.employeeAuthenticated) { showEmployeeLogin(); return; }
+    if (state.employeeMustChangePassword) { renderMandatoryPasswordGate(''); return; }
+    hideEmployeeLogin();
+    applyEmployeeAccess();
+    await startDeliveryAppOnce();
+  } catch (error) {
+    showEmployeeLogin(error.status && error.status !== 401 ? 'Service momentan\u00e9ment indisponible. R\u00e9essayez.' : 'Connectez-vous avec votre compte employ\u00e9.');
+  }
+}
+
+function roleLabel(role) {
+  const key = String(role || '').toLowerCase();
+  return DELIVERY_ROLE_LABELS[key] || role || '-';
+}
+
+function openEmployeeAccount() {
+  if (!state.employee) return;
+  const user = state.employee;
+  const name = user.display_name || user.username || 'Compte';
+  const canManage = hasDeliveryPermission('employees');
+  const canPerformance = hasDeliveryPermission('performance');
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal account-modal">' +
+    '<h3>Mon compte</h3><div class="account-summary"><div class="account-summary-avatar">' + escHtml(employeeInitials(name)) + '</div>' +
+    '<div><strong>' + escHtml(name) + '</strong><small>@' + escHtml(user.username || '') + ' &middot; ' + escHtml(roleLabel(state.employeeRole)) + '</small></div></div>' +
+    '<div class="account-menu-grid">' +
+    '<button type="button" onclick="openChangeEmployeePassword()">&#128274; Modifier mon mot de passe</button>' +
+    (canManage ? '<button type="button" onclick="openEmployeeAdmin()">&#128101; Employ&eacute;s et acc&egrave;s</button>' : '') +
+    (canPerformance ? '<button type="button" onclick="closeModal();switchTab(\'dashboard\');setDashboardMode(\'team\')">&#128202; Performance de l\'&eacute;quipe</button>' : '') +
+    '<button type="button" class="danger" onclick="logoutEmployee()">&#10140; Se d&eacute;connecter</button>' +
+    '</div><div class="modal-actions"><button class="btn-modal-cancel" onclick="closeModal()">FERMER</button></div></div></div>';
+}
+
+function openChangeEmployeePassword() {
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop"><div class="modal account-modal"><h3>Modifier le mot de passe</h3>' +
+    '<div class="admin-form"><label class="full">Mot de passe actuel<input id="accountCurrentPassword" type="password" autocomplete="current-password"></label>' +
+    '<label class="full">Nouveau mot de passe<input id="accountNewPassword" type="password" autocomplete="new-password" minlength="10"></label>' +
+    '<label class="full">Confirmer<input id="accountConfirmPassword" type="password" autocomplete="new-password" minlength="10"></label></div>' +
+    '<div class="admin-help" id="accountPasswordMessage">Au moins 10 caract&egrave;res.</div>' +
+    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="openEmployeeAccount()">RETOUR</button><button class="btn-confirm" onclick="saveOwnPassword()">ENREGISTRER</button></div></div></div>';
+}
+
+async function saveOwnPassword() {
+  const current = document.getElementById('accountCurrentPassword').value;
+  const next = document.getElementById('accountNewPassword').value;
+  const confirm = document.getElementById('accountConfirmPassword').value;
+  const message = document.getElementById('accountPasswordMessage');
+  if (next.length < 10) { message.textContent = 'Utilisez au moins 10 caract\u00e8res.'; return; }
+  if (next !== confirm) { message.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
+  try {
+    const result = await API.changeEmployeePassword(current, next);
+    if (result && result.csrf) {
+      state.employeeCsrf = result.csrf;
+      state.chatCsrf = result.csrf;
+    }
+    showToast('Mot de passe modifi\u00e9.');
+    closeModal();
+  } catch (error) {
+    message.textContent = error.message || 'Impossible de modifier le mot de passe.';
+  }
+}
+
+async function logoutEmployee() {
+  try { await API.employeeLogout(); } catch (error) {}
+  window.location.reload();
+}
+
+function employeeRoleOptions(selected) {
+  const roles = state.employeeRoles.length ? state.employeeRoles : [
+    {id:'owner',label:'Propri\u00e9taire'}, {id:'manager',label:'Responsable'},
+    {id:'employee',label:'Employ\u00e9'}, {id:'viewer',label:'Lecture seule'}
+  ];
+  return roles.map(function(role) {
+    const id = String(role.id || role.name || role.role || '');
+    const label = DELIVERY_ROLE_LABELS[id.toLowerCase()] || role.label || id;
+    return '<option value="' + escHtml(id) + '"' + (id === selected ? ' selected' : '') + '>' + escHtml(label) + '</option>';
+  }).join('');
+}
+
+function roleExplanation(role) {
+  const explanations = {
+    owner: 'Tout g\u00e9rer, y compris les comptes employ\u00e9s et la s\u00e9curit\u00e9.',
+    manager: 'G\u00e9rer les op\u00e9rations, voir l\u2019historique et la performance de l\u2019\u00e9quipe.',
+    employee: 'Cr\u00e9er et modifier les commandes, discuter avec les clients et envoyer les rappels.',
+    viewer: 'Consulter les commandes seulement, sans aucune modification.'
+  };
+  return explanations[String(role || '').toLowerCase()] || '';
+}
+
+function updateRoleExplanation(select, targetId) {
+  const target = document.getElementById(targetId);
+  if (target) target.textContent = roleExplanation(select.value);
+}
+
+async function openEmployeeAdmin() {
+  if (!hasDeliveryPermission('employees')) return;
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop"><div class="modal employee-admin-modal"><h3>Employ&eacute;s et acc&egrave;s</h3><div class="loading-overlay"><span class="spinner"></span> Chargement&hellip;</div></div></div>';
+  try {
+    const results = await Promise.all([API.getEmployees(), API.getEmployeeRoles()]);
+    state.employees = Array.isArray(results[0]) ? results[0] : (results[0].employees || []);
+    state.employeeRoles = Array.isArray(results[1]) ? results[1] : (results[1].roles || []);
+    renderEmployeeAdmin();
+  } catch (error) {
+    mc.querySelector('.employee-admin-modal').innerHTML = '<h3>Employ&eacute;s et acc&egrave;s</h3><div class="history-empty">' + escHtml(error.message || 'Chargement impossible.') + '</div><div class="modal-actions"><button class="btn-modal-cancel" onclick="closeModal()">FERMER</button></div>';
+  }
+}
+
+function renderEmployeeAdmin() {
+  const modal = document.querySelector('.employee-admin-modal');
+  if (!modal) return;
+  let html = '<div class="admin-toolbar"><div><h3>Employ&eacute;s et acc&egrave;s</h3><div class="admin-help">Chaque personne utilise son propre identifiant.</div></div>' +
+    '<button type="button" onclick="openCreateEmployee()">+ NOUVEL EMPLOY&Eacute;</button></div><div class="employee-list">';
+  state.employees.forEach(function(employee) {
+    const id = String(employee.id);
+    const isSelf = state.employee && String(state.employee.id) === id;
+    html += '<div class="employee-admin-card"><div class="employee-admin-head"><div><strong>' + escHtml(employee.display_name || employee.username) + '</strong>' +
+      '<small>@' + escHtml(employee.username || '') + ' &middot; Derni&egrave;re connexion: ' + escHtml(formatAuditDate(employee.last_login_at) || 'jamais') + '</small></div>' +
+      '<span class="employee-status' + (employee.active === false ? ' off' : '') + '">' + (employee.active === false ? 'INACTIF' : 'ACTIF') + '</span></div>' +
+      '<div class="employee-card-fields"><input id="emp-name-' + escHtml(id) + '" value="' + escHtml(employee.display_name || '') + '" aria-label="Nom affich&eacute;">' +
+      '<input id="emp-username-' + escHtml(id) + '" value="' + escHtml(employee.username || '') + '" aria-label="Identifiant" autocapitalize="none">' +
+      '<select id="emp-role-' + escHtml(id) + '" aria-label="R&ocirc;le" onchange="updateRoleExplanation(this,\'emp-role-help-' + escHtml(id) + '\')">' + employeeRoleOptions(String(employee.role || 'employee')) + '</select>' +
+      '<div class="role-explanation" id="emp-role-help-' + escHtml(id) + '">' + escHtml(roleExplanation(employee.role || 'employee')) + '</div></div>' +
+      '<div class="employee-card-actions"><button onclick="saveEmployee(\'' + escHtml(id) + '\')">ENREGISTRER</button>' +
+      (!isSelf ? '<button class="secondary" onclick="resetEmployeePassword(\'' + escHtml(id) + '\')">NOUVEAU MOT DE PASSE</button>' : '') +
+      (!isSelf ? '<button class="secondary" onclick="toggleEmployeeActive(\'' + escHtml(id) + '\',' + (employee.active === false ? 'true' : 'false') + ')">' + (employee.active === false ? 'R&Eacute;ACTIVER' : 'D&Eacute;SACTIVER') + '</button>' : '') +
+      '</div></div>';
+  });
+  html += '</div><div class="modal-actions"><button class="btn-modal-cancel" onclick="openEmployeeAccount()">RETOUR</button><button class="btn-modal-cancel" onclick="closeModal()">FERMER</button></div>';
+  modal.innerHTML = html;
+}
+
+function openCreateEmployee() {
+  const modal = document.querySelector('.employee-admin-modal');
+  if (!modal) return;
+  modal.innerHTML = '<h3>Nouvel employ&eacute;</h3><div class="admin-form">' +
+    '<label>Nom affich&eacute;<input id="newEmployeeName" autocomplete="off"></label>' +
+    '<label>Identifiant<input id="newEmployeeUsername" autocomplete="off" autocapitalize="none"></label>' +
+    '<label>R&ocirc;le<select id="newEmployeeRole" onchange="updateRoleExplanation(this,\'newEmployeeRoleHelp\')">' + employeeRoleOptions('employee') + '</select></label>' +
+    '<label>Mot de passe temporaire (facultatif)<input id="newEmployeePassword" type="password" autocomplete="new-password" minlength="10" placeholder="Laisser vide pour le g&eacute;n&eacute;rer"></label>' +
+    '<div class="role-explanation" id="newEmployeeRoleHelp">' + escHtml(roleExplanation('employee')) + '</div></div>' +
+    '<div class="admin-help" id="newEmployeeMessage">Laissez le mot de passe vide: Luna Shop en cr&eacute;era un fort &agrave; copier une seule fois. L\'employ&eacute; devra le changer &agrave; sa premi&egrave;re connexion.</div>' +
+    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="renderEmployeeAdmin()">RETOUR</button><button class="btn-confirm" onclick="createEmployee()">CR&Eacute;ER</button></div>';
+}
+
+async function createEmployee() {
+  const data = {
+    display_name: document.getElementById('newEmployeeName').value.trim(),
+    username: document.getElementById('newEmployeeUsername').value.trim().toLowerCase(),
+    role: document.getElementById('newEmployeeRole').value,
+    password: document.getElementById('newEmployeePassword').value
+  };
+  const message = document.getElementById('newEmployeeMessage');
+  if (!data.display_name || !data.username) { message.textContent = 'Le nom et l\u2019identifiant sont obligatoires.'; return; }
+  if (data.password && data.password.length < 10) { message.textContent = 'Le mot de passe doit contenir au moins 10 caract\u00e8res, ou laissez-le vide pour le g\u00e9n\u00e9rer.'; return; }
+  if (!data.password) delete data.password;
+  try {
+    const result = await API.createEmployee(data);
+    const created = result.employee || result;
+    if (created && created.id) state.employees.push(created);
+    showToast('Compte employ\u00e9 cr\u00e9\u00e9.');
+    if (result.temporary_password) showOneTimePassword(result.temporary_password);
+    else renderEmployeeAdmin();
+  } catch (error) { message.textContent = error.message || 'Cr\u00e9ation impossible.'; }
+}
+
+async function saveEmployee(id) {
+  try {
+    const result = await API.updateEmployee(id, {
+      display_name: document.getElementById('emp-name-' + id).value.trim(),
+      username: document.getElementById('emp-username-' + id).value.trim().toLowerCase(),
+      role: document.getElementById('emp-role-' + id).value
+    });
+    const updated = result.employee || result;
+    state.employees = state.employees.map(function(item) { return String(item.id) === String(id) ? Object.assign({}, item, updated) : item; });
+    showToast('Acc\u00e8s mis \u00e0 jour.');
+    renderEmployeeAdmin();
+  } catch (error) { showToast(error.message || 'Modification impossible.', 'error'); }
+}
+
+async function toggleEmployeeActive(id, active) {
+  try {
+    const result = await API.updateEmployee(id, {active: !!active});
+    const updated = result.employee || result;
+    state.employees = state.employees.map(function(item) { return String(item.id) === String(id) ? Object.assign({}, item, updated, {active: !!active}) : item; });
+    renderEmployeeAdmin();
+  } catch (error) { showToast(error.message || 'Modification impossible.', 'error'); }
+}
+
+async function resetEmployeePassword(id) {
+  if (!window.confirm('Cr\u00e9er un nouveau mot de passe temporaire pour cet employ\u00e9 ?')) return;
+  try {
+    const result = await API.resetEmployeePassword(id);
+    const temporary = result.temporary_password || result.password || result.temp_password || '';
+    showOneTimePassword(temporary);
+  } catch (error) { showToast(error.message || 'R\u00e9initialisation impossible.', 'error'); }
+}
+
+function showOneTimePassword(temporary) {
+  const modal = document.querySelector('.employee-admin-modal');
+  if (modal) modal.innerHTML = '<h3>Mot de passe temporaire</h3><p class="admin-help">Copiez-le maintenant. Il ne sera plus affich&eacute; ensuite.</p>' +
+    '<div class="one-time-password"><strong>MOT DE PASSE</strong><span id="oneTimePassword">' + escHtml(temporary || 'Cr\u00e9\u00e9, mais non retourn\u00e9 par le serveur') + '</span></div>' +
+    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="openEmployeeAdmin()">TERMINER</button>' +
+    (temporary ? '<button class="btn-confirm" onclick="copyOneTimePassword()">COPIER</button>' : '') + '</div>';
+}
+
+async function copyOneTimePassword() {
+  const value = document.getElementById('oneTimePassword').textContent;
+  try { await navigator.clipboard.writeText(value); showToast('Mot de passe copi\u00e9.'); } catch (error) { window.prompt('Copiez le mot de passe :', value); }
+}
+
+function formatAuditDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return String(value);
+  try { return date.toLocaleString('fr-FR', {dateStyle:'short',timeStyle:'short'}); } catch (error) { return date.toLocaleString('fr-FR'); }
+}
+
+function setDashboardMode(mode) {
+  if (mode === 'team' && !hasDeliveryPermission('performance')) return;
+  state.dashboardMode = mode === 'team' ? 'team' : 'orders';
+  const team = state.dashboardMode === 'team';
+  document.getElementById('dashboardOrdersPanel').hidden = team;
+  document.getElementById('teamPerformance').hidden = !team;
+  document.getElementById('dashboardOrdersButton').classList.toggle('active', !team);
+  document.getElementById('dashboardTeamButton').classList.toggle('active', team);
+  if (team) {
+    const from = document.getElementById('performanceFrom');
+    const to = document.getElementById('performanceTo');
+    if (!from.value) from.value = state.dashDate || todayISO();
+    if (!to.value) to.value = state.dashDate || todayISO();
+    loadTeamPerformance();
+  } else {
+    loadStats();
+  }
+}
+
+async function loadTeamPerformance() {
+  if (!hasDeliveryPermission('performance')) return;
+  const from = document.getElementById('performanceFrom').value || state.dashDate || todayISO();
+  const to = document.getElementById('performanceTo').value || from;
+  const content = document.getElementById('teamPerformanceContent');
+  content.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> Chargement&hellip;</div>';
+  try {
+    const result = await API.getTeamPerformance(from, to);
+    const members = Array.isArray(result) ? result : (result.members || result.employees || []);
+    if (!members.length) { content.innerHTML = '<div class="history-empty">Aucune activit&eacute; sur cette p&eacute;riode.</div>'; return; }
+    content.innerHTML = '<div class="performance-grid">' + members.map(function(member) {
+      const outcomeMetrics = (member.orders_completed !== undefined ? performanceNumber(member.orders_completed, 'Livr\u00e9es') : '') +
+        (member.orders_cancelled !== undefined ? performanceNumber(member.orders_cancelled, 'Annul\u00e9es') : '');
+      return '<div class="performance-card"><h3>' + escHtml(member.display_name || member.username || '-') + ' <small>&middot; ' + escHtml(roleLabel(member.role)) + '</small></h3>' +
+        '<div class="performance-numbers">' + performanceNumber(member.orders_created, 'Cr\u00e9\u00e9es') +
+        performanceNumber(member.orders_updated, 'Modifi\u00e9es') + performanceNumber(member.orders_deleted, 'Supprim\u00e9es') +
+        outcomeMetrics + performanceNumber(member.actions, 'Actions') + performanceNumber(formatAuditDate(member.last_action_at) || '-', 'Derni\u00e8re action') +
+        performanceNumber(formatAuditDate(member.last_login_at) || '-', 'Derni\u00e8re connexion') + '</div></div>';
+    }).join('') + '</div>';
+  } catch (error) {
+    content.innerHTML = '<div class="history-empty">' + escHtml(error.message || 'Chargement impossible.') + '</div>';
+  }
+}
+
+function performanceNumber(value, label) {
+  return '<div class="performance-number"><strong>' + escHtml(String(value == null ? 0 : value)) + '</strong><span>' + escHtml(label) + '</span></div>';
+}
 
 /* ═════════════════════════════════════════════════════════════════════
    API
@@ -1328,7 +1963,7 @@ const API = {
     // ?api=local as an explicit diagnostic fallback only.
     const params = new URLSearchParams(window.location.search);
     const forced = params.get('api') || localStorage.getItem('deliveryApiMode') || '';
-    return forced !== 'local';
+    return DELIVERY_SECURE_MODE || forced !== 'local';
   })(),
   staticProducts: [
     {code:'CA',name:'Creme Affinante',price:25000,subtypes:[]},
@@ -1384,6 +2019,10 @@ const API = {
   },
 
   isStaticMode() {
+    // The secured VPS entry always uses the authenticated Firebase gateway;
+    // legacy ?api=local/localStorage diagnostics must not switch it back to
+    // unauthenticated desktop-style API routes.
+    if (DELIVERY_SECURE_MODE) return true;
     return this.staticHost || this.firebaseFirst;
   },
 
@@ -1394,8 +2033,12 @@ const API = {
     const opts = {
       method,
       cache: 'no-store',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' }
     };
+    if (method !== 'GET' && method !== 'HEAD' && state.employeeCsrf && path.indexOf('/control/api/delivery/') === 0) {
+      opts.headers['X-CSRF-Token'] = state.employeeCsrf;
+    }
     if (body) opts.body = JSON.stringify(body);
     const r = await fetch(this.base + path, opts);
     if (!r.ok) {
@@ -1405,6 +2048,13 @@ const API = {
         details = await r.json();
         msg = details.error || details.message || msg;
       } catch(e) {}
+      if (DELIVERY_SECURE_MODE && path.indexOf('/control/api/delivery/') === 0) {
+        if (r.status === 401) showEmployeeLogin('Votre session a expir\u00e9. Reconnectez-vous.');
+        if (r.status === 403 && details && details.code === 'password_change_required') {
+          state.employeeMustChangePassword = true;
+          renderMandatoryPasswordGate('');
+        }
+      }
       const error = new Error(msg);
       error.status = r.status;
       error.data = details;
@@ -1413,12 +2063,62 @@ const API = {
     return r.json();
   },
 
+  employeeRequest(method, suffix, body) {
+    return this.request(method, '/control/api/delivery/' + String(suffix || '').replace(/^\/+/, ''), body);
+  },
+
+  getEmployeeSession() { return this.employeeRequest('GET', 'session'); },
+  employeeLogin(username, password) { return this.employeeRequest('POST', 'login', {username: username, password: password}); },
+  employeeLogout() { return this.employeeRequest('POST', 'logout', {}); },
+  changeEmployeePassword(currentPassword, newPassword) {
+    return this.employeeRequest('POST', 'change-password', {current_password: currentPassword, new_password: newPassword});
+  },
+  getEmployeeRoles() { return this.employeeRequest('GET', 'roles'); },
+  getEmployees() { return this.employeeRequest('GET', 'employees'); },
+  createEmployee(data) { return this.employeeRequest('POST', 'employees', data); },
+  updateEmployee(id, data) { return this.employeeRequest('PATCH', 'employees/' + encodeURIComponent(id), data); },
+  deleteEmployee(id) { return this.employeeRequest('DELETE', 'employees/' + encodeURIComponent(id)); },
+  resetEmployeePassword(id) { return this.employeeRequest('POST', 'employees/' + encodeURIComponent(id) + '/reset-password', {}); },
+  getTeamPerformance(from, to) {
+    return this.employeeRequest('GET', 'performance?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to));
+  },
+  getOrderHistory(orderKey) { return this.employeeRequest('GET', 'orders/' + encodeURIComponent(orderKey) + '/history'); },
+
   async fb(method, path, body) {
-    const opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    if (DELIVERY_SECURE_MODE && !state.employeeAuthenticated) {
+      const authError = new Error('Connexion employ\u00e9 requise.');
+      authError.status = 401;
+      throw authError;
+    }
+    const opts = { method: method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' } };
+    if (method !== 'GET' && method !== 'HEAD' && state.employeeCsrf) {
+      opts.headers['X-CSRF-Token'] = state.employeeCsrf;
+    }
     if (body !== undefined) opts.body = JSON.stringify(body);
     const jsonPath = path.indexOf('?') >= 0 ? path.replace('?', '.json?') : path + '.json';
-    const r = await fetch(this.firebaseBase + jsonPath, opts);
-    if (!r.ok) throw new Error('Firebase request failed (' + r.status + ')');
+    const target = DELIVERY_SECURE_MODE
+      ? this.base + '/control/api/delivery/firebase' + jsonPath
+      : this.firebaseBase + jsonPath;
+    const r = await fetch(target, opts);
+    if (!r.ok) {
+      let message = 'Firebase request failed (' + r.status + ')';
+      let detail = null;
+      try {
+        detail = await r.json();
+        message = detail.error || detail.message || message;
+      } catch (error) {}
+      if (r.status === 401 && DELIVERY_SECURE_MODE) showEmployeeLogin('Votre session a expir\u00e9. Reconnectez-vous.');
+      if (r.status === 403 && detail && detail.code === 'password_change_required') {
+        state.employeeMustChangePassword = true;
+        renderMandatoryPasswordGate('');
+      }
+      const requestError = new Error(message);
+      requestError.status = r.status;
+      throw requestError;
+    }
+    if (method !== 'GET' && method !== 'HEAD' && r.headers.get('X-Luna-Audit-Warning') === 'true') {
+      showToast('Commande enregistr\u00e9e \u2014 historique \u00e0 v\u00e9rifier.', 'error');
+    }
     return r.json();
   },
 
@@ -1718,6 +2418,17 @@ const API = {
     return order;
   },
 
+  stripServerActorMetadata(order) {
+    const clean = Object.assign({}, order || {});
+    [
+      'actor_meta','created_by','updated_by','last_edited_by','creator','last_editor',
+      'created_by_user_id','updated_by_user_id','last_edited_by_user_id','creator_user_id','creator_id','last_editor_id',
+      'created_by_display_name','updated_by_display_name','last_edited_by_display_name','creator_display_name','last_editor_display_name',
+      'created_by_username','updated_by_username','last_edited_by_username','created_by_role','updated_by_role'
+    ].forEach(function(field) { delete clean[field]; });
+    return clean;
+  },
+
   async getFirebaseOrders(date) {
     let path = this.firebaseOrdersPath;
     if (date) {
@@ -1816,7 +2527,7 @@ const API = {
   },
   createOrder(data) {
     if (this.isStaticMode()) {
-      const order = this.makeOrder(data);
+      const order = this.stripServerActorMetadata(this.makeOrder(data));
       order.source = 'web_ui';
       order.updated_at = this.nowStamp();
       const review = data && data.duplicate_review;
@@ -1841,7 +2552,7 @@ const API = {
   updateOrder(iid, data) {
     if (this.isStaticMode()) {
       return this.fb('GET', this.firebaseOrdersPath + '/' + encodeURIComponent(iid)).then((raw) => {
-        const order = this.makeOrder(data, raw || {});
+        const order = this.stripServerActorMetadata(this.makeOrder(data, raw || {}));
         order.source = 'web_ui';
         order.updated_at = this.nowStamp();
         const review = data && data.duplicate_review;
@@ -3067,6 +3778,9 @@ function reminderStepHtml(order, channel, index) {
 }
 
 function renderDeliveryContactHub(order) {
+  const canChat = hasDeliveryPermission('chat');
+  const canReminder = hasDeliveryPermission('reminder');
+  if (!canChat && !canReminder) return '';
   const orderKey = memoKeyForOrder(order);
   const status = state.chatCardStatuses[orderKey] || {};
   const selected = state.reminderPanels[orderKey] || '';
@@ -3083,20 +3797,22 @@ function renderDeliveryContactHub(order) {
     cue = '<span class="delivery-cue waiting">En attente de réponse</span>';
   }
   let steps = '';
-  ['messenger','sms'].forEach(function(channel) {
-    steps += '<div class="delivery-steps' + (selected === channel ? ' open' : '') +
-      '" data-reminder-channel="' + channel + '">' +
-      [0,1,2].map(function(index) { return reminderStepHtml(order, channel, index); }).join('') +
-      '</div>';
-  });
+  if (canReminder) {
+    ['messenger','sms'].forEach(function(channel) {
+      steps += '<div class="delivery-steps' + (selected === channel ? ' open' : '') +
+        '" data-reminder-channel="' + channel + '">' +
+        [0,1,2].map(function(index) { return reminderStepHtml(order, channel, index); }).join('') +
+        '</div>';
+    });
+  }
   return '<div class="delivery-contact-hub" data-contact-order-key="' + escHtml(orderKey) + '">' +
     '<div class="delivery-contact-toolbar">' +
-      '<button type="button" class="delivery-chat-open" data-order-iid="' + escHtml(order.iid) +
-      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">💬 Conversation</button>' +
-      '<button type="button" class="delivery-channel messenger' + (selected === 'messenger' ? ' active' : '') +
+      (canChat ? '<button type="button" class="delivery-chat-open" data-order-iid="' + escHtml(order.iid) +
+      '" onclick="openMessengerChat(this.getAttribute(\'data-order-iid\'))">💬 Conversation</button>' : '') +
+      (canReminder ? '<button type="button" class="delivery-channel messenger' + (selected === 'messenger' ? ' active' : '') +
       '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'messenger\')">Rappel Messenger</button>' +
       '<button type="button" class="delivery-channel sms' + (selected === 'sms' ? ' active' : '') +
-      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'sms\')">Rappel SMS</button>' +
+      '" data-order-iid="' + escHtml(order.iid) + '" onclick="toggleReminderPanel(this.getAttribute(\'data-order-iid\'),\'sms\')">Rappel SMS</button>' : '') +
       '<div class="delivery-contact-cue">' + cue + '</div></div>' + steps +
     '<div class="delivery-step-status' + (localMessage ? ' ' + escHtml(localMessage.type) : '') + '">' +
       escHtml(localMessage ? localMessage.text : '') + '</div></div>';
@@ -3125,6 +3841,7 @@ async function ensureMessengerConversation(order) {
 }
 
 function openMessengerChat(iid) {
+  if (!hasDeliveryPermission('chat')) return;
   const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
   if (!order) return;
   if (!state.chatAuthenticated) {
@@ -3138,6 +3855,7 @@ function openMessengerChat(iid) {
 }
 
 async function sendMessengerReminder(iid, index) {
+  if (!hasDeliveryPermission('reminder')) return;
   const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
   const reminderKey = DELIVERY_REMINDER_KEYS[Number(index)];
   if (!order || !reminderKey) return;
@@ -3337,7 +4055,7 @@ function memoModalOrderIid() {
 function updateMemoPresetControls() {
   const select = document.getElementById('memoPresetSelect');
   const removeButton = document.getElementById('memoRemovePresetBtn');
-  if (removeButton) removeButton.disabled = !select || !select.value;
+  if (removeButton) removeButton.disabled = !hasDeliveryPermission('settings') || !select || !select.value;
 }
 
 function applyMemoPreset(presetId) {
@@ -3356,6 +4074,10 @@ function applyMemoPreset(presetId) {
 }
 
 function openOrderMemo(iid) {
+  if (!hasDeliveryPermission('memo')) {
+    showToast('Votre r\u00f4le ne permet pas de modifier les m\u00e9mos.', 'error');
+    return;
+  }
   const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
   if (!order) {
     showToast(T('order_not_found'), 'error');
@@ -3363,6 +4085,7 @@ function openOrderMemo(iid) {
   }
 
   const memo = normalizeOrderMemo(order.web_memo) || memoForOrder(order);
+  const canManagePresets = hasDeliveryPermission('settings');
   const presets = (state.memoPresets || []).filter(Boolean);
   const selectedPresetId = memo && presets.some(function(preset) {
     return preset.id === memo.preset_id;
@@ -3383,15 +4106,15 @@ function openOrderMemo(iid) {
       '<div class="memo-helper">' + escHtml(T('memo_web_only')) + '</div>' +
       '<label class="memo-field-label" for="memoPresetSelect">' + escHtml(T('memo_saved')) + '</label>' +
       '<select id="memoPresetSelect" onchange="applyMemoPreset(this.value)">' + presetOptions + '</select>' +
-      '<button type="button" class="btn-sm" id="memoRemovePresetBtn" onclick="removeSelectedMemoPreset()"' +
-        (selectedPresetId ? '' : ' disabled') + '>' + escHtml(T('memo_remove_preset')) + '</button>' +
+      (canManagePresets ? '<button type="button" class="btn-sm" id="memoRemovePresetBtn" onclick="removeSelectedMemoPreset()"' +
+        (selectedPresetId ? '' : ' disabled') + '>' + escHtml(T('memo_remove_preset')) + '</button>' : '') +
       '<label class="memo-field-label" for="memoCategory">' + escHtml(T('memo_category')) + '</label>' +
       '<select id="memoCategory">' + categoryOptions + '</select>' +
       '<label class="memo-field-label" for="memoText">' + escHtml(T('memo_text')) + '</label>' +
       '<textarea id="memoText" maxlength="600" placeholder="' + escHtml(T('memo_text_placeholder')) + '">' +
         escHtml(memo ? memo.text : '') + '</textarea>' +
-      '<label class="memo-check"><input type="checkbox" id="memoSavePreset"><span>' +
-        escHtml(T('memo_save_preset')) + '</span></label>' +
+      (canManagePresets ? '<label class="memo-check"><input type="checkbox" id="memoSavePreset"><span>' +
+        escHtml(T('memo_save_preset')) + '</span></label>' : '') +
       '<div class="modal-actions">' +
         (memo ? '<button type="button" class="btn-memo-remove" onclick="removeOrderMemo()">' + escHtml(T('memo_remove')) + '</button>' : '') +
         '<button type="button" class="btn-modal-cancel" onclick="closeModal()">' + escHtml(T('cancel')) + '</button>' +
@@ -3429,7 +4152,7 @@ async function saveOrderMemo() {
   const requestedCategory = categoryInput ? categoryInput.value : 'custom';
   const categoryId = MEMO_CATEGORIES[requestedCategory] ? requestedCategory : 'custom';
   let presetId = presetInput ? presetInput.value : '';
-  const shouldSavePreset = !!(savePresetInput && savePresetInput.checked);
+  const shouldSavePreset = !!(hasDeliveryPermission('settings') && savePresetInput && savePresetInput.checked);
   const existingMemo = memoForOrder(order);
   if (saveButton) {
     saveButton.disabled = true;
@@ -3488,6 +4211,7 @@ async function removeOrderMemo() {
 }
 
 async function removeSelectedMemoPreset() {
+  if (!hasDeliveryPermission('settings')) return;
   const select = document.getElementById('memoPresetSelect');
   const presetId = select ? select.value : '';
   const iid = memoModalOrderIid();
@@ -3774,13 +4498,20 @@ async function copyAgentRouteLink(agent) {
 }
 
 function switchTab(tab) {
+  if (tab === 'form' && !(hasDeliveryPermission('create') || hasDeliveryPermission('edit'))) {
+    showToast('Votre r\u00f4le ne permet pas de modifier les commandes.', 'error');
+    return;
+  }
+  if (tab === 'routes' && !hasDeliveryPermission('routes')) return;
+  if (tab === 'dailyClose' && !hasDeliveryPermission('daily_close')) return;
   state.activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tab);
   });
   document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
   // Show FAB on orders/dashboard, hide it while working in a focused workflow.
-  document.getElementById('fabNewOrder').style.display = (tab === 'form' || tab === 'routes' || tab === 'dailyClose') ? 'none' : 'flex';
+  document.getElementById('fabNewOrder').style.display = hasDeliveryPermission('create') &&
+    (tab !== 'form' && tab !== 'routes' && tab !== 'dailyClose') ? 'flex' : 'none';
   if (tab === 'orders') {
     document.getElementById('tabOrders').classList.add('active');
     updateDateBanner(state.currentDate);
@@ -3807,7 +4538,8 @@ function switchTab(tab) {
     updateDateBanner(state.dashDate);
     stopAutoRefresh();
     stopDailyCloseRefresh();
-    loadStats();
+    if (state.dashboardMode === 'team' && hasDeliveryPermission('performance')) loadTeamPerformance();
+    else loadStats();
   } else if (tab === 'routes') {
     document.getElementById('tabRoutes').classList.add('active');
     updateDateBanner(state.routeDate);
@@ -4412,6 +5144,11 @@ function memoKeyForOrder(order) {
   return 'desktop_' + iid.replace(/[^A-Za-z0-9_-]/g, '_');
 }
 
+function filterByCreator() {
+  state.filterCreator = document.getElementById('filterCreator').value;
+  renderOrders();
+}
+
 function normalizeSmsReminderActivity(raw) {
   const source = raw && typeof raw === 'object' ? raw : {};
   const allowed = new Set(['driver_arrived','driver_waiting','delivery_confirmation']);
@@ -4502,6 +5239,7 @@ async function loadOrders(options) {
     if (signature !== state.ordersSignature) {
       state.orders = nextOrders;
       state.ordersSignature = signature;
+      populateCreatorFilter();
       renderOrders();
     }
   } catch(e) {
@@ -5268,8 +6006,114 @@ function compareOrdersNewestFirst(a, b) {
   return bid.localeCompare(aid);
 }
 
+function orderActorInfo(order) {
+  const meta = order && order.actor_meta && typeof order.actor_meta === 'object' ? order.actor_meta : {};
+  const createdObject = meta.created_by && typeof meta.created_by === 'object' ? meta.created_by : {};
+  const editedObject = meta.last_edited_by && typeof meta.last_edited_by === 'object' ? meta.last_edited_by :
+    (meta.updated_by && typeof meta.updated_by === 'object' ? meta.updated_by : {});
+  const creatorId = meta.created_by_user_id || meta.creator_user_id || meta.creator_id || createdObject.id || createdObject.user_id || '';
+  const creatorName = meta.created_by_display_name || meta.creator_display_name || meta.created_by_name || createdObject.display_name || createdObject.username || '';
+  const editorId = meta.last_edited_by_user_id || meta.updated_by_user_id || meta.last_editor_id || editedObject.id || editedObject.user_id || '';
+  const editorName = meta.last_edited_by_display_name || meta.updated_by_display_name || meta.last_editor_display_name || editedObject.display_name || editedObject.username || '';
+  const legacy = !creatorId && !creatorName;
+  return {
+    creatorId: String(creatorId || ''),
+    creatorName: creatorName || 'Application principale / ancien ordre',
+    creatorKey: creatorId ? 'user:' + String(creatorId) : (creatorName ? 'name:' + normalizeSearchText(creatorName) : 'legacy'),
+    editorId: String(editorId || ''),
+    editorName: editorName || '',
+    createdAt: meta.created_at || order.created_at || '',
+    updatedAt: meta.updated_at || order.updated_at || '',
+    legacy: legacy
+  };
+}
+
+function populateCreatorFilter() {
+  const select = document.getElementById('filterCreator');
+  if (!select) return;
+  const previous = state.filterCreator || select.value;
+  const creators = {};
+  (state.orders || []).forEach(function(order) {
+    const actor = orderActorInfo(order);
+    creators[actor.creatorKey] = actor.creatorName;
+  });
+  select.innerHTML = '<option value="">Tous les cr&eacute;ateurs</option>' + Object.keys(creators).sort(function(a, b) {
+    return String(creators[a]).localeCompare(String(creators[b]), 'fr', {sensitivity:'base'});
+  }).map(function(key) {
+    return '<option value="' + escHtml(key) + '">' + escHtml(creators[key]) + '</option>';
+  }).join('');
+  if (previous && Object.prototype.hasOwnProperty.call(creators, previous)) {
+    select.value = previous;
+    state.filterCreator = previous;
+  } else {
+    select.value = '';
+    state.filterCreator = '';
+  }
+}
+
+function renderOrderAuditLine(order) {
+  const actor = orderActorInfo(order);
+  let text = 'Cr\u00e9\u00e9e par ' + actor.creatorName;
+  if (actor.editorName && actor.editorName !== actor.creatorName) text += ' \u00b7 Modifi\u00e9e par ' + actor.editorName;
+  if (actor.updatedAt) text += ' \u00b7 ' + formatAuditDate(actor.updatedAt);
+  if (hasDeliveryPermission('history')) {
+    return '<div class="order-audit-line"><button type="button" class="order-audit-button can-open" onclick="openOrderHistory(\'' + escHtml(String(order.iid)) + '\')">' + escHtml(text) + ' &rsaquo;</button></div>';
+  }
+  return '<div class="order-audit-line"><span class="order-audit-button">' + escHtml(text) + '</span></div>';
+}
+
+function auditActionLabel(action) {
+  const labels = {create:'Commande cr\u00e9\u00e9e',created:'Commande cr\u00e9\u00e9e',update:'Commande modifi\u00e9e',updated:'Commande modifi\u00e9e',delete:'Commande supprim\u00e9e',deleted:'Commande supprim\u00e9e',status:'Statut modifi\u00e9'};
+  return labels[String(action || '').toLowerCase()] || String(action || 'Modification');
+}
+
+function auditValue(value) {
+  if (value == null || value === '') return '-';
+  const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  return text.length > 120 ? text.slice(0, 117) + '...' : text;
+}
+
+async function openOrderHistory(orderKey) {
+  if (!hasDeliveryPermission('history')) return;
+  const order = state.orders.find(function(item) { return String(item.iid) === String(orderKey); });
+  const mc = document.getElementById('modalContainer');
+  mc.innerHTML = '<div class="modal-backdrop" onclick="if(event.target===this)closeModal()"><div class="modal history-modal"><h3>Historique &mdash; ' + escHtml(order ? order.client_name : orderKey) + '</h3><div class="loading-overlay"><span class="spinner"></span> Chargement&hellip;</div></div></div>';
+  try {
+    const result = await API.getOrderHistory(orderKey);
+    const history = Array.isArray(result) ? result : (result.history || result.events || []);
+    const modal = document.querySelector('.history-modal');
+    if (!modal) return;
+    let html = '<h3>Historique &mdash; ' + escHtml(order ? order.client_name : orderKey) + '</h3>';
+    if (!history.length) {
+      html += '<div class="history-empty">Aucun historique enregistr&eacute; pour cet ancien ordre.</div>';
+    } else {
+      html += '<div class="history-list">' + history.map(function(event) {
+        const changed = Array.isArray(event.changed_fields) ? event.changed_fields : Object.keys(event.changed_fields || {});
+        const before = event.before_data || {};
+        const after = event.after_data || {};
+        const details = changed.map(function(field) {
+          return '<div><strong>' + escHtml(field) + ':</strong> ' + escHtml(auditValue(before[field])) + ' &rarr; ' + escHtml(auditValue(after[field])) + '</div>';
+        }).join('');
+        return '<div class="history-event"><div class="history-event-head"><span>' + escHtml(auditActionLabel(event.action)) + '</span><small>' + escHtml(formatAuditDate(event.occurred_at || event.created_at)) + '</small></div>' +
+          '<small>' + escHtml(event.actor_display_name || event.actor_username || 'Application principale') + '</small>' +
+          (details ? '<div class="history-changes">' + details + '</div>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    html += '<div class="modal-actions"><button class="btn-modal-cancel" onclick="closeModal()">FERMER</button></div>';
+    modal.innerHTML = html;
+  } catch (error) {
+    const modal = document.querySelector('.history-modal');
+    if (modal) modal.innerHTML = '<h3>Historique</h3><div class="history-empty">' + escHtml(error.message || 'Chargement impossible.') + '</div><div class="modal-actions"><button class="btn-modal-cancel" onclick="closeModal()">FERMER</button></div>';
+  }
+}
+
 function renderOrders() {
   let filtered = state.orders;
+  const canStatus = hasDeliveryPermission('status');
+  const canEdit = hasDeliveryPermission('edit');
+  const canMemo = hasDeliveryPermission('memo');
+  const canDelete = hasDeliveryPermission('delete');
+  const canChat = hasDeliveryPermission('chat');
 
   if (state.filterStatus) {
     filtered = filtered.filter(o => o.status === state.filterStatus);
@@ -5279,6 +6123,9 @@ function renderOrders() {
   }
   if (state.filterPayment) {
     filtered = filtered.filter(o => (o.payment_method || 'cash') === state.filterPayment);
+  }
+  if (state.filterCreator) {
+    filtered = filtered.filter(function(order) { return orderActorInfo(order).creatorKey === state.filterCreator; });
   }
   if (state.searchQuery) {
     const q = state.searchQuery;
@@ -5304,6 +6151,9 @@ function renderOrders() {
       } else if (state.sortField === 'agent') {
         va = (a.agent || '').toLowerCase();
         vb = (b.agent || '').toLowerCase();
+      } else if (state.sortField === 'creator') {
+        va = orderActorInfo(a).creatorName.toLowerCase();
+        vb = orderActorInfo(b).creatorName.toLowerCase();
       } else {
         va = a[state.sortField] || '';
         vb = b[state.sortField] || '';
@@ -5320,7 +6170,8 @@ function renderOrders() {
   countEl.textContent = filtered.length + ' ' + T('orders_count') +
     (state.filterStatus ? ' (' + translateStatus(state.filterStatus) + ')' : '') +
     (state.filterAgent ? ' - ' + state.filterAgent : '') +
-    (state.filterPayment ? ' - ' + paymentLabel(state.filterPayment) : '');
+    (state.filterPayment ? ' - ' + paymentLabel(state.filterPayment) : '') +
+    (state.filterCreator ? ' - ' + ((document.querySelector('#filterCreator option:checked') || {}).textContent || '') : '');
 
   const container = document.getElementById('ordersList');
 
@@ -5365,7 +6216,7 @@ function renderOrders() {
         '<span class="memo-text">' + escHtml(webMemo.text) + '</span></div>' : '') +
       '<div class="card-body">' +
         '<div class="card-row"><span class="card-label">' + escHtml(T('phone')) + '</span>' +
-          '<a href="tel:' + escHtml(phoneClean) + '">' + escHtml(o.phone) + '</a></div>' +
+          (canChat ? '<a href="tel:' + escHtml(phoneClean) + '">' + escHtml(o.phone) + '</a>' : '<span class="card-value">' + escHtml(o.phone) + '</span>') + '</div>' +
         '<div class="card-row"><span class="card-label">' + escHtml(T('address')) + '</span>' +
           '<span class="card-value">' + escHtml(o.address || '-') + '</span></div>' +
         '<div class="card-row"><span class="card-label">' + escHtml(T('products')) + '</span>' +
@@ -5420,18 +6271,22 @@ function renderOrders() {
 
     html += '</div>'; // card-body
 
-    html += renderDeliveryContactHub(o);
+    if (hasDeliveryPermission('chat') || hasDeliveryPermission('reminder')) {
+      html += renderDeliveryContactHub(o);
+    }
+
+    html += renderOrderAuditLine(o);
 
     html += '<div class="card-footer">' +
-      '<select onchange="changeStatus(\'' + escHtml(o.iid) + '\',this.value,this)" title="Change status">';
+      '<select onchange="changeStatus(\'' + escHtml(o.iid) + '\',this.value,this)" title="Change status"' + (canStatus ? '' : ' disabled') + '>';
     statuses.forEach(s => {
       html += '<option value="' + escHtml(s) + '"' + (o.status === s ? ' selected' : '') + '>' + escHtml(translateStatus(s)) + '</option>';
     });
     html += '</select>' +
-      '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' +
-      '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' +
-      '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' +
-      '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' +
+      (canEdit ? '<button class="btn-sm btn-edit" onclick="editOrder(\'' + escHtml(o.iid) + '\')">' + escHtml(T('edit')) + '</button>' : '') +
+      (canMemo ? '<button class="btn-sm btn-memo' + (webMemo ? ' has-memo' : '') + '" data-memo-iid="' + escHtml(o.iid) + '" onclick="openOrderMemo(this.getAttribute(\'data-memo-iid\'))">&#128221; ' + escHtml(T('memo_action')) + '</button>' : '') +
+      (canChat ? '<a class="btn-sm btn-call" href="tel:' + escHtml(phoneClean) + '">' + escHtml(T('call')) + '</a>' : '') +
+      (canDelete ? '<button class="btn-sm btn-delete" onclick="deleteOrder(\'' + escHtml(o.iid) + '\',\'' + escHtml(o.client_name).replace(/'/g,"\\'") + '\')">' + escHtml(T('delete')) + '</button>' : '') +
     '</div>'; // card-footer
 
     html += '</div>'; // order-card
@@ -5928,6 +6783,11 @@ function toggleSubtypes(rowId) {
    CHANGE STATUS
    ═════════════════════════════════════════════════════════════════════ */
 function changeStatus(iid, newStatus, selectEl) {
+  if (!hasDeliveryPermission('status')) {
+    showToast('Votre r\u00f4le ne permet pas de changer le statut.', 'error');
+    renderOrders();
+    return;
+  }
   const order = state.orders.find(o => o.iid === iid);
   if (!order) return;
   const oldStatus = order.status;
@@ -5993,6 +6853,10 @@ async function doStatusUpdate(iid, newStatus, extra, selectEl, oldStatus) {
    DELETE ORDER
    ═════════════════════════════════════════════════════════════════════ */
 function deleteOrder(iid, name) {
+  if (!hasDeliveryPermission('delete')) {
+    showToast('Votre r\u00f4le ne permet pas de supprimer une commande.', 'error');
+    return;
+  }
   const order = state.orders.find(function(item) { return String(item.iid) === String(iid); });
   const memoKey = memoKeyForOrder(order);
   showModal(T('delete_order'),
@@ -6022,6 +6886,10 @@ function deleteOrder(iid, name) {
    EDIT ORDER
    ═════════════════════════════════════════════════════════════════════ */
 async function editOrder(iid) {
+  if (!hasDeliveryPermission('edit')) {
+    showToast('Votre r\u00f4le ne permet pas de modifier une commande.', 'error');
+    return;
+  }
   const order = state.orders.find(o => o.iid === iid);
   if (!order) {
     showToast(T('order_not_found'), 'error');
@@ -6254,6 +7122,7 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
     let index = 0;
     const reviewed = [];
     const remove = [];
+    const canRemoveExisting = hasDeliveryPermission('delete');
     const container = document.getElementById('modalContainer');
 
     function finish(result) {
@@ -6314,10 +7183,10 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
         escHtml(duplicateUiText('COMMANDE EFA VOATAHIRY', 'EXISTING SAVED ORDER')) + '</h4>' +
         duplicateOrderRows(candidate, existing, 'old') + '</section></div>' +
         duplicateConversationMarkup(existing) +
-        '<div class="duplicate-help">' + escHtml(duplicateUiText(
+        '<div class="duplicate-help">' + escHtml(canRemoveExisting ? duplicateUiText(
           'FITSIPIKA TSOTRA: fidio TEHIRIZO IZY ROA raha tena nanao commande vaovao ilay client. Ny SOLOINA ILAY TALOHA dia mamafa tanteraka ilay commande teo aloha.',
           'Simple rule: choose BOTH only if the conversation confirms a new order. REPLACE permanently deletes the earlier order.'
-        )) + '</div>' +
+        ) : 'RESPONSABLE REQUIS pour supprimer une ancienne commande. Vous pouvez revenir corriger les informations ou garder les deux seulement si le client a vraiment command\u00e9 de nouveau.') + '</div>' +
         '<button class="duplicate-cancel" id="duplicateCancel">' +
         escHtml(duplicateUiText('HIVERINA TSY MISY TEHIRIZINA', 'Return without saving')) +
         '</button><div class="duplicate-actions">' +
@@ -6325,9 +7194,9 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
         escHtml(duplicateUiText('1. AZA TEHIRIZINA ITY VAOVAO ITY\nTAZOMY ILAY EFA VOATAHIRY', '1. CANCEL THE NEW ONE\nKeep the saved order')) +
         '</button><button class="duplicate-keep-both" id="duplicateKeepBoth">' +
         escHtml(duplicateUiText('2. TEHIRIZO IZY ROA\nNANAO COMMANDE VAOVAO ILAY CLIENT', '2. SAVE BOTH ORDERS\nThe customer ordered again')) +
-        '</button><button class="duplicate-keep-new" id="duplicateKeepNew">' +
+        '</button>' + (canRemoveExisting ? '<button class="duplicate-keep-new" id="duplicateKeepNew">' +
         escHtml(duplicateUiText('3. SOLOINA ILAY TALOHA\nTEHIRIZO VAOVAO + FAFAO TALOHA', '3. REPLACE THE OLD ORDER\nSave new + delete old')) +
-        '</button></div></div></div>';
+        '</button>' : '') + '</div></div></div>';
 
       document.getElementById('duplicateCancel').onclick = function() {
         finish({proceed: false, cancelled: true, reviewed_iids: [], delete_iids: []});
@@ -6336,7 +7205,9 @@ function reviewDuplicateMatches(candidate, matches, isEdit) {
         finish({proceed: false, keep_existing: true, reviewed_iids: [], delete_iids: []});
       };
       document.getElementById('duplicateKeepBoth').onclick = function() { next('both'); };
-      document.getElementById('duplicateKeepNew').onclick = function() { next('new'); };
+      if (document.getElementById('duplicateKeepNew')) {
+        document.getElementById('duplicateKeepNew').onclick = function() { next('new'); };
+      }
     }
 
     render();
@@ -6498,6 +7369,10 @@ function validateOrderForm(productResult) {
 
 async function submitOrder(e) {
   e.preventDefault();
+  if (state.editingOrder ? !hasDeliveryPermission('edit') : !hasDeliveryPermission('create')) {
+    showToast('Votre r\u00f4le ne permet pas cette action.', 'error');
+    return;
+  }
 
   clearOrderValidation();
   const productsInput = document.getElementById('fProducts');
@@ -6765,6 +7640,8 @@ function applyLanguage() {
   // Filter agent dropdown first option
   const fa = document.getElementById('filterAgent');
   if (fa.options[0]) fa.options[0].textContent = T('all_agents');
+  const fc = document.getElementById('filterCreator');
+  if (fc && fc.options[0]) fc.options[0].textContent = LANG.current === 'fr' ? 'Tous les cr\u00e9ateurs' : 'All creators';
 
   // Filter payment dropdown
   const fp = document.getElementById('filterPayment');
@@ -6894,7 +7771,7 @@ async function init() {
     loadReferenceData({force: true}),
     loadOrders(),
     refreshHistoryState(),
-    initializeMessengerSession()
+    hasDeliveryPermission('chat') ? initializeMessengerSession() : Promise.resolve()
   ]);
 
   // Try to get today's date from server
@@ -6925,8 +7802,8 @@ async function init() {
   if (initialParams.get('routeAgent') || initialParams.get('tab') === 'routes') switchTab('routes');
 }
 
-// Kick it off
-init();
+// Check the employee session before any secured order request is started.
+bootstrapEmployeeAccess();
 </script>
 <script src="web_pdf_export.js"></script>
 <script src="pdf_export_actions.js"></script>
