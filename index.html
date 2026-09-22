@@ -159,7 +159,6 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 .employee-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.employee-card-actions .secondary{background:#eef1f8;color:#465064}.employee-card-actions .danger{background:#ffebee;color:#b42318}
 .admin-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}.admin-form .full{grid-column:1/-1}.admin-help{font-size:.72rem;color:#73798a;margin:8px 0}
 .role-explanation{grid-column:1/-1;font-size:.7rem;line-height:1.35;color:#61697a;background:#f5f6fa;border-radius:8px;padding:7px 9px}
-.one-time-password{padding:12px;background:#fff7db;border:1px solid #eed887;border-radius:10px;color:#654f00;word-break:break-all;margin-top:10px}.one-time-password strong{display:block;margin-bottom:5px}
 .history-list{display:grid;gap:10px}.history-event{border-left:3px solid #667eea;padding:8px 10px;background:#f8f9fd;border-radius:0 9px 9px 0}.history-event-head{display:flex;justify-content:space-between;gap:8px;font-weight:750;font-size:.79rem}.history-event small{color:#777}.history-changes{margin-top:6px;font-size:.72rem;color:#555;line-height:1.45}.history-empty{text-align:center;color:#777;padding:24px}
 .dashboard-mode{display:none;gap:6px;margin-bottom:12px}.dashboard-mode.visible{display:flex}.dashboard-mode button{border:1px solid #dfe3ec;border-radius:999px;padding:7px 12px;background:#fff;color:#646b7b;font-weight:750}.dashboard-mode button.active{background:#667eea;color:#fff;border-color:#667eea}
 .team-performance[hidden],.dashboard-orders-panel[hidden]{display:none}.team-performance-controls{display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap;background:#fff;border-radius:12px;padding:11px;margin-bottom:12px}.team-performance-controls label{font-size:.68rem;color:#666;font-weight:700}.team-performance-controls input{display:block;margin-top:4px;border:1px solid #d9dde7;border-radius:8px;padding:7px}.team-performance-controls button{border:0;border-radius:8px;padding:8px 12px;background:#667eea;color:#fff;font-weight:800}
@@ -1575,7 +1574,7 @@ function renderMandatoryPasswordGate(currentPassword) {
   document.body.classList.add('auth-pending');
   gate.innerHTML = '<div class="employee-login-card">' +
     '<div class="employee-login-brand"><div class="employee-login-logo">LS</div><div><h2>Nouveau mot de passe</h2>' +
-    '<p>Vous devez remplacer le mot de passe temporaire.</p></div></div>' +
+    '<p>Choisissez un nouveau mot de passe pour continuer.</p></div></div>' +
     '<form id="mandatoryPasswordForm">' +
     (currentPassword ? '' : '<label for="mandatoryCurrentPassword">Mot de passe actuel</label><input id="mandatoryCurrentPassword" type="password" autocomplete="current-password" required>') +
     '<label for="mandatoryNewPassword">Nouveau mot de passe</label><input id="mandatoryNewPassword" type="password" autocomplete="new-password" minlength="10" required>' +
@@ -1786,7 +1785,7 @@ function renderEmployeeAdmin() {
       '<select id="emp-role-' + escHtml(id) + '" aria-label="R&ocirc;le" onchange="updateRoleExplanation(this,\'emp-role-help-' + escHtml(id) + '\')">' + employeeRoleOptions(String(employee.role || 'employee')) + '</select>' +
       '<div class="role-explanation" id="emp-role-help-' + escHtml(id) + '">' + escHtml(roleExplanation(employee.role || 'employee')) + '</div></div>' +
       '<div class="employee-card-actions"><button onclick="saveEmployee(\'' + escHtml(id) + '\')">ENREGISTRER</button>' +
-      (!isSelf ? '<button class="secondary" onclick="resetEmployeePassword(\'' + escHtml(id) + '\')">NOUVEAU MOT DE PASSE</button>' : '') +
+      (!isSelf ? '<button class="secondary" onclick="openEmployeePasswordReset(\'' + escHtml(id) + '\')">MODIFIER LE MOT DE PASSE</button>' : '') +
       (!isSelf ? '<button class="secondary" onclick="toggleEmployeeActive(\'' + escHtml(id) + '\',' + (employee.active === false ? 'true' : 'false') + ')">' + (employee.active === false ? 'R&Eacute;ACTIVER' : 'D&Eacute;SACTIVER') + '</button>' : '') +
       '</div></div>';
   });
@@ -1801,9 +1800,10 @@ function openCreateEmployee() {
     '<label>Nom affich&eacute;<input id="newEmployeeName" autocomplete="off"></label>' +
     '<label>Identifiant<input id="newEmployeeUsername" autocomplete="off" autocapitalize="none"></label>' +
     '<label>R&ocirc;le<select id="newEmployeeRole" onchange="updateRoleExplanation(this,\'newEmployeeRoleHelp\')">' + employeeRoleOptions('employee') + '</select></label>' +
-    '<label>Mot de passe temporaire (facultatif)<input id="newEmployeePassword" type="password" autocomplete="new-password" minlength="10" placeholder="Laisser vide pour le g&eacute;n&eacute;rer"></label>' +
+    '<label>Mot de passe permanent<input id="newEmployeePassword" type="password" autocomplete="new-password" minlength="10" required placeholder="10 caract&egrave;res minimum"></label>' +
+    '<label>Confirmer le mot de passe<input id="newEmployeePasswordConfirm" type="password" autocomplete="new-password" minlength="10" required></label>' +
     '<div class="role-explanation" id="newEmployeeRoleHelp">' + escHtml(roleExplanation('employee')) + '</div></div>' +
-    '<div class="admin-help" id="newEmployeeMessage">Laissez le mot de passe vide: Luna Shop en cr&eacute;era un fort &agrave; copier une seule fois. L\'employ&eacute; devra le changer &agrave; sa premi&egrave;re connexion.</div>' +
+    '<div class="admin-help" id="newEmployeeMessage">Choisissez le mot de passe utilis&eacute; par cet employ&eacute;. Il restera valide jusqu\'&agrave; ce que vous ou l\'employ&eacute; le modifiiez.</div>' +
     '<div class="modal-actions"><button class="btn-modal-cancel" onclick="renderEmployeeAdmin()">RETOUR</button><button class="btn-confirm" onclick="createEmployee()">CR&Eacute;ER</button></div>';
 }
 
@@ -1814,17 +1814,17 @@ async function createEmployee() {
     role: document.getElementById('newEmployeeRole').value,
     password: document.getElementById('newEmployeePassword').value
   };
+  const passwordConfirm = document.getElementById('newEmployeePasswordConfirm').value;
   const message = document.getElementById('newEmployeeMessage');
   if (!data.display_name || !data.username) { message.textContent = 'Le nom et l\u2019identifiant sont obligatoires.'; return; }
-  if (data.password && data.password.length < 10) { message.textContent = 'Le mot de passe doit contenir au moins 10 caract\u00e8res, ou laissez-le vide pour le g\u00e9n\u00e9rer.'; return; }
-  if (!data.password) delete data.password;
+  if (data.password.length < 10) { message.textContent = 'Le mot de passe est obligatoire et doit contenir au moins 10 caract\u00e8res.'; return; }
+  if (data.password !== passwordConfirm) { message.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
   try {
     const result = await API.createEmployee(data);
     const created = result.employee || result;
     if (created && created.id) state.employees.push(created);
     showToast('Compte employ\u00e9 cr\u00e9\u00e9.');
-    if (result.temporary_password) showOneTimePassword(result.temporary_password);
-    else renderEmployeeAdmin();
+    renderEmployeeAdmin();
   } catch (error) { message.textContent = error.message || 'Cr\u00e9ation impossible.'; }
 }
 
@@ -1851,26 +1851,44 @@ async function toggleEmployeeActive(id, active) {
   } catch (error) { showToast(error.message || 'Modification impossible.', 'error'); }
 }
 
-async function resetEmployeePassword(id) {
-  if (!window.confirm('Cr\u00e9er un nouveau mot de passe temporaire pour cet employ\u00e9 ?')) return;
-  try {
-    const result = await API.resetEmployeePassword(id);
-    const temporary = result.temporary_password || result.password || result.temp_password || '';
-    showOneTimePassword(temporary);
-  } catch (error) { showToast(error.message || 'R\u00e9initialisation impossible.', 'error'); }
-}
-
-function showOneTimePassword(temporary) {
+function openEmployeePasswordReset(id) {
+  const employee = state.employees.find(function(item) { return String(item.id) === String(id); });
   const modal = document.querySelector('.employee-admin-modal');
-  if (modal) modal.innerHTML = '<h3>Mot de passe temporaire</h3><p class="admin-help">Copiez-le maintenant. Il ne sera plus affich&eacute; ensuite.</p>' +
-    '<div class="one-time-password"><strong>MOT DE PASSE</strong><span id="oneTimePassword">' + escHtml(temporary || 'Cr\u00e9\u00e9, mais non retourn\u00e9 par le serveur') + '</span></div>' +
-    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="openEmployeeAdmin()">TERMINER</button>' +
-    (temporary ? '<button class="btn-confirm" onclick="copyOneTimePassword()">COPIER</button>' : '') + '</div>';
+  if (!employee || !modal) return;
+  modal.innerHTML = '<h3>Modifier le mot de passe</h3>' +
+    '<p class="admin-help">Compte: <strong>' + escHtml(employee.display_name || employee.username) + '</strong>. Le nouveau mot de passe sera permanent.</p>' +
+    '<div class="admin-form">' +
+    '<label class="full">Nouveau mot de passe<input id="employeeResetPassword" type="password" autocomplete="new-password" minlength="10" required></label>' +
+    '<label class="full">Confirmer<input id="employeeResetPasswordConfirm" type="password" autocomplete="new-password" minlength="10" required></label>' +
+    '</div><div class="admin-help" id="employeeResetPasswordMessage">Au moins 10 caract&egrave;res.</div>' +
+    '<div class="modal-actions"><button class="btn-modal-cancel" onclick="renderEmployeeAdmin()">RETOUR</button>' +
+    '<button class="btn-confirm" id="employeeResetPasswordButton" onclick="saveEmployeePasswordReset(\'' + escHtml(id) + '\')">ENREGISTRER</button></div>';
 }
 
-async function copyOneTimePassword() {
-  const value = document.getElementById('oneTimePassword').textContent;
-  try { await navigator.clipboard.writeText(value); showToast('Mot de passe copi\u00e9.'); } catch (error) { window.prompt('Copiez le mot de passe :', value); }
+async function saveEmployeePasswordReset(id) {
+  const password = document.getElementById('employeeResetPassword').value;
+  const confirm = document.getElementById('employeeResetPasswordConfirm').value;
+  const message = document.getElementById('employeeResetPasswordMessage');
+  if (password.length < 10) { message.textContent = 'Le mot de passe doit contenir au moins 10 caract\u00e8res.'; return; }
+  if (password !== confirm) { message.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
+  const button = document.getElementById('employeeResetPasswordButton');
+  button.disabled = true;
+  try {
+    const result = await API.resetEmployeePassword(id, password);
+    if (result && result.csrf) {
+      state.employeeCsrf = result.csrf;
+      state.chatCsrf = result.csrf;
+    }
+    const updated = result.employee || {};
+    state.employees = state.employees.map(function(item) {
+      return String(item.id) === String(id) ? Object.assign({}, item, updated, {must_change_password: false}) : item;
+    });
+    showToast('Mot de passe permanent enregistr\u00e9.');
+    renderEmployeeAdmin();
+  } catch (error) {
+    message.textContent = error.message || 'Modification impossible.';
+    button.disabled = false;
+  }
 }
 
 function formatAuditDate(value) {
@@ -2078,7 +2096,9 @@ const API = {
   createEmployee(data) { return this.employeeRequest('POST', 'employees', data); },
   updateEmployee(id, data) { return this.employeeRequest('PATCH', 'employees/' + encodeURIComponent(id), data); },
   deleteEmployee(id) { return this.employeeRequest('DELETE', 'employees/' + encodeURIComponent(id)); },
-  resetEmployeePassword(id) { return this.employeeRequest('POST', 'employees/' + encodeURIComponent(id) + '/reset-password', {}); },
+  resetEmployeePassword(id, password) {
+    return this.employeeRequest('POST', 'employees/' + encodeURIComponent(id) + '/reset-password', {password: password});
+  },
   getTeamPerformance(from, to) {
     return this.employeeRequest('GET', 'performance?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to));
   },
